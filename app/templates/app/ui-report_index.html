@@ -1,0 +1,45 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Report types {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title "><b>報表種類一覽</b>:</h4>
+                  <p class="card-category"> Here is a subtitle for this table</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class=" text-primary">
+                                <th>Link</th>
+                                <th>ID</th>
+                                <th>Report</th>
+                                <th>Description</th>
+                            </thead>
+                            <tbody>
+                                {% for report_title,description in list.items%}
+                                <tr>
+                                    <td><a href="/report_index/prehandle/?rtype={{report_title}}">。</a></td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{report_title}}</td>
+                                    <td>{{description}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <a href="/" class="btn btn-primary btn-round">Home</a>
+        </div>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

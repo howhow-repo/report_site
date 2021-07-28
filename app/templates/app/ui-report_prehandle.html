@@ -1,0 +1,51 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Report types {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <h4>請輸入下列資訊以建立報表：</h4>
+    <p>
+        <br>
+        start_time: <input type="date" value={{default_values.d_start_time}} id="start_time"><br>
+        end_time: <input type="date" value={{default_values.d_start_time}} id="end_time"><br>
+        rid: <input  value={{default_values.d_rid}} id="rid"><br>
+        carno: <input  value={{default_values.d_carno}} id="carno"><br>
+        vid: <input  value={{default_values.d_vid}} id="vid"><br>
+        off_duty_tol: <input  value=1200 id="off_duty_tol"><br>
+        early_tol: <input  value=60 id="early_tol"><br>
+        delay_tol: <input  value=300 id="delay_tol"><br>
+        <br>
+    </p>
+    <a onclick="redirectWithPara()" class="btn btn-primary btn-round" id="create">Create</a>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    function initElement() {
+        var p = document.getElementById("create");
+        p.onclick = redirectWithPara;
+    };
+    function redirectWithPara(event) {
+        var start_time = document.getElementById("start_time").value;
+        var end_time = document.getElementById("end_time").value;
+        var rid = document.getElementById("rid").value;
+        var carno = document.getElementById("carno").value;
+        var vid = document.getElementById("vid").value;
+        var off_duty_tol = document.getElementById("off_duty_tol").value;
+        var early_tol = document.getElementById("early_tol").value;
+        var delay_tol = document.getElementById("delay_tol").value;
+
+        var paras = "start_time="+start_time+"&end_time="+end_time
+        paras = paras + "&rid="+rid + "&carno="+carno + "&vid="+vid
+        paras = paras + "&off_duty_tol="+off_duty_tol + "&early_tol="+early_tol + "&delay_tol="+delay_tol
+
+        window.location.href = "/report_index/{{rtype}}/?" + paras;
+    }
+
+</script>
+{% endblock javascripts %}

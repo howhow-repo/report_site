@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+
+<!-- Specific Page CSS goes HERE  -->
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <!--<head><meta charset="UTF-8"></head>-->
+
+    <div id="report_html">
+
+        <h1><center>{{title}}</center></h1>
+        <h2><center>{{sub_title}} </center></h2>
+        <h4><center>{{time_range}}</center></h4>
+        <center>{{report|safe}}</center>
+    </div>
+    <br>
+    <center><a class="btn btn-primary btn-round" onclick="showAlert()" id="pdf">Download as pdf</a></center>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script type="text/javascript">
+
+    function initElement() {
+        var p = document.getElementById("pdf");
+        p.onclick = html2canvas;
+    };
+
+    function showAlert(event) {
+        report_html = document.getElementById("report_html").innerHTML;
+    }
+
+</script>
+
+<script type="text/javascript" src="./html2canvas.js"></script>
+<script type="text/javascript">
+    html2canvas(document.body, {
+	onrendered: function(canvas) {
+		var contentWidth = canvas.width;
+		var contentHeight = canvas.height;
+		//一頁pdf顯示html頁面生成的canvas高度;
+		var pageHeight = contentWidth / 592.28 * 841.89;
+		//未生成pdf的html頁面高度
+		var leftHeight = contentHeight;
+		//頁面偏移
+		var position = 0;
+		//a4紙的尺寸[595.28,841.89]，html頁面生成的canvas在pdf中圖片的寬高
+		var imgWidth = 595.28;
+		var imgHeight = 592.28 / contentWidth * contentHeight;
+		var pageData = canvas.toDataURL('image/jpeg', 1.0);
+		var pdf = new jsPDF('', 'pt', 'a4');
+		//有兩個高度需要區分，一個是html頁面的實際高度，和生成pdf的頁面高度(841.89)
+		//當內容未超過pdf一頁顯示的範圍，無需分頁
+		if (leftHeight < pageHeight) {
+			pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
+		} else {
+			while (leftHeight > 0) {
+				pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+				leftHeight -= pageHeight;
+				position -= 841.89;
+				//避免新增空白頁
+				if (leftHeight > 0) {
+					pdf.addPage();
+				}
+			}
+		}
+		pdf.save('content.pdf');
+	}
+})
+</script>
+{% endblock javascripts %}
