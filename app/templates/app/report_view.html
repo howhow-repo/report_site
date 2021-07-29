@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %}
+
+<!-- Specific Page CSS goes HERE  -->
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div id="report_html">
+    {% include "app/report_simple.html" %}
+    </div>
+
+    <br>
+    <center><a onclick="window.open('{{ request.get_full_path }}&type=pdf')" class="btn btn-primary btn-round" id="pdf">Download as pdf</a></center>
+    <center><a onclick=sendData() class="btn btn-primary btn-round" id="sentpost">Download as pdf</a></center>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script type="text/javascript">
+
+    function initElement() {
+        var p = document.getElementById("pdf");
+        var h = document.getElementById("sentpost");
+        p.onclick = showAlert();
+        h.onclick = sendData();
+    };
+
+    function showAlert(event) {
+        report_html = document.getElementById("report_html").innerHTML;
+    }
+
+    function post(path, params, method='post'){
+
+    }
+
+    function sendData(){
+        $.ajax({
+            //the url to send the data to
+            url: "{% url 'html2pdf' %}",
+
+            //the data to send to
+            data: document.getElementById("report_html").innerHTML,
+
+            //type. for eg: GET, POST
+            type: "POST",
+
+            //datatype expected to get in reply form server
+            dataType: "html",
+            error: function(xhr) {
+				alert('Ajax request 發生錯誤');
+			},
+
+            success: function (data) {
+                fileName = 'ppp'
+                //Convert the Byte Data to BLOB object.
+                var blob = new Blob([data], { type: "application/pdf" });
+
+                //Check the Browser type and download the File.
+                var isIE = false || !!document.documentMode;
+                if (isIE) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                    } else {
+                    var url = window.URL || window.webkitURL;
+                    link = url.createObjectURL(blob);
+                    var a = $("<a />");
+                    a.attr("download", fileName);
+                    a.attr("href", link);
+                    $("body").append(a);
+                    a[0].click();
+                    $("body").remove(a);
+                }
+            }
+        });
+    }
+
+</script>
+{% endblock javascripts %}

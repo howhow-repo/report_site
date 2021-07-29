@@ -35,7 +35,6 @@ def parsing_df_for_user(report: pd.DataFrame):
                                 'departure_timedelta': '發車時間差(s)',
                                 'run_stop_rate': '到站率',
                                 }, inplace=True)
-    print(main_report)
     main_report.index += 1  # index from 1
     return main_report
 

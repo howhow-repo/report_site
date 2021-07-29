@@ -12,6 +12,7 @@ class ReportBase:
         self.title = None
         self.simple_description = ''
         self.sub_title = ''
+        self.sub_title2 = ''
         self.report = None
         self.start_time = None
         self.end_time = None

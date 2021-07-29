@@ -60,8 +60,14 @@ class StationCenter(CenterDB):
     def get_vid_ch_name(self, vid: int):
         return self._get_single_data(f"SELECT name FROM bus.vendor where id = {vid};")
 
+    def get_vids_ch_name(self):
+        return self._get_table_data("", f"SELECT bus.vendor.id as vid, bus.vendor.name FROM bus.vendor;")
+
     def get_route_ch_name(self, rid: int):
         return self._get_single_data(f"SELECT name FROM bus.route where id = {rid}")
+
+    def get_routes_ch_name(self):
+        return self._get_table_data("", f"SELECT bus.route.id as rid, bus.route.name FROM bus.route;")
 
     def get_route_eng_name(self, rid: int):
         return self._get_single_data(f"SELECT ename FROM bus.route where id = {rid}")
@@ -265,5 +271,5 @@ class StationCenter(CenterDB):
                   f"where bus_departure_time between '{start_time}' and '{end_time}' " \
                   f"and error_code != 0; "
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
-        table.sort_values(by=['rid','bus_departure_time'], ignore_index=True, inplace=True)
+        table.sort_values(by=['rid', 'bus_departure_time'], ignore_index=True, inplace=True)
         return table

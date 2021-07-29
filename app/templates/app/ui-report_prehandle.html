@@ -7,50 +7,61 @@
 
 {% block content %}
     <h1>{{title}}</h1>
-    <h4>請輸入下列資訊以建立報表：</h4>
+    <h3>請輸入下列資訊以建立報表：</h3>
     <p>
         <br>
-        <form action="/report_index/{{rtype}}/" method="get">
+        <h4><form action="/report_index/{{rtype}}/" method="get">
+            {% if "start_time" in rtype_paras %}
+                起始時間: <input type="date" value={{default_values.d_start_time}} name="start_time"><br><br>
+            {% endif %}
 
-            start_time: <input type="date" value={{default_values.d_start_time}} name="start_time"><br>
-            end_time: <input type="date" value={{default_values.d_start_time}} name="end_time"><br>
-            rid: <input  value={{default_values.d_rid}} name="rid"><br>
-            carno: <input  value={{default_values.d_carno}} name="carno"><br>
-            vid: <input  value={{default_values.d_vid}} name="vid"><br>
-            off_duty_tol: <input  value=1200 name="off_duty_tol"><br>
-            early_tol: <input  value=60 name="early_tol"><br>
-            delay_tol: <input  value=300 name="delay_tol"><br>
+            {% if "end_time" in rtype_paras %}
+                結束時間: <input type="date" value={{default_values.d_start_time}} name="end_time"><br><br>
+            {% endif %}
+
+            {% if "rid" in rtype_paras %}
+                路線: <select name="rid">
+                {% for r in rids%}
+                    <option value={{r.rid}}>{{r.name}} </option>
+                {% endfor %}
+                </select><br><br>
+
+            {% endif %}
+
+            {% if "carno" in rtype_paras %}
+                車號: <input  value={{default_values.d_carno}} name="carno"><br><br>
+            {% endif %}
+
+            {% if "vid" in rtype_paras %}
+                營運商:<select name="vid">
+                {% for v in vids%}
+                    <option value={{v.vid}}>{{v.name}} </option>
+                {% endfor %}
+                </select><br><br>
+            {% endif %}
+
+            {% if "off_duty_tol" in rtype_paras %}
+                脫班: <input  value=1200 name="off_duty_tol">秒<br>
+                <p class="text-muted">  發車時間超出？秒即脫班</p><br>
+            {% endif %}
+
+            {% if "early_tol" in rtype_paras %}
+                早發: <input  value=60 name="early_tol">秒<br>
+                <p class="text-muted">  發車時間提早表訂時間逾?秒鐘</p><br>
+            {% endif %}
+
+            {% if "delay_tol" in rtype_paras %}
+                遲發: <input  value=300 name="delay_tol">秒<br>
+                <p class="text-muted">  發車時間超過表訂時間逾?秒鐘</p><br>
+            {% endif %}
+
             <br><br>
             <input type="submit" class="btn btn-primary btn-round" value="Create">
 
-        </form>
+        </form></h4>
     </p>
-<!--    <a onclick="redirectWithPara()" class="btn btn-primary btn-round" id="create">Create</a>-->
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script>
-    function initElement() {
-        var p = document.getElementById("create");
-        p.onclick = redirectWithPara;
-    };
-    function redirectWithPara(event) {
-        var start_time = document.getElementById("start_time").value;
-        var end_time = document.getElementById("end_time").value;
-        var rid = document.getElementById("rid").value;
-        var carno = document.getElementById("carno").value;
-        var vid = document.getElementById("vid").value;
-        var off_duty_tol = document.getElementById("off_duty_tol").value;
-        var early_tol = document.getElementById("early_tol").value;
-        var delay_tol = document.getElementById("delay_tol").value;
-
-        var paras = "start_time="+start_time+"&end_time="+end_time
-        paras = paras + "&rid="+rid + "&carno="+carno + "&vid="+vid
-        paras = paras + "&off_duty_tol="+off_duty_tol + "&early_tol="+early_tol + "&delay_tol="+delay_tol
-
-        window.location.href = "/report_index/{{rtype}}/?" + paras;
-    }
-
-</script>
 {% endblock javascripts %}

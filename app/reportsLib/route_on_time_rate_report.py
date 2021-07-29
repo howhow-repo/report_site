@@ -104,6 +104,7 @@ class RouteOnTimeRateReport(ReportBase):
         self.vid = route_schedule_departure_report.vid
         self.vid_ch_name = route_schedule_departure_report.vid_ch_name
         self.sub_title = "路線：" + self.rid_name
+        self.sub_title2 = "營運商：" + self.vid_ch_name
 
         self.report = pd.DataFrame(columns=['start_time', 'end_time', 'duty_count', 'off_duty', 'not_from_first_stop',
                                             'early_departure', 'delay_departure', 'on_time_departure', 'on_time_rate'])
