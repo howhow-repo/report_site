@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 import pdfkit
 from datetime import datetime,timedelta
@@ -29,6 +31,8 @@ def parsing_df_for_user(report: pd.DataFrame):
                                       "route_stops_count": int})  # format each
     main_report['run_stop_rate'] = pd.Series(["{0:.1f}%".format(val * 100) for val in main_report['run_stop_rate']],
                                              index=main_report.index)  # format to %
+
+    main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
     main_report.rename(columns={'rid_ch_name': '路線名稱',
                                 'schedule_departure_time': '表定發車時間',
@@ -67,6 +71,7 @@ class BusDayRunReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "公車任務執行紀錄"
+        self.simple_description = '顯示一台車(車號)，在日期內執行過哪些班次任務，及各班次執行狀態。'
         self.start_time = None
         self.end_time = None
         self.carno = None
@@ -81,6 +86,7 @@ class BusDayRunReport(ReportBase):
             self.end_time = start_time
 
         self.carno = carno
+        self.sub_title = "車號："+self.carno
         empty_report = pd.DataFrame(columns=report_schema)
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()

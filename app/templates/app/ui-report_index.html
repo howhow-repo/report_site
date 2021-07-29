@@ -23,12 +23,12 @@
                                 <th>Description</th>
                             </thead>
                             <tbody>
-                                {% for report_title,description in list.items%}
+                                {% for report in index_table%}
                                 <tr>
-                                    <td><a href="/report_index/prehandle/?rtype={{report_title}}">。</a></td>
+                                    <td><a href="/report_index/prehandle/?rtype={{report.type}}">●</a></td>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{report_title}}</td>
-                                    <td>{{description}}</td>
+                                    <td>{{report.title}}</td>
+                                    <td>{{report.simple_description}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

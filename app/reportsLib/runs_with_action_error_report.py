@@ -39,7 +39,7 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 class RunsWithActionErrorReport(ReportBase):
     '''
-        顯示班車行進中有異常的異常方式：
+        顯示有異常的班車，及其異常方式：
             ＊ 發車當日無該路線班次
             ＊ 非班次時間內發車
             ＊ 非首站發車
@@ -49,6 +49,7 @@ class RunsWithActionErrorReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "公車班次執行異常一覽表"
+        self.simple_description = '顯示有異常的班車，及其異常方式。'
         self.start_time = None
         self.end_time = None
         self.report = None

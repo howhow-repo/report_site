@@ -1,4 +1,7 @@
 import os
+
+import numpy as np
+
 from .report_base import ReportBase
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
@@ -20,6 +23,9 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
     main_report = main_report.astype({"runs_count": int})  # format each
 
     main_report = main_report[['rid_ch_name', 'runs_count', 'avg_run_stop_rate']]
+
+    main_report.replace([np.nan, None, "nan%"], '', inplace=True)
+
     main_report.rename(columns={'rid_ch_name': '路線名稱',
                                 'runs_count': '班次數量',
                                 'avg_run_stop_rate': '平均到站率',
@@ -35,6 +41,7 @@ class VendorRunStopRateReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "營運商 平均路線到站率一覽表"
+        self.simple_description = '以單一營運商為單位建立各路線平均班次到站率。'
         self.vid = None
         self.vid_ch_name = None
         self.start_time = None
@@ -61,6 +68,7 @@ class VendorRunStopRateReport(ReportBase):
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
         self.vid_ch_name = station_center.get_vid_ch_name(self.vid)
+        self.sub_title = "營運商：" + self.vid_ch_name
 
         rids_of_vid = station_center.get_rids_list_by_vid(self.vid)
         rids_in_schedule = station_center.get_rid_list_by_date(start_time=self.start_time, end_time=self.end_time)

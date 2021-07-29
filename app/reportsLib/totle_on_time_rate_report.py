@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 import pdfkit
 from datetime import datetime, timedelta
@@ -23,6 +25,8 @@ def parsing_df_for_user(report: pd.DataFrame):
 
         main_report = main_report[['rid','rid_name','duty_count', 'off_duty', 'not_from_first_stop',
                                    'early_delay', 'on_time_departure', 'on_time_rate']]
+
+        main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
         main_report.rename(columns={'rid_name':'路線名稱',
                                     'start_time': '日期',
@@ -49,6 +53,7 @@ class TotleOnTimeRateReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "準點率一覽表"
+        self.simple_description = '以各路線準點報表(單一路線準點率)為基礎，建立各路線準點率的報表。'
         self.start_time = None
         self.end_time = None
         self.totle_rids = []

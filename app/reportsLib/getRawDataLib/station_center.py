@@ -102,7 +102,6 @@ class StationCenter(CenterDB):
                   f"and starttime between '{start_time}' and '{end_time}' " \
                   "order by starttime"
         return self._get_table_data("schedule", sql_cmd=sql_cmd)
-        pass
 
     def get_run_stop_rate_by_rid(self, rid: int, start_time: datetime, end_time: datetime = None) -> pd.DataFrame:
         if end_time is None or end_time == start_time:

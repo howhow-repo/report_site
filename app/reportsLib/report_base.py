@@ -10,6 +10,8 @@ class ReportBase:
         self._centerDB_conn_options = centerDB_conn_options
         self._drivelogDB_conn_options = drivelogDB_conn_options
         self.title = None
+        self.simple_description = ''
+        self.sub_title = ''
         self.report = None
         self.start_time = None
         self.end_time = None

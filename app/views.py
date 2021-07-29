@@ -52,12 +52,17 @@ def pages(request):
         return HttpResponseServerError(html_template.render(context, request))
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 def report_index(request):
     rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
 
+    index_table = []
+    for rn in rc.report_list:
+        r = rc.create_empty_report(rn)
+        index_table.append({'type': rn, 'title': r.title, 'simple_description': r.simple_description})
+
     context = {
-        'list': rc.simple_description,
+        'index_table': index_table,
     }
     load_template = 'app/ui-report_index.html'
     html_template = loader.get_template(load_template)
@@ -72,6 +77,9 @@ def report_prehandle(request):
 
     rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
     report = rc.create_empty_report(rtype)
+
+    rtype_paras = {
+    }
 
     context = {
         "rtype": rtype,
@@ -88,8 +96,8 @@ def report_prehandle(request):
     return HttpResponse(html_template.render(context, request))
 
 
-# @login_required(login_url="/login/")
-def report_view(request, rtype, para_received=None):
+@login_required(login_url="/login/")
+def report_view(request, rtype):
     rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
     report = rc.create_empty_report(rtype)
 
@@ -101,18 +109,16 @@ def report_view(request, rtype, para_received=None):
         report.generate_report(**para_received)
         return HttpResponse(report.report.to_json(), content_type="application/json")
 
-
     elif request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))
-        print(para_received)
         report.generate_report(**para_received)
 
         s = datetime.strftime(report.start_time, '%Y-%m-%d')
         e = datetime.strftime(report.end_time, '%Y-%m-%d')
         context = {
             'title': report.title,
-            'sub_title': 'sub_title',
-            'time_range': f'{s}~{e}',
+            'sub_title': report.sub_title,
+            'time_range': f'{s} ~ {e}',
             'report': report.parsing_df_for_user().to_html(),
         }
         load_template = 'app/report_base_view.html'

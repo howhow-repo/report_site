@@ -1,4 +1,7 @@
 import os
+
+import numpy as np
+
 from .report_base import ReportBase
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
@@ -17,6 +20,8 @@ def parsing_df_for_user(report: pd.DataFrame):
         ['starttime', 'bus_count', 'on_time_bus_count', 'not_on_time_bus_count', 'from_first_stop']
     ]
     main_report['from_first_stop'] = main_report['from_first_stop'].replace([True, False, None], ['Y', 'N', ''])
+
+    main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
     main_report.rename(columns={'starttime': '表定發車時間',
                                 'bus_count': '總發車數量',
@@ -51,6 +56,7 @@ class RouteScheduleDepartureReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = '路線班次發車次數統計'
+        self.simple_description = '以路線班次為基準，計算各班次有多少車，發車是否為準時。'
         self.start_time = None
         self.end_time = None
         self.rid = None
@@ -85,6 +91,8 @@ class RouteScheduleDepartureReport(ReportBase):
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
         self.rid_name = station_center.get_route_ch_name(self.rid)
+        self.sub_title = "路線：" + self.rid_name
+
         self.vid = station_center.get_route_vid(self.rid)
         self.vid_ch_name = station_center.get_vid_ch_name(self.vid)
         departure_logs = station_center.get_rid_schedule_run_logs(rid=self.rid,

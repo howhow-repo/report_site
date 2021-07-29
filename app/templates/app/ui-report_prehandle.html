@@ -10,17 +10,22 @@
     <h4>請輸入下列資訊以建立報表：</h4>
     <p>
         <br>
-        start_time: <input type="date" value={{default_values.d_start_time}} id="start_time"><br>
-        end_time: <input type="date" value={{default_values.d_start_time}} id="end_time"><br>
-        rid: <input  value={{default_values.d_rid}} id="rid"><br>
-        carno: <input  value={{default_values.d_carno}} id="carno"><br>
-        vid: <input  value={{default_values.d_vid}} id="vid"><br>
-        off_duty_tol: <input  value=1200 id="off_duty_tol"><br>
-        early_tol: <input  value=60 id="early_tol"><br>
-        delay_tol: <input  value=300 id="delay_tol"><br>
-        <br>
+        <form action="/report_index/{{rtype}}/" method="get">
+
+            start_time: <input type="date" value={{default_values.d_start_time}} name="start_time"><br>
+            end_time: <input type="date" value={{default_values.d_start_time}} name="end_time"><br>
+            rid: <input  value={{default_values.d_rid}} name="rid"><br>
+            carno: <input  value={{default_values.d_carno}} name="carno"><br>
+            vid: <input  value={{default_values.d_vid}} name="vid"><br>
+            off_duty_tol: <input  value=1200 name="off_duty_tol"><br>
+            early_tol: <input  value=60 name="early_tol"><br>
+            delay_tol: <input  value=300 name="delay_tol"><br>
+            <br><br>
+            <input type="submit" class="btn btn-primary btn-round" value="Create">
+
+        </form>
     </p>
-    <a onclick="redirectWithPara()" class="btn btn-primary btn-round" id="create">Create</a>
+<!--    <a onclick="redirectWithPara()" class="btn btn-primary btn-round" id="create">Create</a>-->
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->

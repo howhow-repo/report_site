@@ -48,6 +48,7 @@ class RunsNotOnScheduleReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "無對應班次之發車紀錄一覽表"
+        self.simple_description = "顯示時間內有多少車次是無對應的班次。"
         self.start_time = None
         self.end_time = None
         self.report = None

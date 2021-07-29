@@ -10,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 def parsing_df_for_user(report: pd.DataFrame):
     if report.empty:
         return pd.DataFrame(columns=['路線名稱', '車牌號碼', '發車時間', '發車站名',
-                                     '無法辨識的站牌', '無路線站序', '無首站出站紀錄','無抵達紀錄'])
+                                     '無法辨識的站牌', '無路線站序', '首站無出站紀錄','無抵達紀錄'])
     main_report = report.copy()  # 開始處裡準點報表
     main_report['run_stop_rate'] = pd.Series(["{0:.1f}%".format(val * 100) for val in main_report['run_stop_rate']],
                                              index=main_report.index)
@@ -40,7 +40,7 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 class RunsWithLogErrorReport(ReportBase):
     '''
-        顯示班車行資訊回報有異常的異常方式：
+        顯示資訊回報有異常的班車，及其異常方式：
             ＊ 無法辨識的站牌
             ＊ 無路線站序
             ＊ 無首站出站紀錄
@@ -49,6 +49,7 @@ class RunsWithLogErrorReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "公車班次紀錄回報異常一覽表"
+        self.simple_description = '顯示資訊回報有異常的班車，及其異常方式。'
         self.start_time = None
         self.end_time = None
         self.report = None

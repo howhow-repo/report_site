@@ -1,5 +1,7 @@
 import logging
 import os
+
+import numpy as np
 import pandas as pd
 import pdfkit
 from datetime import datetime, timedelta
@@ -22,6 +24,8 @@ def parsing_df_for_user(report: pd.DataFrame):
 
         main_report = main_report[['start_time', 'end_time', 'duty_count', 'off_duty', 'not_from_first_stop',
                                    'early_delay', 'on_time_departure', 'on_time_rate']]
+
+        main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
         main_report.rename(columns={'start_time': '日期',
                                     'end_time': '結束日期',
@@ -61,7 +65,8 @@ class RouteOnTimeRateReport(ReportBase):
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = '路線準點率'
+        self.title = '單一路線準點率'
+        self.simple_description = '統計一個路線的時間內的班次發車情形，並計算準點率。'
         self.start_time = None
         self.end_time = None
         self.rid = None
@@ -98,6 +103,7 @@ class RouteOnTimeRateReport(ReportBase):
         self.rid_name = route_schedule_departure_report.rid_name
         self.vid = route_schedule_departure_report.vid
         self.vid_ch_name = route_schedule_departure_report.vid_ch_name
+        self.sub_title = "路線：" + self.rid_name
 
         self.report = pd.DataFrame(columns=['start_time', 'end_time', 'duty_count', 'off_duty', 'not_from_first_stop',
                                             'early_departure', 'delay_departure', 'on_time_departure', 'on_time_rate'])

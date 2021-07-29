@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 import pdfkit
 from datetime import datetime, timedelta
@@ -27,6 +29,9 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
         ['rid_name', 'start_time', 'duty_count', 'off_duty', 'not_from_first_stop',
          'early_delay', 'on_time_departure', 'on_time_rate']
     ]
+
+    main_report.replace([np.nan, None, "nan%"], '', inplace=True)
+
     main_report.rename(columns={'rid_name': '路線名稱',
                                 'start_time': '日期',
                                 'duty_count': '應發車次數',
@@ -49,6 +54,7 @@ class VendorRouteOnTimeRateReport(ReportBase):
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "營運商 準點率一覽表"
+        self.simple_description = '以單一營運商為單位建立路線的準點率一覽報表。'
         self.vid = None
         self.vid_ch_name = None
         self.start_time = None
@@ -72,6 +78,7 @@ class VendorRouteOnTimeRateReport(ReportBase):
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
         self.vid_ch_name = station_center.get_vid_ch_name(self.vid)
+        self.sub_title = "營運商：" + self.vid_ch_name
 
         #  totle_rids = rids_of_vid & rids_in_schedule
         rids_of_vid = station_center.get_rids_list_by_vid(self.vid)
