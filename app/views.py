@@ -140,7 +140,7 @@ def report_view(request, rtype):
             html_string = html_template.render(context, request)
             pdf = pdfkit.from_string(html_string, False)
             response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'filename="{rtype+"_"+report.start_time.strftime("%Y_%m_%d")}.pdf"'
+            response['Content-Disposition'] = f'filename="{rtype + "_" + report.start_time.strftime("%Y_%m_%d")}.pdf"'
             return response
 
         else:
