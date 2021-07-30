@@ -1,16 +1,16 @@
-from datetime import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
-from django_apscheduler.jobstores import DjangoJobStore, register_job
-
-scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), 'default')
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from .reportsLib import DailyInfoStaker
+import os, json
 
 
-@register_job(scheduler, 'interval', id='test', seconds=10, replace_existing=True)
 def test():
-    # 具体要执行的代码
     print(f'{datetime.now()} loopppp')
-    pass
 
 
-scheduler.start()
+def runsAndStopStacking():
+    load_dotenv()
+    sql_options = json.loads(os.getenv("EBUS_SQLDB"))
+    mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
+    daily_stacker = DailyInfoStaker(MongoDBOptions=mongo_options, sqlOption=sql_options)
+    daily_stacker.start(datetime.today() - timedelta(days=1))
