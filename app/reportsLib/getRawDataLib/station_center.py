@@ -131,7 +131,7 @@ class StationCenter(CenterDB):
         end_time = end_time.strftime("%Y-%m-%d")
 
         sql_cmd = f"SELECT bus.schedule.id, bus.schedule.starttime, " \
-                  f"bus.runlogs.carno,bus.runlogs.cid,bus.runlogs.did,bus.runlogs.rid," \
+                  f"bus.runlogs.carno,bus.runlogs.cid,bus.runlogs.did,bus.schedule.rid," \
                   f"bus.runlogs.bus_departure_time,bus.runlogs.bus_departure_stop," \
                   f"bus.runlogs.departure_timedelta,bus.runlogs.error_code " \
                   f"FROM bus.schedule " \
@@ -273,3 +273,43 @@ class StationCenter(CenterDB):
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         table.sort_values(by=['rid', 'bus_departure_time'], ignore_index=True, inplace=True)
         return table
+
+    def get_totle_on_time_rate(self, start_time: datetime, off_duty_tol:int = 1200, early_tol: int = 60,
+                               delay_tol: int = 300, end_time: datetime = None, other_filter:str = None):
+        if end_time is None or end_time == start_time:
+            end_time = start_time
+        end_time = end_time + timedelta(days=1)
+        start_time = start_time.strftime("%Y-%m-%d")
+        end_time = end_time.strftime("%Y-%m-%d")
+        sql_cmd = f"""SELECT  
+                tt.rid,
+                tt.name as rid_name,
+                COUNT(*) as duty_count,
+                COUNT(if((-{early_tol}<=tt.departure_timedelta) and (tt.departure_timedelta<={delay_tol}) and (tt.error_code & 32 != 32),1,null)) as on_time_departure,
+                COUNT(if(tt.bus_departure_time is null,1,null)) as off_duty,
+                COUNT(if (tt.error_code & 32 = 32,1,null)) as not_from_first_stop,
+                count(if(-{early_tol}>tt.departure_timedelta,1,null)) as early_departure,
+                count(if({delay_tol}<tt.departure_timedelta,1,null)) as delay_departure,
+                COUNT(if((-{early_tol}<=tt.departure_timedelta) and (tt.departure_timedelta<={delay_tol}) and (tt.error_code & 32 != 32),1,null))
+                /COUNT(*) as on_time_rate
+                
+                FROM( 
+                    SELECT DISTINCT(bus.schedule.id), bus.schedule.starttime, 
+                        rl.carno,rl.cid,rl.did,bus.schedule.rid,r.name,rl.schedule_id, 
+                        rl.bus_departure_time,rl.bus_departure_stop,
+                        rl.departure_timedelta,rl.error_code 
+                    FROM bus.schedule 
+                        left join bus.runlogs as rl ON rl.schedule_id = bus.schedule.id
+                        left join bus.route as r ON r.id = bus.schedule.rid
+                    where starttime between  '{start_time}' and '{end_time}'
+                    and (departure_timedelta is null or abs(departure_timedelta) < {off_duty_tol}) 
+                    order by rid , starttime
+                    )as tt """
+
+        if other_filter is not None:
+            sql_cmd += other_filter
+        sql_cmd += "group by rid,name"
+        table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
+        return table
+
+

@@ -116,9 +116,38 @@ def report_view(request, rtype):
         body = json.loads(request.body.decode('utf-8'))
         para_received = body
         para_received = format_paras(para_received)
-
         report.generate_report(**para_received)
-        return HttpResponse(report.report.to_json(), content_type="application/json")
+
+        if "type" in para_received.keys():
+            if para_received['type'] == 'json':
+                return HttpResponse(report.report.to_json(), content_type="application/json")
+
+            elif para_received['type'] == 'csv':
+                return HttpResponse(report.report.to_csv(), content_type="application/csv")
+
+            elif para_received['type'] == 'html':
+                return HttpResponse(report.parsing_df_for_user().to_html(), content_type="application/csv")
+
+            elif para_received['type'] == 'pdf':
+                context = {
+                    'rtype': rtype,
+                    'title': report.title,
+                    'sub_title': report.sub_title,
+                    'sub_title2': report.sub_title2,
+                    'start_time': report.start_time,
+                    'end_time': report.end_time,
+                    'report': report.parsing_df_for_user().to_html(),
+                }
+                load_template = 'app/report_simple.html'
+                html_template = loader.get_template(load_template)
+                html_string = html_template.render(context, request)
+                pdf = pdfkit.from_string(html_string, False)
+                response = HttpResponse(pdf, content_type='application/pdf')
+                response[
+                    'Content-Disposition'] = f'filename="{rtype + "_" + report.start_time.strftime("%Y_%m_%d")}.pdf"'
+                return response
+        else:
+            return HttpResponse(report.report.to_json(), content_type="application/json")
 
     elif request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))

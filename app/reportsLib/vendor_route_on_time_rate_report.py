@@ -19,21 +19,21 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
 
     main_report = report.copy()  # 開始處裡準點報表
     main_report.index += 1  # index from 1
-    main_report['start_time'] = pd.to_datetime(main_report['start_time'], format="%Y-%m-%d")
+    # main_report['start_time'] = pd.to_datetime(main_report['start_time'], format="%Y-%m-%d")
     main_report['on_time_rate'] = pd.Series(["{0:.1f}%".format(val * 100) for val in main_report['on_time_rate']],
                                     index=main_report.index)
     sum_column = main_report["early_departure"] + main_report["delay_departure"]
     main_report["early_delay"] = sum_column
 
     main_report = main_report[
-        ['rid_name', 'start_time', 'duty_count', 'off_duty', 'not_from_first_stop',
+        ['rid_name', 'duty_count', 'off_duty', 'not_from_first_stop',
          'early_delay', 'on_time_departure', 'on_time_rate']
     ]
 
     main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
     main_report.rename(columns={'rid_name': '路線名稱',
-                                'start_time': '日期',
+                                # 'start_time': '日期',
                                 'duty_count': '應發車次數',
                                 'off_duty': '漏班次數',
                                 'not_from_first_stop': '非首站發車',
@@ -83,25 +83,17 @@ class VendorRouteOnTimeRateReport(ReportBase):
         #  totle_rids = rids_of_vid & rids_in_schedule
         rids_of_vid = station_center.get_rids_list_by_vid(self.vid)
         rids_in_schedule = station_center.get_rid_list_by_date(start_time=start_time, end_time=end_time)
-        self.totle_rids = list(set(rids_of_vid).intersection(rids_in_schedule))
+
+        self.totle_rids = str(list(set(rids_of_vid).intersection(rids_in_schedule)))
+        self.totle_rids = self.totle_rids.replace('[','(')
+        self.totle_rids = self.totle_rids.replace(']', ')')
+        r = station_center.get_totle_on_time_rate(start_time=start_time, off_duty_tol=off_duty_tol,
+                                                  end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
+                                                  other_filter=f" where rid in {self.totle_rids}")
 
         station_center.disconnect()
-
-        # calculating
-        rid_on_time_report = RouteOnTimeRateReport(centerDB_conn_options=self._centerDB_conn_options,
-                                                   drivelogDB_conn_options=self._drivelogDB_conn_options)
-        for i, rid in enumerate(self.totle_rids):
-            print(f"gathering {i + 1}/{len(self.totle_rids)} report from rid {rid}...")
-            try:
-                rid_on_time_report.generate_report(rid=rid, start_time=start_time, off_duty_tol=off_duty_tol,
-                                                   end_time=end_time, early_tol=early_tol, delay_tol=delay_tol)
-            except Exception as err:
-                logger.warning(f'can not built rid_on_time_report of rid = {rid}')
-                continue
-
-            report_of_one_rid = rid_on_time_report.report.copy()
-            report_of_one_rid['rid_name'] = rid_on_time_report.rid_name
-            self.report = self.report.append(report_of_one_rid, ignore_index=True)
+        self.report = r
+        return self.report
 
     def parsing_df_for_user(self):
         return parsing_df_for_user(self.report)

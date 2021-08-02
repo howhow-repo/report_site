@@ -12,6 +12,7 @@ import logging
 
 logger = logging.getLogger()
 
+
 def parsing_df_for_user(report: pd.DataFrame):
     main_report = report.copy()  # 開始處裡準點報表
     if main_report.empty:
@@ -19,16 +20,16 @@ def parsing_df_for_user(report: pd.DataFrame):
                                             '非首站發車次數', '脫班次數', '正常發車次數', '準點率'])
     else:
         main_report['on_time_rate'] = pd.Series(["{0:.1f}%".format(val * 100) for val in main_report['on_time_rate']],
-                                        index=main_report.index)
+                                                index=main_report.index)
         sum_column = main_report["early_departure"] + main_report["delay_departure"]
         main_report["early_delay"] = sum_column
 
-        main_report = main_report[['rid','rid_name','duty_count', 'off_duty', 'not_from_first_stop',
+        main_report = main_report[['rid', 'rid_name', 'duty_count', 'off_duty', 'not_from_first_stop',
                                    'early_delay', 'on_time_departure', 'on_time_rate']]
 
         main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
-        main_report.rename(columns={'rid_name':'路線名稱',
+        main_report.rename(columns={'rid_name': '路線名稱',
                                     'start_time': '日期',
                                     'end_time': '結束日期',
                                     'duty_count': '應發車次數',
@@ -58,9 +59,8 @@ class TotleOnTimeRateReport(ReportBase):
         self.end_time = None
         self.totle_rids = []
 
-    def generate_report(self, start_time: datetime, off_duty_tol:int = 1200,early_tol: int = 60,
+    def generate_report(self, start_time: datetime, off_duty_tol: int = 1200, early_tol: int = 60,
                         delay_tol: int = 300, end_time: datetime = None, **kwargs):
-        proccess_start = datetime.now()
         self.start_time = start_time - timedelta(hours=start_time.hour, minutes=start_time.minute,
                                                  seconds=start_time.second, microseconds=start_time.microsecond)
         if end_time is not None:
@@ -72,35 +72,11 @@ class TotleOnTimeRateReport(ReportBase):
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
         self.totle_rids = station_center.get_rid_list_by_date(start_time=start_time, end_time=end_time)
-        station_center.disconnect()
-
-        route_on_time_report = RouteOnTimeRateReport(centerDB_conn_options=self._centerDB_conn_options,
-                                                   drivelogDB_conn_options=self._drivelogDB_conn_options)
-
-        # calculating
-        report = pd.DataFrame({})
-        for i, rid in enumerate(self.totle_rids):
-            t = datetime.now()
-            print(f"gathering {i + 1}/{len(self.totle_rids)} report from rid {rid}...")
-            try:
-                route_on_time_report.generate_report(rid=rid, start_time=start_time, end_time=end_time,
-                                                     off_duty_tol=off_duty_tol,
-                                                     early_tol=early_tol, delay_tol=delay_tol)
-            except Exception as err:
-                logger.warning(f'can not built rid_on_time_report of rid = {rid}')
-                logger.warning(err)
-                continue
-
-            report_of_one_rid = route_on_time_report.report
-            report_of_one_rid['rid'] = route_on_time_report.rid
-            report_of_one_rid['rid_name'] = route_on_time_report.rid_name
-            report_of_one_rid['vid'] = route_on_time_report.vid
-            report_of_one_rid['vid_ch_name'] = route_on_time_report.vid_ch_name
-            report = report.append(report_of_one_rid, ignore_index=True)
-            print(f"----Done, time spent: {datetime.now() - t}\n")
-
+        report = station_center.get_totle_on_time_rate(start_time=start_time, end_time=end_time,
+                                                  off_duty_tol=off_duty_tol, early_tol=early_tol, delay_tol=delay_tol)
         self.report = report
-        print(f'----Time spent: {datetime.now() - proccess_start} ----')
+        station_center.disconnect()
+        return self.report
 
     def parsing_df_for_user(self):
         return parsing_df_for_user(self.report)
