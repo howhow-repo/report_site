@@ -12,7 +12,7 @@ def parsing_df_for_user(report: pd.DataFrame):
     main_report.index += 1  # index from 1
     main_report.rename(columns={'carno': '車牌號碼',
                                 'count_of_runs': '執行班次數量',
-                                'count_of_travled_stop': '經過站牌總數',
+                                'count_of_traveled_stop': '經過站牌總數',
                                 }, inplace=True)
 
     return main_report
@@ -41,30 +41,15 @@ class BusDepartureCountReport(ReportBase):
         else:
             assert end_time >= start_time
         self.end_time = end_time
-        self.report = pd.DataFrame(columns=['carno', 'count_of_runs', 'count_of_travled_stop'])
-        self.report['count_of_runs'] = self.report['count_of_runs'].astype('int')
-        self.report['count_of_travled_stop'] = self.report['count_of_travled_stop'].astype('int')
+        self.report = pd.DataFrame(columns=['carno', 'count_of_runs', 'count_of_traveled_stop'])
 
         # getting all carno
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
-        self.drove_bus = station_center.get_carno_list_departed_by_date(start_time=start_time, end_time=end_time)
-        print(f'There r {len(self.drove_bus)} buses to check')
-
-        # calculate & generate report
-
-        for i, carno in enumerate(self.drove_bus):
-            print(f'----parsing carno {carno}----')
-            bus_logs = station_center.get_run_logs_by_carno(carno, start_time=start_time, end_time=end_time)
-            new_row = {
-                'carno': carno,
-                'count_of_runs': len(bus_logs),
-                'count_of_travled_stop': bus_logs['traveled_stops_count'].sum()
-            }
-            self.report = self.report.append(new_row, ignore_index=True)
-            print(f'parsing done:{i}')
-
+        self.report = station_center.get_runs_count_by_date(start_time=self.start_time,end_time=self.end_time)
         station_center.disconnect()
+        self.report['count_of_runs'] = self.report['count_of_runs'].astype('int')
+        self.report['count_of_traveled_stop'] = self.report['count_of_traveled_stop'].astype('int')
 
     def parsing_df_for_user(self):
         return parsing_df_for_user(self.report)

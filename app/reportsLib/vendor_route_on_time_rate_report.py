@@ -6,7 +6,6 @@ import pdfkit
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
 from .report_base import ReportBase
-from .route_on_time_rate_report import RouteOnTimeRateReport
 from jinja2 import Environment, FileSystemLoader
 import logging
 
@@ -87,9 +86,9 @@ class VendorRouteOnTimeRateReport(ReportBase):
         self.totle_rids = str(list(set(rids_of_vid).intersection(rids_in_schedule)))
         self.totle_rids = self.totle_rids.replace('[','(')
         self.totle_rids = self.totle_rids.replace(']', ')')
-        r = station_center.get_totle_on_time_rate(start_time=start_time, off_duty_tol=off_duty_tol,
-                                                  end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
-                                                  other_filter=f" where rid in {self.totle_rids}")
+        r = station_center.get_on_time_rate(start_time=start_time, off_duty_tol=off_duty_tol,
+                                            end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
+                                            other_filter=f" where rid in {self.totle_rids}")
 
         station_center.disconnect()
         self.report = r

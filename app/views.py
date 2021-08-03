@@ -5,13 +5,12 @@ Copyright (c) 2019 - present AppSeed.us
 import os, json
 from datetime import datetime, timedelta
 
-import pdfkit
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django import template
-
+from .models import get_report_index_str, parsing_post_report, parsing_get_report
 from .reportsLib import ReportCenter, StationCenter
 from dotenv import load_dotenv
 import inspect
@@ -36,7 +35,6 @@ def pages(request):
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
     try:
-
         load_template = request.path.split('/')[-1]
         context['segment'] = load_template
         html_template = loader.get_template(load_template)
@@ -47,23 +45,13 @@ def pages(request):
         return HttpResponseNotFound(html_template.render(context, request))
 
     except:
-
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")
 def report_index(request):
-    rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
-
-    index_table = []
-    for rn in rc.report_list:
-        r = rc.create_empty_report(rn)
-        index_table.append({'type': rn, 'title': r.title, 'simple_description': r.simple_description})
-
-    context = {
-        'index_table': index_table,
-    }
+    context = get_report_index_str()
     load_template = 'app/ui-report_index.html'
     html_template = loader.get_template(load_template)
     return HttpResponse(html_template.render(context, request))
@@ -80,16 +68,13 @@ def report_prehandle(request):
     rtype_paras = list(inspect.signature(report.generate_report).parameters)
 
     context = {
+        'segment': 'report_index',
         "rtype": rtype,
         "title": report.title,
-        "rids": [{}],
-        "vids": [{}],
         "rtype_paras": rtype_paras,
         "default_values": {
-            "d_start_time": (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d"),
-            "d_rid": 6,
+            "d_start_time": (datetime.today() - timedelta(days=1, hours=3)).strftime("%Y-%m-%d"),
             "d_carno": "117-FX",
-            "d_vid": 29
         },
     }
 
@@ -109,88 +94,16 @@ def report_prehandle(request):
 
 # @login_required(login_url="/login/")
 def report_view(request, rtype):
-    rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
-    report = rc.create_empty_report(rtype)
-
     if request.method == 'POST':
         body = json.loads(request.body.decode('utf-8'))
         para_received = body
         para_received = format_paras(para_received)
-        report.generate_report(**para_received)
-
-        if "type" in para_received.keys():
-            if para_received['type'] == 'json':
-                return HttpResponse(report.report.to_json(), content_type="application/json")
-
-            elif para_received['type'] == 'csv':
-                return HttpResponse(report.report.to_csv(), content_type="application/csv")
-
-            elif para_received['type'] == 'html':
-                return HttpResponse(report.parsing_df_for_user().to_html(), content_type="application/csv")
-
-            elif para_received['type'] == 'pdf':
-                context = {
-                    'rtype': rtype,
-                    'title': report.title,
-                    'sub_title': report.sub_title,
-                    'sub_title2': report.sub_title2,
-                    'start_time': report.start_time,
-                    'end_time': report.end_time,
-                    'report': report.parsing_df_for_user().to_html(),
-                }
-                load_template = 'app/report_simple.html'
-                html_template = loader.get_template(load_template)
-                html_string = html_template.render(context, request)
-                pdf = pdfkit.from_string(html_string, False)
-                response = HttpResponse(pdf, content_type='application/pdf')
-                response[
-                    'Content-Disposition'] = f'filename="{rtype + "_" + report.start_time.strftime("%Y_%m_%d")}.pdf"'
-                return response
-        else:
-            return HttpResponse(report.report.to_json(), content_type="application/json")
+        return parsing_post_report(request=request, rtype=rtype,para_received=para_received)
 
     elif request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))
-        report.generate_report(**para_received)
+        return parsing_get_report(request=request, rtype=rtype, para_received=para_received)
 
-        context = {
-            'rtype': rtype,
-            'title': report.title,
-            'sub_title': report.sub_title,
-            'sub_title2': report.sub_title2,
-            'start_time': report.start_time,
-            'end_time': report.end_time,
-            'report': report.parsing_df_for_user().to_html(),
-        }
-
-        if "type" in para_received and para_received['type'] == 'pdf':
-            load_template = 'app/report_simple.html'
-            html_template = loader.get_template(load_template)
-            html_string = html_template.render(context, request)
-            pdf = pdfkit.from_string(html_string, False)
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'filename="{rtype + "_" + report.start_time.strftime("%Y_%m_%d")}.pdf"'
-            return response
-
-        else:
-            load_template = 'app/report_view.html'
-            html_template = loader.get_template(load_template)
-            html_string = html_template.render(context, request)
-            return HttpResponse(html_string)
-
-    else:
-        html_template = loader.get_template('page-500.html')
-        return HttpResponseServerError(html_template.render({}, request))
-
-
-def html2pdf(request):
-    if request.method == 'POST':
-        html_string = request.body.decode('utf-8')
-        print(html_string)
-        pdf = pdfkit.from_string(html_string, False)
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment;filename="{"1234"}.pdf"'
-        return response
     else:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render({}, request))

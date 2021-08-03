@@ -10,29 +10,11 @@
     {% include "app/report_simple.html" %}
     </div>
 
-    <form id="TheForm" method="post" action="{% url 'html2pdf' %}" target="_blank">
-        <input type="hidden" value='{% include "app/report_simple.html" %}' />
-    </form>
-
     <br>
     <center><a onclick="window.open('{{ request.get_full_path }}&type=pdf')" class="btn btn-primary btn-round">Download as pdf</a></center>
-<!--    <a href="{% url 'html2pdf' %}" onClick="document.forms['TheForm'].submit(); return false;" class="btn btn-primary btn-round">Download as pdf</a>-->
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<!--<script type="text/javascript">-->
 
-<!--    function initElement() {-->
-<!--        var h = document.getElementById("sentpost");-->
-<!--        h.onclick = openWindowWithPost();-->
-<!--    };-->
-<!--    -->
-<!--    function openWindowWithPost(event) {-->
-<!--        var f = document.getElementById('TheForm');-->
-<!--        window.open('', 'TheWindow');-->
-<!--        f.submit();-->
-<!--    }-->
-
-<!--</script>-->
 {% endblock javascripts %}

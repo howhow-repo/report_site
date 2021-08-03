@@ -109,18 +109,23 @@ class StationCenter(CenterDB):
                   "order by starttime"
         return self._get_table_data("schedule", sql_cmd=sql_cmd)
 
-    def get_run_stop_rate_by_rid(self, rid: int, start_time: datetime, end_time: datetime = None) -> pd.DataFrame:
+    def get_run_stop_rate(self, start_time: datetime, end_time: datetime = None, other_filter: str = None):
         if end_time is None or end_time == start_time:
             end_time = start_time
         end_time = end_time + timedelta(days=1)
         start_time = start_time.strftime("%Y-%m-%d")
         end_time = end_time.strftime("%Y-%m-%d")
 
-        sql_cmd = f"SELECT run_stop_rate FROM bus.runlogs " \
-                  f"where bus_departure_time between '{start_time}' and '{end_time}' " \
-                  f"and rid = {rid} order by bus_departure_time"
+        sql_cmd = f"""SELECT * FROM (SELECT rl.rid, r.name as rid_ch_name, count(*) as runs_count, avg(rl.run_stop_rate) as avg_run_stop_rate  FROM bus.runlogs as rl
+            left join bus.route as r on r.id = rl.rid
+            where bus_departure_time between  '{start_time}' and '{end_time}'
+            group by rl.rid, r.name) as org_t """
 
-        return self._get_table_data("runlogs", sql_cmd=sql_cmd)
+        if other_filter is not None:
+            sql_cmd += other_filter
+
+        table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
+        return table
 
     def get_rid_schedule_run_logs(self, rid: int, start_time: datetime, end_time: datetime = None,
                                   off_duty_timedelta: int = 1200):
@@ -193,6 +198,20 @@ class StationCenter(CenterDB):
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         carno_list = table['carno'].tolist()
         return carno_list
+
+    def get_runs_count_by_date(self, start_time: datetime, end_time: datetime = None):
+        if end_time is None or end_time == start_time:
+            end_time = start_time
+        end_time = end_time + timedelta(days=1)
+        start_time = start_time.strftime("%Y-%m-%d")
+        end_time = end_time.strftime("%Y-%m-%d")
+        sql_cmd = f""" SELECT carno, count(*) as count_of_runs ,sum(traveled_stops_count) as count_of_traveled_stop 
+                FROM bus.runlogs
+                where bus_departure_time between  '{start_time}' and '{end_time}'
+                group by carno
+                """
+        table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
+        return table
 
     def get_carno_list_by_vid(self, vid: int) -> list:
         sql_cmd = f"SELECT no as carno FROM bus.car " \
@@ -274,8 +293,8 @@ class StationCenter(CenterDB):
         table.sort_values(by=['rid', 'bus_departure_time'], ignore_index=True, inplace=True)
         return table
 
-    def get_totle_on_time_rate(self, start_time: datetime, off_duty_tol:int = 1200, early_tol: int = 60,
-                               delay_tol: int = 300, end_time: datetime = None, other_filter:str = None):
+    def get_on_time_rate(self, start_time: datetime, off_duty_tol:int = 1200, early_tol: int = 60,
+                         delay_tol: int = 300, end_time: datetime = None, other_filter: str = None):
         if end_time is None or end_time == start_time:
             end_time = start_time
         end_time = end_time + timedelta(days=1)

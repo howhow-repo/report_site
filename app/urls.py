@@ -15,7 +15,6 @@ urlpatterns = [
     # url with reports
     path('report_index/', views.report_index, name='report_index'),
     path('report_index/prehandle/', views.report_prehandle, name='report_prehandle'),
-    path('report_index/html2pdf', views.html2pdf, name='html2pdf'),
     path('report_index/<str:rtype>/', views.report_view, name='report_view'),
 
     # Matches any html file

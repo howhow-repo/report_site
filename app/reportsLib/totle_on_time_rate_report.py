@@ -72,8 +72,8 @@ class TotleOnTimeRateReport(ReportBase):
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
         self.totle_rids = station_center.get_rid_list_by_date(start_time=start_time, end_time=end_time)
-        report = station_center.get_totle_on_time_rate(start_time=start_time, end_time=end_time,
-                                                  off_duty_tol=off_duty_tol, early_tol=early_tol, delay_tol=delay_tol)
+        report = station_center.get_on_time_rate(start_time=start_time, end_time=end_time,
+                                                 off_duty_tol=off_duty_tol, early_tol=early_tol, delay_tol=delay_tol)
         self.report = report
         station_center.disconnect()
         return self.report

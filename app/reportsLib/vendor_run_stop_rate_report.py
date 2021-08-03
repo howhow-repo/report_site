@@ -22,7 +22,7 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
         index=main_report.index)
     main_report = main_report.astype({"runs_count": int})  # format each
 
-    main_report = main_report[['rid_ch_name', 'runs_count', 'avg_run_stop_rate']]
+    main_report = main_report[['rid','rid_ch_name', 'runs_count', 'avg_run_stop_rate']]
 
     main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
@@ -72,24 +72,12 @@ class VendorRunStopRateReport(ReportBase):
 
         rids_of_vid = station_center.get_rids_list_by_vid(self.vid)
         rids_in_schedule = station_center.get_rid_list_by_date(start_time=self.start_time, end_time=self.end_time)
+        self.totle_rids = str(list(set(rids_of_vid).intersection(rids_in_schedule)))
+        self.totle_rids = self.totle_rids.replace('[', '(')
+        self.totle_rids = self.totle_rids.replace(']', ')')
 
-        self.totle_rids = list(set(rids_of_vid).intersection(rids_in_schedule))
-
-        for rid in self.totle_rids:
-            rid_ch_name = station_center.get_route_ch_name(rid)
-            run_stop_rate = station_center.get_run_stop_rate_by_rid(rid, self.start_time, self.end_time)
-            runs_count = len(run_stop_rate)
-            if run_stop_rate.empty:
-                avg_run_stop_rate = 0
-            else:
-                avg_run_stop_rate = run_stop_rate['run_stop_rate'].mean()
-            self.report = self.report.append(pd.DataFrame({
-                'rid': [rid],
-                'rid_ch_name': [rid_ch_name],
-                'runs_count': [runs_count],
-                'avg_run_stop_rate': [avg_run_stop_rate],
-            }), ignore_index=True)
-
+        self.report = station_center.get_run_stop_rate(start_time=self.start_time, end_time=self.end_time,
+                                                       other_filter=f"where rid in {self.totle_rids}")
         station_center.disconnect()
 
     def parsing_df_for_user(self):
