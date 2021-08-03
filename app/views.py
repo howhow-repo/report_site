@@ -11,6 +11,7 @@ from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django import template
 from .models import get_report_index_str, parsing_post_report, parsing_get_report
+from .models import add_parsing_status
 from .reportsLib import ReportCenter, StationCenter
 from dotenv import load_dotenv
 import inspect
@@ -18,6 +19,11 @@ import inspect
 load_dotenv()
 sql_options = json.loads(os.getenv("EBUS_SQLDB"))
 mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
+
+
+def test_button(request):
+    add_parsing_status(date=datetime.today(), bus_count=333, error_bus_count=3, error_code=0)
+    return HttpResponse("ok")
 
 
 @login_required(login_url="/login/")

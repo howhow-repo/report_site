@@ -2,6 +2,7 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+import datetime
 import json
 import os
 
@@ -18,7 +19,33 @@ load_dotenv()
 sql_options = json.loads(os.getenv("EBUS_SQLDB"))
 mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
+
 # Create your models here.
+class DailyDriveLogParsingStatus(models.Model):
+    date = models.DateField()
+    buses_count = models.PositiveIntegerField()
+    error_bus_count = models.PositiveIntegerField()
+    error_code = models.IntegerField()
+
+
+class ErrorParsingBus(models.Model):
+    date = models.DateField()
+    carno = models.CharField(max_length=15)
+
+
+def add_parsing_status(date: datetime.date,
+                       bus_count: int = 0, error_bus_count: int = 0, error_code: int = 0):
+    result = {
+        'buses_count': bus_count,
+        'error_bus_count': error_bus_count,
+        'error_code': error_code,
+    }
+    DailyDriveLogParsingStatus.objects.update_or_create(date=date, defaults=result)
+
+
+def add_err_bus(err_bus: list, date: datetime.date):
+    for bus in err_bus:
+        ErrorParsingBus.objects.update_or_create(date=date, carno=bus)
 
 
 def get_report_index_str():

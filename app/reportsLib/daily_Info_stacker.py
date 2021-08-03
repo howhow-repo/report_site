@@ -26,6 +26,7 @@ class DailyInfoStaker:
         self.totle_runs = pd.DataFrame({})
         self.totle_stop_to_stop = pd.DataFrame({})
         self.err_bus = []
+        self.error_code = 0
 
     def gather_run_logs_by_buses(self, bus_list: list, date: datetime):
         date = date - timedelta(hours=date.hour, minutes=date.minute, seconds=date.second,
