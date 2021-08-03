@@ -317,8 +317,22 @@ class StationCenter(CenterDB):
                         rl.carno,rl.cid,rl.did,bus.schedule.rid,r.name,rl.schedule_id, 
                         rl.bus_departure_time,rl.bus_departure_stop,
                         rl.departure_timedelta,rl.error_code 
-                    FROM bus.schedule 
-                        left join bus.runlogs as rl ON rl.schedule_id = bus.schedule.id
+                    FROM bus.schedule
+                        left join (SELECT rl.* FROM bus.runlogs as rl
+                            inner JOIN(
+                                  SELECT schedule_id, 
+                                  MIN(abs(departure_timedelta)) as min_departure_timedelta,
+                                  SUBSTRING_INDEX(group_concat(carno),',',1) as carno
+                                  FROM  bus.runlogs
+                                  where bus_departure_time between  '{start_time}' 
+                                        and '{end_time}' 
+                                        and (error_code & 32 != 32)
+                                  GROUP BY  schedule_id) as tbl
+                             ON rl.schedule_id = tbl.schedule_id
+                             where bus_departure_time between  '{start_time}' and '{end_time}'
+                             and tbl.min_departure_timedelta = abs(rl.departure_timedelta)
+                             and tbl.carno = rl.carno
+                        ) as rl ON rl.schedule_id = bus.schedule.id
                         left join bus.route as r ON r.id = bus.schedule.rid
                     where starttime between  '{start_time}' and '{end_time}'
                     and (departure_timedelta is null or abs(departure_timedelta) < {off_duty_tol}) 
