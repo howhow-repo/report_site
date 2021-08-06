@@ -10,7 +10,8 @@ from .vendor_route_on_time_rate_report import VendorRouteOnTimeRateReport
 from .vendor_run_stop_rate_report import VendorRunStopRateReport
 from .route_schedule_departure_report import RouteScheduleDepartureReport
 from .route_on_time_rate_report import RouteOnTimeRateReport
-from .totle_on_time_rate_report import TotleOnTimeRateReport
+from .total_on_time_rate_report import TotalOnTimeRateReport
+from .total_run_stop_rate_report import TotalRunStopRateReport
 from .runs_not_on_schedule_report import RunsNotOnScheduleReport
 from .runs_with_action_error_report import RunsWithActionErrorReport
 from .runs_with_log_error_report import RunsWithLogErrorReport
@@ -32,7 +33,8 @@ class ReportCenter(object):
             'vendor_run_stop_rate_report': VendorRunStopRateReport,
             'route_schedule_departure_report': RouteScheduleDepartureReport,
             'route_on_time_rate_report': RouteOnTimeRateReport,
-            'totle_on_time_rate_report': TotleOnTimeRateReport,
+            'total_on_time_rate_report': TotalOnTimeRateReport,
+            'total_run_stop_rate_report': TotalRunStopRateReport,
             'runs_not_on_schedule_report': RunsNotOnScheduleReport,
             'runs_with_action_error_report': RunsWithActionErrorReport,
             'runs_with_log_error_report': RunsWithLogErrorReport,

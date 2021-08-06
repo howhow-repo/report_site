@@ -1,12 +1,13 @@
 import json
 import os
+from background_task import background
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 
 from .reportsLib import DailyInfoStaker
 
-from .models import add_err_bus, add_parsing_status
+from .models import add_exception_bus, add_parsing_result
 
 
 def test():
@@ -18,8 +19,17 @@ def stacking_runs_and_stoptostop():
     sql_options = json.loads(os.getenv("EBUS_SQLDB"))
     mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
     daily_stacker = DailyInfoStaker(MongoDBOptions=mongo_options, sqlOption=sql_options)
-    daily_stacker.start(datetime.today() - timedelta(days=1))
-    add_parsing_status(datetime.today() - timedelta(days=1), bus_count=len(daily_stacker.drove_bus),
-                       error_bus_count=len(daily_stacker.err_bus), error_code=daily_stacker.error_code)
-    add_err_bus(daily_stacker.err_bus,datetime.today() - timedelta(days=1))
+    process_date = datetime.today() - timedelta(days=1)
+    result = daily_stacker.start(process_date)
+    add_parsing_result(date=process_date, bus_count=result['bus_count'], runs_count=result['runs_count'],
+                       exception_bus_count=result['exception_bus_count'], error_code=result['error_code'],
+                       time_spent=result['time_spent'])
+    add_exception_bus(daily_stacker.exception_bus, datetime.today() - timedelta(days=1))
 
+    return result
+
+
+
+def trigger_stacking():
+    result = stacking_runs_and_stoptostop()
+    return result

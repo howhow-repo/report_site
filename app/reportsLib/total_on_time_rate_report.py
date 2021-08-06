@@ -44,7 +44,7 @@ def parsing_df_for_user(report: pd.DataFrame):
     return main_report
 
 
-class TotleOnTimeRateReport(ReportBase):
+class TotalOnTimeRateReport(ReportBase):
     '''
         以個路線準點報表(route_on_time_rate_report_rnBase)為基礎，建立各路線準點率的報表。
 
@@ -57,7 +57,7 @@ class TotleOnTimeRateReport(ReportBase):
         self.simple_description = '以各路線準點報表(單一路線準點率)為基礎，建立各路線準點率的報表。'
         self.start_time = None
         self.end_time = None
-        self.totle_rids = []
+        self.total_rids = []
 
     def generate_report(self, start_time: datetime, off_duty_tol: int = 1200, early_tol: int = 60,
                         delay_tol: int = 300, end_time: datetime = None, **kwargs):
@@ -71,7 +71,7 @@ class TotleOnTimeRateReport(ReportBase):
 
         station_center = StationCenter(sqlOption=self._centerDB_conn_options)
         station_center.connect()
-        self.totle_rids = station_center.get_rid_list_by_date(start_time=start_time, end_time=end_time)
+        self.total_rids = station_center.get_rid_list_by_date(start_time=start_time, end_time=end_time)
         report = station_center.get_on_time_rate(start_time=start_time, end_time=end_time,
                                                  off_duty_tol=off_duty_tol, early_tol=early_tol, delay_tol=delay_tol)
         self.report = report

@@ -19,7 +19,8 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost','0.0.0.0', '127.0.0.1', config('SERVER', default='127.0.0.1'), '172.20.10.3','192.168.0.103']
+ALLOWED_HOSTS = ['localhost','0.0.0.0', '127.0.0.1', config('SERVER', default='127.0.0.1'),]
+ALLOWED_HOSTS += ['172.20.10.5', '192.168.0.103',]
 
 # Application definition
 
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_apscheduler',
+    'background_task',
     'app'  # Enable the inner app 
 ]
 

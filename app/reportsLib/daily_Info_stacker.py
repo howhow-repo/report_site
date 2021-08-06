@@ -23,20 +23,22 @@ class DailyInfoStaker:
         self.__sqlOption = sqlOption
         self.__station_center = StationCenter(sqlOption=sqlOption)
         self.__MongoHandler = MongoDB(MongoDBOptions=MongoDBOptions)
-        self.totle_runs = pd.DataFrame({})
-        self.totle_stop_to_stop = pd.DataFrame({})
-        self.err_bus = []
+        self.total_runs = pd.DataFrame({})
+        self.total_stop_to_stop = pd.DataFrame({})
+        self.drove_bus = []
+        self.exception_bus = []
         self.error_code = 0
+        self.time_spent = 0
 
     def gather_run_logs_by_buses(self, bus_list: list, date: datetime):
         date = date - timedelta(hours=date.hour, minutes=date.minute, seconds=date.second,
                                 microseconds=date.microsecond)
-        self.totle_runs = pd.DataFrame({})
-        self.totle_stop_to_stop = pd.DataFrame({})
-        self.err_bus = []
+        self.total_runs = pd.DataFrame({})
+        self.total_stop_to_stop = pd.DataFrame({})
+        self.exception_bus = []
         bus = Bus(MongoDBPath=self.__mongoDBOptions, sqlOption=self.__sqlOption)
         bus.connect()
-        for i, bus_no in enumerate(bus_list):
+        for i, bus_no in enumerate(bus_list[:3]):
             try:
                 print(f"Now processing carno {bus_no}, {i + 1}/{len(bus_list)}")
                 t = datetime.now()
@@ -44,8 +46,8 @@ class DailyInfoStaker:
                 bus.setup(date)
                 for run in bus.runs:
                     print(f"    THIS Run IS BEGIN FROM {run.bus_departure_sne} at {run.bus_departure_time}")
-                    self.totle_runs = self.totle_runs.append(run.df_for_sql(), ignore_index=True)
-                    self.totle_stop_to_stop = self.totle_stop_to_stop.append((run.stop_to_stop_df))
+                    self.total_runs = self.total_runs.append(run.df_for_sql(), ignore_index=True)
+                    self.total_stop_to_stop = self.total_stop_to_stop.append((run.stop_to_stop_df))
                 print(f"----Done, time spent: {datetime.now() - t}\n")
 
             except Exception as e:
@@ -59,7 +61,7 @@ class DailyInfoStaker:
                 funcName = lastCallStack[2]  # 取得發生的函數名稱
                 errMsg = "File \"{}\", line {}, in {}: [{}] {}".format(fileName, lineNum, funcName, error_class, detail)
                 logger.warning(errMsg)
-                self.err_bus.append(bus_no)
+                self.exception_bus.append(bus_no)
                 continue
 
             except KeyboardInterrupt:
@@ -67,12 +69,12 @@ class DailyInfoStaker:
                 raise KeyboardInterrupt
 
         bus.disconnect()
-        return self.totle_runs
+        return self.total_runs
 
     def stack_to_sql(self):
         self.__station_center.connect()
-        self.__station_center.insert_data(table_name='runlogs', data=self.totle_runs)
-        self.__station_center.insert_data(table_name='stoptostop', data=self.totle_stop_to_stop)
+        self.__station_center.insert_data(table_name='runlogs', data=self.total_runs)
+        self.__station_center.insert_data(table_name='stoptostop', data=self.total_stop_to_stop)
         self.__station_center.disconnect()
 
     def start(self, start_date: datetime, end_date:datetime = None):
@@ -105,9 +107,9 @@ class DailyInfoStaker:
             # save to sql
             while True:
                 try:
-                    print('Saving data to sql ... ')
-                    self.stack_to_sql()
-                    print('Saving success')
+                    # print('Saving data to sql ... ')
+                    # self.stack_to_sql()
+                    # print('Saving success')
                     break
                 except Exception as e:
                     logger.error(e)
@@ -115,7 +117,17 @@ class DailyInfoStaker:
                     if k != 'c':
                         print('system skip')
                         break
-
+        self.time_spent = int((datetime.now() - time_started).seconds)
         print(f'----Time spent: {datetime.now() - time_started} ----')
-        if len(self.err_bus) != 0:
-            print(f"err bus = {self.err_bus}, \n please check manually.")
+        if len(self.exception_bus) != 0:
+            print(f"err bus = {self.exception_bus}, \n please check manually.")
+
+        return {
+            'date': days,
+            'bus_count': len(self.drove_bus),
+            'runs_count': len(self.total_runs),
+            'exception_bus_count': len(self.exception_bus),
+            'time_spent': self.time_spent,
+            'error_buses': self.exception_bus,
+            'error_code': self.error_code,
+        }

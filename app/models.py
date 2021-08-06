@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 import datetime
+import inspect
 import json
 import os
 
@@ -24,28 +25,36 @@ mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 class DailyDriveLogParsingStatus(models.Model):
     date = models.DateField()
     buses_count = models.PositiveIntegerField()
-    error_bus_count = models.PositiveIntegerField()
+    runs_count = models.PositiveIntegerField()
+    time_spent = models.PositiveIntegerField()
+    exception_bus_count = models.PositiveIntegerField()
     error_code = models.IntegerField()
 
 
-class ErrorParsingBus(models.Model):
+class ExceptionParsingBus(models.Model):
     date = models.DateField()
     carno = models.CharField(max_length=15)
 
+# class TaskControl:
 
-def add_parsing_status(date: datetime.date,
-                       bus_count: int = 0, error_bus_count: int = 0, error_code: int = 0):
+
+
+def add_parsing_result(date: datetime.date,
+                       bus_count: int = 0, runs_count: int = 0, exception_bus_count: int = 0, time_spent: int = 0,
+                       error_code: int = 0):
     result = {
         'buses_count': bus_count,
-        'error_bus_count': error_bus_count,
+        'runs_count': runs_count,
+        'exception_bus_count': exception_bus_count,
         'error_code': error_code,
+        'time_spent': time_spent,
     }
     DailyDriveLogParsingStatus.objects.update_or_create(date=date, defaults=result)
 
 
-def add_err_bus(err_bus: list, date: datetime.date):
+def add_exception_bus(err_bus: list, date: datetime.date):
     for bus in err_bus:
-        ErrorParsingBus.objects.update_or_create(date=date, carno=bus)
+        ExceptionParsingBus.objects.update_or_create(date=date, carno=bus)
 
 
 def get_report_index_str():
@@ -53,7 +62,8 @@ def get_report_index_str():
     index_table = []
     for rn in rc.report_list:
         r = rc.create_empty_report(rn)
-        index_table.append({'type': rn, 'title': r.title, 'simple_description': r.simple_description})
+        index_table.append({'type': rn, 'title': r.title, 'simple_description': r.simple_description,
+                            'args': list(inspect.signature(r.generate_report).parameters)})
 
     context = {
         'segment': 'report_index',

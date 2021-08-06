@@ -123,7 +123,7 @@ class StationCenter(CenterDB):
 
         if other_filter is not None:
             sql_cmd += other_filter
-
+        print(sql_cmd)
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         return table
 

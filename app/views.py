@@ -8,10 +8,11 @@ from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django import template
 from .models import get_report_index_str, parsing_post_report, parsing_get_report
-from .models import add_parsing_status
+from .models import add_parsing_result
+from .tasks import trigger_stacking
 from .reportsLib import ReportCenter, StationCenter
 from dotenv import load_dotenv
 import inspect
@@ -22,16 +23,15 @@ mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
 
 def test_button(request):
-    add_parsing_status(date=datetime.today(), bus_count=333, error_bus_count=3, error_code=0)
+    add_parsing_result(date=datetime.today(), bus_count=333, error_bus_count=3, error_code=0)
     return HttpResponse("ok")
 
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {}
-    context['segment'] = 'index'
+    context = {'segment': 'index'}
 
-    html_template = loader.get_template('index.html')
+    html_template = loader.get_template('app/task_info.html')
     return HttpResponse(html_template.render(context, request))
 
 
@@ -49,21 +49,24 @@ def pages(request):
     except template.TemplateDoesNotExist:
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request))
-
     except:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render(context, request))
 
 
-@login_required(login_url="/login/")
+# @login_required(login_url="/login/")
 def report_index(request):
     context = get_report_index_str()
-    load_template = 'app/ui-report_index.html'
-    html_template = loader.get_template(load_template)
-    return HttpResponse(html_template.render(context, request))
+
+    if request.method == 'GET':
+        load_template = 'app/ui-report_index.html'
+        html_template = loader.get_template(load_template)
+        return HttpResponse(html_template.render(context, request))
+    elif request.method == 'POST':
+        return HttpResponse(context['index_table'], content_type="application/json")
 
 
-@login_required(login_url="/login/")
+# @login_required(login_url="/login/")
 def report_prehandle(request):
     rtype = request.GET.get('rtype', None)
     if rtype is None:
@@ -110,6 +113,15 @@ def report_view(request, rtype):
         para_received = format_paras(dict(request.GET.items()))
         return parsing_get_report(request=request, rtype=rtype, para_received=para_received)
 
+    else:
+        html_template = loader.get_template('page-500.html')
+        return HttpResponseServerError(html_template.render({}, request))
+
+
+def trigger_daily_task(request):
+    if request.method == 'POST':
+        result = trigger_stacking()
+        return JsonResponse(result)
     else:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render({}, request))
