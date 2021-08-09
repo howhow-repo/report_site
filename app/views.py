@@ -23,7 +23,7 @@ mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
 
 def test_button(request):
-    add_parsing_result(date=datetime.today(), bus_count=333, error_bus_count=3, error_code=0)
+    add_parsing_result(date=datetime(1992, 11, 29), bus_count=333, exception_bus_count=3, error_code=0)
     return HttpResponse("ok")
 
 
@@ -107,7 +107,7 @@ def report_view(request, rtype):
         body = json.loads(request.body.decode('utf-8'))
         para_received = body
         para_received = format_paras(para_received)
-        return parsing_post_report(request=request, rtype=rtype,para_received=para_received)
+        return parsing_post_report(request=request, rtype=rtype, para_received=para_received)
 
     elif request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))
@@ -120,7 +120,17 @@ def report_view(request, rtype):
 
 def trigger_daily_task(request):
     if request.method == 'POST':
-        result = trigger_stacking()
+        d = {'start_date': None, 'end_date': None}
+        body = json.loads(request.body.decode('utf-8'))
+        para_received = body
+        if (not ('confirm' in para_received)) or (para_received['confirm'] != True):
+            return JsonResponse({'comment': 'confirm not True'})
+
+        if 'start_date' in para_received:
+            d['start_date'] = datetime.strptime(para_received["start_date"], '%Y-%m-%d')
+            if 'end_date' in para_received:
+                d['end_date'] = datetime.strptime(para_received["end_date"], '%Y-%m-%d')
+        result = trigger_stacking(start_date=d['start_date'], end_date=d['end_date'])
         return JsonResponse(result)
     else:
         html_template = loader.get_template('page-500.html')

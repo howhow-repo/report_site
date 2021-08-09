@@ -90,7 +90,7 @@ class RunsWithActionErrorReport(ReportBase):
                &( self.report['not_arrive_to_last_stop'] == False)
         ].index
         self.report.drop(i, inplace=True)
-        self.report.reset_index()
+        self.report.reset_index(inplace=True)
 
     def parsing_df_for_user(self):
         return parsing_df_for_user(self.report)

@@ -1,7 +1,11 @@
-import pandas as pd
+import json
+import os
 
 from .center_db import *
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+load_dotenv()
+TIME_SHIFT = int(os.getenv("TIME_SHIFT"))
 
 
 class StationCenter(CenterDB):
@@ -36,7 +40,8 @@ class StationCenter(CenterDB):
         end_time = end_time + timedelta(days=1)
         start_time = start_time.strftime("%Y-%m-%d")
         end_time = end_time.strftime("%Y-%m-%d")
-        sql_cmd = f"SELECT * FROM bus.schedule where rid = {rid} and starttime between '{start_time}' and '{end_time}' " \
+        sql_cmd = f"SELECT * FROM bus.schedule " \
+                  f"where rid = {rid} and starttime between '{start_time} {TIME_SHIFT}' and '{end_time} {TIME_SHIFT}' " \
                   f"order by starttime";
         return self._get_table_data("schedule", sql_cmd=sql_cmd)
 

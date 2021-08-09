@@ -38,7 +38,7 @@ class DailyInfoStaker:
         self.exception_bus = []
         bus = Bus(MongoDBPath=self.__mongoDBOptions, sqlOption=self.__sqlOption)
         bus.connect()
-        for i, bus_no in enumerate(bus_list[:3]):
+        for i, bus_no in enumerate(bus_list):
             try:
                 print(f"Now processing carno {bus_no}, {i + 1}/{len(bus_list)}")
                 t = datetime.now()
@@ -77,7 +77,7 @@ class DailyInfoStaker:
         self.__station_center.insert_data(table_name='stoptostop', data=self.total_stop_to_stop)
         self.__station_center.disconnect()
 
-    def start(self, start_date: datetime, end_date:datetime = None):
+    def start(self, start_date: datetime, end_date: datetime = None):
         time_started = datetime.now()
         if end_date is None:
             end_date = start_date
@@ -88,17 +88,18 @@ class DailyInfoStaker:
         t = start_date
         while t <= end_date:
             days.append(t)
-            t = t + timedelta(days = 1)
+            t = t + timedelta(days=1)
+
+        # get_bus_list
+        self.__MongoHandler.connect()
+        bus_list = []
+        for day in days:
+            bus_list = bus_list + self.__MongoHandler.get_distinct(day, 'drivelog', {}, 'carno')
+        self.__MongoHandler.disconnect()
+        self.drove_bus = list(set(bus_list))
+        self.drove_bus.sort()
 
         for day in days:
-            # get_bus_list
-            bus_list = []
-            self.__MongoHandler.connect()
-            bus_list = bus_list + self.__MongoHandler.get_distinct(day, 'drivelog', {}, 'carno')
-            self.__MongoHandler.disconnect()
-            self.drove_bus = list(set(bus_list))
-            self.drove_bus.sort()
-
             #  gather_run_logs
             print(f"Processing date: {day.strftime('%Y-%m-%d')}")
             print(f'There r {len(self.drove_bus)} buses to check')
@@ -107,9 +108,9 @@ class DailyInfoStaker:
             # save to sql
             while True:
                 try:
-                    # print('Saving data to sql ... ')
-                    # self.stack_to_sql()
-                    # print('Saving success')
+                    print('Saving data to sql ... ')
+                    self.stack_to_sql()
+                    print('Saving success')
                     break
                 except Exception as e:
                     logger.error(e)
@@ -128,6 +129,6 @@ class DailyInfoStaker:
             'runs_count': len(self.total_runs),
             'exception_bus_count': len(self.exception_bus),
             'time_spent': self.time_spent,
-            'error_buses': self.exception_bus,
+            'exception_buses': self.exception_bus,
             'error_code': self.error_code,
         }

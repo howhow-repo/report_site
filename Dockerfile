@@ -1,9 +1,10 @@
-FROM python:3.6
+FROM python:3.9
 
 COPY manage.py gunicorn-cfg.py requirements.txt .env ./
 COPY app app
 COPY authentication authentication
 COPY core core
+COPY db.sqlite3 db.sqlite3
 
 RUN pip install -r requirements.txt
 

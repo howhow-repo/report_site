@@ -62,8 +62,8 @@ def get_report_index_str():
     index_table = []
     for rn in rc.report_list:
         r = rc.create_empty_report(rn)
-        index_table.append({'type': rn, 'title': r.title, 'simple_description': r.simple_description,
-                            'args': list(inspect.signature(r.generate_report).parameters)})
+        index_table.append({"type": rn, "title": r.title, "simple_description": r.simple_description,
+                            "args": list(inspect.signature(r.generate_report).parameters)})
 
     context = {
         'segment': 'report_index',
@@ -84,7 +84,7 @@ def parsing_post_report(request, rtype, para_received):
             return HttpResponse(report.report.to_csv(), content_type="application/csv")
 
         elif para_received['type'] == 'html':
-            return HttpResponse(report.parsing_df_for_user().to_html(), content_type="application/csv")
+            return HttpResponse(report.parsing_df_for_user().to_html(), content_type="application/html")
 
         elif para_received['type'] == 'pdf':
             context = {

@@ -118,7 +118,6 @@ class Bus(DriveLogDB):
             self.travel_logs.sort_values(by=['date_gps'], inplace=True, ignore_index=True)
 
         self.__get_long_stay_logs(start_time=start_time, end_time=end_time)
-
         return self.travel_logs
 
     def __get_long_stay_logs(self, start_time: datetime, end_time: datetime = None):
@@ -126,6 +125,7 @@ class Bus(DriveLogDB):
             end_time = start_time
         else:
             assert end_time >= start_time
+        self.long_stay_logs = pd.DataFrame({})
         while start_time <= end_time:
             long_stays = self._get_drive_logs(datetime=start_time,
                                               query_cmd={"$and": [{"carno": self.carno}, {"event": "LongStay"}]},
@@ -170,5 +170,10 @@ class Bus(DriveLogDB):
                     self.traveled_stops = self.traveled_stops + self.runs[-1].traveled_stops
 
     def setup(self, start_time: datetime, end_time: datetime = None):
+        self.travel_logs = pd.DataFrame({})
+        self.traveled_stops = []
+        self.long_stay_logs = pd.DataFrame({})
+        self.runs = []
+
         self.get_travel_logs(start_time=start_time,end_time=end_time)
         self.standardize_runs_logs()

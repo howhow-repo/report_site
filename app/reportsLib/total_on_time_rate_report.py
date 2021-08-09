@@ -6,7 +6,6 @@ import pdfkit
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
 from .report_base import ReportBase
-from .route_on_time_rate_report import RouteOnTimeRateReport
 from jinja2 import Environment, FileSystemLoader
 import logging
 
