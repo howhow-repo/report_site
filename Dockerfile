@@ -11,27 +11,21 @@ RUN mv wkhtmltopdf-amd64 /usr/local/bin/wkhtmltopdf
 RUN chmod +x /usr/local/bin/wkhtmltopdf
 
 # add chinese font
-RUN apt-get update -qqy \
-  && apt-get -qqy install \
-    xvfb \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
-
 RUN apt-get -qqy update \
   && apt-get -qqy --no-install-recommends install \
     fonts-wqy-microhei \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get -qyy clean
 
-# src
+# project src
 WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY . /code/
 
+
+# setup djngo
 RUN python manage.py makemigrations
 RUN python manage.py migrate
-
-
-
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
