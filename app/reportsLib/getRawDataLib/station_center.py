@@ -4,8 +4,11 @@ import os
 from .center_db import *
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-load_dotenv()
-TIME_SHIFT = int(os.getenv("TIME_SHIFT"))
+try:
+    load_dotenv()
+    TIME_SHIFT = int(os.getenv("TIME_SHIFT"))
+except Exception as e:
+    TIME_SHIFT = 0
 
 
 class StationCenter(CenterDB):

@@ -6,7 +6,9 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 from decouple import config
 from unipath import Path
-import dj_database_url
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
@@ -19,8 +21,8 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost','0.0.0.0', '127.0.0.1', config('SERVER', default='127.0.0.1'),]
-ALLOWED_HOSTS += ['172.20.10.5', '192.168.0.103','192.168.30.177',]
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', config('SERVER', default='127.0.0.1'), ]
+ALLOWED_HOSTS += ['172.20.10.5', '192.168.0.103', '192.168.30.177', ]
 
 # Application definition
 
@@ -50,7 +52,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 APPEND_SLASH = True
-LOGIN_REDIRECT_URL = "home"   # Route defined in app/urls.py
+LOGIN_REDIRECT_URL = "home"  # Route defined in app/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
 TEMPLATE_DIR = os.path.join(CORE_DIR, "core/templates")  # ROOT dir for templates
 
@@ -77,13 +79,24 @@ BACKGROUND_TASK_RUN_ASYNC = True
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME'  : 'db.sqlite3',
+#         'OPTIONS': {
+#             'timeout': 30,
+#         },
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME'  : 'db.sqlite3',
-        'OPTIONS': {
-            'timeout': 30,
-        },
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'reportsite',
+        'USER': os.getenv("LOCALSQL_USER"),
+        'PASSWORD': os.getenv("LOCALSQL_PW"),
+        'HOST': os.getenv("LOCALSQL_HOST"),
+        'PORT': os.getenv("LOCALSQL_PORT"),
     }
 }
 
@@ -111,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

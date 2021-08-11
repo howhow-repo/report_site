@@ -1,5 +1,8 @@
 import json
 import os
+import requests
+from urllib import parse
+
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
@@ -8,13 +11,13 @@ from .reportsLib import DailyInfoStaker
 
 from .models import add_exception_bus, add_parsing_result
 
+load_dotenv()
 
 def test():
-    print(f'{datetime.now()} loopppp')
+    print(f'{datetime.now()} loop test heart beat')
 
 
 def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime = None):
-    load_dotenv()
     sql_options = json.loads(os.getenv("EBUS_SQLDB"))
     mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
@@ -33,9 +36,26 @@ def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime
                        time_spent=result['time_spent'])
     add_exception_bus(result['exception_buses'], datetime.today() - timedelta(days=1))
 
+    try:
+        send_line_notify("[PingDong][runs task]" + str(result))
+    except Exception as err:
+        pass
+
     return result
 
 
 def trigger_stacking(start_date: datetime = None, end_date: datetime = None):
     result = stacking_runs_and_stoptostop(start_date=start_date, end_date=end_date)
     return result
+
+
+def send_line_notify(text):
+    TOKEN = os.getenv("LINE_TOKEN")
+    url = "https://notify-api.line.me/api/notify"
+    headers = {
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer '+TOKEN
+    }
+    payload = parse.urlencode({'message': str(text)})
+    response = requests.post(url, data=payload, headers = headers)
+    return response

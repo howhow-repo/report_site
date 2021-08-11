@@ -8,7 +8,18 @@ from .getRawDataLib import StationCenter, MongoDB
 logger = logging.getLogger()
 
 
-# getting all carno
+def days_in_list(start_date: datetime, end_date:datetime = None):
+    if end_date is None:
+        return [start_date]
+    assert end_date > start_date
+    days = []
+    t = start_date
+    while t <= end_date:
+        days.append(t)
+        t = t + timedelta(days=1)
+    return days
+
+
 class DailyInfoStaker:
     '''
         use to calculate everyday logs and seperate them into Runs;
@@ -84,11 +95,7 @@ class DailyInfoStaker:
         else:
             assert end_date >= start_date
 
-        days = []
-        t = start_date
-        while t <= end_date:
-            days.append(t)
-            t = t + timedelta(days=1)
+        days = days_in_list(start_date, end_date)
 
         # get_bus_list
         self.__MongoHandler.connect()
@@ -106,20 +113,13 @@ class DailyInfoStaker:
             self.gather_run_logs_by_buses(bus_list=self.drove_bus, date=day)
 
             # save to sql
-            while True:
-                try:
-                    print('Saving data to sql ... ')
-                    self.stack_to_sql()
-                    print('Saving success')
-                    break
-                except Exception as e:
-                    logger.error(e)
-                    k = input('Enter c to retry; press any key to skip sql stack.')
-                    if k != 'c':
-                        print('system skip')
-                        break
+            print('Saving data to sql ... ')
+            self.stack_to_sql()
+            print('Saving success')
+
         self.time_spent = int((datetime.now() - time_started).seconds)
         print(f'----Time spent: {datetime.now() - time_started} ----')
+
         if len(self.exception_bus) != 0:
             print(f"err bus = {self.exception_bus}, \n please check manually.")
 
