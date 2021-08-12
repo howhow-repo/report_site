@@ -22,15 +22,15 @@ urlpatterns = [
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
-# scheduler.add_job(
-#     test,
-#     trigger=CronTrigger(
-#         second="0"  #
-#     ),
-#     id="testloop",  # The `id` assigned to each job MUST be unique
-#     max_instances=1,
-#     replace_existing=True,
-# )
+scheduler.add_job(
+    test,
+    trigger=CronTrigger(
+        second="0"  #
+    ),
+    id="testloop",  # The `id` assigned to each job MUST be unique
+    max_instances=1,
+    replace_existing=True,
+)
 
 scheduler.add_job(
     stacking_runs_and_stoptostop,

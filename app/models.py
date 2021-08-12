@@ -26,6 +26,7 @@ class DailyDriveLogParsingStatus(models.Model):
     date = models.DateField()
     buses_count = models.PositiveIntegerField()
     runs_count = models.PositiveIntegerField()
+    stoptostop_count = models.PositiveIntegerField(default=0)
     time_spent = models.PositiveIntegerField()
     exception_bus_count = models.PositiveIntegerField()
     error_code = models.IntegerField()
@@ -37,14 +38,16 @@ class ExceptionParsingBus(models.Model):
 
 # class TaskControl:
 
-
+def get_parsing_result(latest: int = 7):
+    return DailyDriveLogParsingStatus.objects.order_by('-date')[:latest]
 
 def add_parsing_result(date: datetime.date,
-                       bus_count: int = 0, runs_count: int = 0, exception_bus_count: int = 0, time_spent: int = 0,
-                       error_code: int = 0):
+                       bus_count: int = 0, runs_count: int = 0, stoptostop_count: int = 0,
+                       exception_bus_count: int = 0, time_spent: int = 0, error_code: int = 0):
     result = {
         'buses_count': bus_count,
         'runs_count': runs_count,
+        'stoptostop_count': stoptostop_count,
         'exception_bus_count': exception_bus_count,
         'error_code': error_code,
         'time_spent': time_spent,

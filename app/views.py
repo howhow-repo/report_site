@@ -11,7 +11,7 @@ from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django import template
 from .models import get_report_index_str, parsing_post_report, parsing_get_report
-from .models import add_parsing_result
+from .models import get_parsing_result
 from .tasks import trigger_stacking
 from .reportsLib import ReportCenter, StationCenter
 from dotenv import load_dotenv
@@ -23,14 +23,27 @@ mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
 
 def test_button(request):
-    add_parsing_result(date=datetime(1992, 11, 29), bus_count=333, exception_bus_count=3, error_code=0)
+    r = get_parsing_result()
+    print(r)
+    print(type(r))
+    print(len(r))
+    print(r[0])
+    print(r[0].date)
+    print(type(r[0].date))
+    print(r[0].buses_count)
+    print(r[0].runs_count)
+    print(r[0].time_spent)
+    print(vars(r[0]))
+    print(vars(r[0])['date'])
+    print(type(vars(r[0])['date']))
     return HttpResponse("ok")
 
 
 @login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
-
+    results = get_parsing_result()
+    context['results'] = [vars(r) for r in results]
     html_template = loader.get_template('app/task_info.html')
     return HttpResponse(html_template.render(context, request))
 

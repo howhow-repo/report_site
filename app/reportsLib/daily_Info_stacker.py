@@ -11,7 +11,7 @@ logger = logging.getLogger()
 def days_in_list(start_date: datetime, end_date:datetime = None):
     if end_date is None:
         return [start_date]
-    assert end_date > start_date
+    assert end_date >= start_date
     days = []
     t = start_date
     while t <= end_date:
@@ -127,6 +127,7 @@ class DailyInfoStaker:
             'date': days,
             'bus_count': len(self.drove_bus),
             'runs_count': len(self.total_runs),
+            'stoptostop_count': len(self.total_stop_to_stop),
             'exception_bus_count': len(self.exception_bus),
             'time_spent': self.time_spent,
             'exception_buses': self.exception_bus,

@@ -32,8 +32,8 @@ def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime
     daily_stacker = DailyInfoStaker(MongoDBOptions=mongo_options, sqlOption=sql_options)
     result = daily_stacker.start(start_date=process_date, end_date=end_date)
     add_parsing_result(date=process_date, bus_count=result['bus_count'], runs_count=result['runs_count'],
-                       exception_bus_count=result['exception_bus_count'], error_code=result['error_code'],
-                       time_spent=result['time_spent'])
+                       stoptostop_count=result['stoptostop_count'], exception_bus_count=result['exception_bus_count'],
+                       error_code=result['error_code'], time_spent=result['time_spent'])
     add_exception_bus(result['exception_buses'], datetime.today() - timedelta(days=1))
 
     try:
