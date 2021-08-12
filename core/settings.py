@@ -15,7 +15,8 @@ BASE_DIR = Path(__file__).parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
+# SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
@@ -92,11 +93,11 @@ BACKGROUND_TASK_RUN_ASYNC = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'reportsite',
-        'USER': os.getenv("LOCALSQL_USER"),
-        'PASSWORD': os.getenv("LOCALSQL_PW"),
-        'HOST': os.getenv("LOCALSQL_HOST"),
-        'PORT': os.getenv("LOCALSQL_PORT"),
+        'NAME': os.getenv("SITESQL_SCHEMA"),
+        'USER': os.getenv("SITESQL_USER"),
+        'PASSWORD': os.getenv("SITESQL_PW"),
+        'HOST': os.getenv("SITESQL_HOST"),
+        'PORT': os.getenv("SITESQL_PORT"),
     }
 }
 
