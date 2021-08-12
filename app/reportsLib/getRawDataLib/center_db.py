@@ -60,12 +60,21 @@ class CenterDB:
             self.disconnect()
             raise ConnectionError("get data from ebus center mysql fail")
 
-    def _get_table_data(self, table_name: str, sql_cmd:str = None) -> pd.DataFrame:
+    def _get_table_data(self, table_name: str, sql_cmd: str = None) -> pd.DataFrame:
         try:
             if sql_cmd is None:
                 return pd.read_sql('SELECT * from ' + table_name, self._db)
             else:
-                return pd.read_sql(sql_cmd,self._db)
+                return pd.read_sql(sql_cmd, self._db)
+        except Exception as err:
+            self.disconnect()
+            raise err
+
+    def _delete_data(self, sql_cmd: str = None):
+        try:
+            sql = sql_cmd
+            self.cursor.execute(sql)
+            self._db.commit()
         except Exception as err:
             self.disconnect()
             raise err

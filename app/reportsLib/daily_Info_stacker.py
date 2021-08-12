@@ -1,14 +1,16 @@
 from datetime import datetime, timedelta
-import json, sys, traceback
+import sys, traceback
 import pandas as pd
 import logging
 from .getRawDataLib import Bus
 from .getRawDataLib import StationCenter, MongoDB
+from .getRawDataLib.error_codes import RunlogsTaskErrorCode
+
 
 logger = logging.getLogger()
 
 
-def days_in_list(start_date: datetime, end_date:datetime = None):
+def days_in_list(start_date: datetime, end_date: datetime = None):
     if end_date is None:
         return [start_date]
     assert end_date >= start_date
@@ -38,8 +40,39 @@ class DailyInfoStaker:
         self.total_stop_to_stop = pd.DataFrame({})
         self.drove_bus = []
         self.exception_bus = []
-        self.error_code = 0
+        self.error = RunlogsTaskErrorCode()
+        self.error_message = []
         self.time_spent = 0
+        self.result = {
+            'date': [],
+            'bus_count': len(self.drove_bus),
+            'runs_count': len(self.total_runs),
+            'stoptostop_count': len(self.total_stop_to_stop),
+            'exception_bus_count': len(self.exception_bus),
+            'time_spent': self.time_spent,
+            'exception_buses': self.exception_bus,
+            'error_message': [],
+            'error_code': self.error.error_code,
+        }
+    def refresh_result(self):
+        self.result['bus_count'] = len(self.drove_bus)
+        self.result['runs_count'] = len(self.total_runs)
+        self.result['stoptostop_count'] = len(self.total_stop_to_stop)
+        self.result['exception_bus_count'] = len(self.exception_bus)
+        self.result['time_spent'] = self.time_spent
+        self.result['exception_buses'] = self.exception_bus
+        self.result['error_message'] = self.error_message
+        self.result['error_code'] = self.error.error_code
+        return self.result
+
+    def get_drove_bus_list(self, days: list):
+        self.__MongoHandler.connect()
+        bus_list = []
+        for day in days:
+            bus_list = bus_list + self.__MongoHandler.get_distinct(day, 'drivelog', {}, 'carno')
+        self.__MongoHandler.disconnect()
+        self.drove_bus = list(set(bus_list))
+        self.drove_bus.sort()
 
     def gather_run_logs_by_buses(self, bus_list: list, date: datetime):
         date = date - timedelta(hours=date.hour, minutes=date.minute, seconds=date.second,
@@ -82,13 +115,17 @@ class DailyInfoStaker:
         bus.disconnect()
         return self.total_runs
 
-    def stack_to_sql(self):
+    def stack_to_sql(self, redo: bool = False, date: datetime = None):
         self.__station_center.connect()
+        if redo:
+            self.__station_center.delete_runlogs_by_date(date)
         self.__station_center.insert_data(table_name='runlogs', data=self.total_runs)
+        if redo:
+            self.__station_center.delete_stoptostop_by_date(date)
         self.__station_center.insert_data(table_name='stoptostop', data=self.total_stop_to_stop)
         self.__station_center.disconnect()
 
-    def start(self, start_date: datetime, end_date: datetime = None):
+    def start(self, start_date: datetime, end_date: datetime = None, redo: bool = False):
         time_started = datetime.now()
         if end_date is None:
             end_date = start_date
@@ -97,25 +134,41 @@ class DailyInfoStaker:
 
         days = days_in_list(start_date, end_date)
 
-        # get_bus_list
-        self.__MongoHandler.connect()
-        bus_list = []
-        for day in days:
-            bus_list = bus_list + self.__MongoHandler.get_distinct(day, 'drivelog', {}, 'carno')
-        self.__MongoHandler.disconnect()
-        self.drove_bus = list(set(bus_list))
-        self.drove_bus.sort()
+        try:
+            self.get_drove_bus_list(days)
+        except Exception:
+            print(Exception)
+            self.error_message.append("SOMETHING WENT WRONG WHILE GETTING DRIVELOG FROM MONGODB")
+            self.error.add_error('MONGODBERROR')
+            self.time_spent = int((datetime.now() - time_started).seconds)
+            return self.refresh_result()
 
+        # calculate
         for day in days:
             #  gather_run_logs
-            print(f"Processing date: {day.strftime('%Y-%m-%d')}")
-            print(f'There r {len(self.drove_bus)} buses to check')
-            self.gather_run_logs_by_buses(bus_list=self.drove_bus, date=day)
+            try:
+                print(f"Processing date: {day.strftime('%Y-%m-%d')}")
+                print(f'There r {len(self.drove_bus)} buses to check')
+                self.gather_run_logs_by_buses(bus_list=self.drove_bus, date=day)
+            except Exception:
+                print(Exception)
+                self.error_message.append("SOMETHING WENT WRONG WHILE GATHERING RUN LOGS")
+                self.error.add_error('RUNLOGSCALCULATEERROR')
+                self.time_spent = int((datetime.now() - time_started).seconds)
+                return self.refresh_result()
 
             # save to sql
-            print('Saving data to sql ... ')
-            self.stack_to_sql()
-            print('Saving success')
+            try:
+                print('Saving data to sql ... ')
+                self.stack_to_sql(redo=redo, date=day)
+                print('Saving success')
+            except Exception:
+                print(Exception)
+                self.error_message.append("SOMETHING WENT WRONG WHILE SAVING RUN LOGS")
+                self.error.add_error('MYSQLSAVINGERROR')
+                self.time_spent = int((datetime.now() - time_started).seconds)
+                raise Exception
+                # return self.refresh_result()
 
         self.time_spent = int((datetime.now() - time_started).seconds)
         print(f'----Time spent: {datetime.now() - time_started} ----')
@@ -123,13 +176,5 @@ class DailyInfoStaker:
         if len(self.exception_bus) != 0:
             print(f"err bus = {self.exception_bus}, \n please check manually.")
 
-        return {
-            'date': days,
-            'bus_count': len(self.drove_bus),
-            'runs_count': len(self.total_runs),
-            'stoptostop_count': len(self.total_stop_to_stop),
-            'exception_bus_count': len(self.exception_bus),
-            'time_spent': self.time_spent,
-            'exception_buses': self.exception_bus,
-            'error_code': self.error_code,
-        }
+        self.result['date'] = days
+        return self.refresh_result()

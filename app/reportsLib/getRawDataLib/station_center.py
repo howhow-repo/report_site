@@ -353,4 +353,28 @@ class StationCenter(CenterDB):
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         return table
 
+    def delete_runlogs_by_date(self, start_date: datetime, end_date: datetime = None):
+        if end_date is None:
+            end_date = start_date
+        end_date = end_date + timedelta(days=1)
+        start_date = start_date.strftime("%Y-%m-%d")
+        end_date = end_date.strftime("%Y-%m-%d")
+        sql_cmd = f"""
+            DELETE FROM bus.runlogs 
+            WHERE bus_departure_time between '{start_date} {TIME_SHIFT}' and '{end_date} {TIME_SHIFT}'
+        """
+        return self._delete_data(sql_cmd)
+
+    def delete_stoptostop_by_date(self, start_date: datetime, end_date: datetime = None):
+        if end_date is None or end_date == start_date:
+            end_date = start_date
+        end_date = end_date + timedelta(days=1)
+        start_date = start_date.strftime("%Y-%m-%d")
+        end_date = end_date.strftime("%Y-%m-%d")
+        sql_cmd = f"""
+            DELETE FROM bus.stoptostop 
+            WHERE departure_time between '{start_date} {TIME_SHIFT}' and '{end_date} {TIME_SHIFT}'
+            or arrival_time between '{start_date} {TIME_SHIFT}' and '{end_date} {TIME_SHIFT}'
+        """
+        return self._delete_data(sql_cmd)
 

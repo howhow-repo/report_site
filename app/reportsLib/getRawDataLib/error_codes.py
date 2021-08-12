@@ -26,6 +26,12 @@ stop_to_stop_err_type = {
     'LONGSTAYBETWEENSTOP': 64, # 從上一站過來的路上有longstay紀錄
 }
 
+runlogs_task_err_type = {
+    'MONGODBERROR': 1,
+    'RUNLOGSCALCULATEERROR': 2,
+    'MYSQLSAVINGERROR': 4
+}
+
 
 class RunErrorCode:
     def __init__(self):
@@ -48,10 +54,33 @@ class RunErrorCode:
                 err_list.append(err)
         return err_list
 
+
 class StopToStopErrorCode:
     def __init__(self):
         self.error_code = 0
         self.type_map = stop_to_stop_err_type
+
+    def add_error(self, error_type):
+        error = 0
+        try:
+            error = self.type_map[error_type]
+        except Exception as err:
+            logger.warning(f"input error type: <{error_type}> is undefined")
+        self.error_code = self.error_code | error
+
+    @classmethod
+    def print_error_type(cls, error_code):
+        err_list = []
+        for err in run_err_type.keys():
+            if error_code & run_err_type[err] == 1:
+                err_list.append(err)
+        return err_list
+
+
+class RunlogsTaskErrorCode:
+    def __init__(self):
+        self.error_code = 0
+        self.type_map = runlogs_task_err_type
 
     def add_error(self, error_type):
         error = 0
