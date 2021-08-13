@@ -47,16 +47,18 @@ class MongoDB:
             print("something went wrong")
             raise err
 
-    def get_distinct(self,datetime: datetime,collection_type: str, query_cmd: dict, field_name: str):
+    def get_distinct(self, datetime: datetime, collection_type: str, query_cmd: dict, field_name: str):
         datetime = datetime.strftime("%Y-%m-%d")
         collection_name = collection_type + "_" + datetime
+        print(query_cmd)
         if collection_name in self.db.collection_names():
-            return self.db[collection_name].find(query_cmd, {field_name:1}).distinct(field_name)
+            return self.db[collection_name].find(query_cmd).distinct(field_name)
         else:
             logger.warning(f"can not find collection name: {collection_name}")
             return []
 
-    def _get_logs(self, datetime: datetime, collection_type: str, query_cmd: dict, projection_cmd: dict = None):
+    def _get_logs(self, datetime: datetime, collection_type: str,
+                  query_cmd: dict, projection_cmd: dict = None) -> pd.DataFrame:
         datetime = datetime.strftime("%Y-%m-%d")
         collection_name = collection_type + "_" + datetime
         if collection_name in self.db.collection_names():

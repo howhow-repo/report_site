@@ -3,7 +3,7 @@ import sys, traceback
 import pandas as pd
 import logging
 from .getRawDataLib import Bus
-from .getRawDataLib import StationCenter, MongoDB
+from .getRawDataLib import StationCenter, MongoDB, DriveLogDB
 from .getRawDataLib.error_codes import RunlogsTaskErrorCode
 
 
@@ -35,7 +35,7 @@ class DailyInfoStaker:
         self.__mongoDBOptions = MongoDBOptions
         self.__sqlOption = sqlOption
         self.__station_center = StationCenter(sqlOption=sqlOption)
-        self.__MongoHandler = MongoDB(MongoDBOptions=MongoDBOptions)
+        self.__DriveLogDB = DriveLogDB(MongoDBOptions=MongoDBOptions)
         self.total_runs = pd.DataFrame({})
         self.total_stop_to_stop = pd.DataFrame({})
         self.drove_bus = []
@@ -65,12 +65,10 @@ class DailyInfoStaker:
         self.result['error_code'] = self.error.error_code
         return self.result
 
-    def get_drove_bus_list(self, days: list):
-        self.__MongoHandler.connect()
-        bus_list = []
-        for day in days:
-            bus_list = bus_list + self.__MongoHandler.get_distinct(day, 'drivelog', {}, 'carno')
-        self.__MongoHandler.disconnect()
+    def get_drove_bus_list(self, day: datetime):
+        self.__DriveLogDB.connect()
+        bus_list = self.__DriveLogDB.get_drove_buses(day)
+        self.__DriveLogDB.disconnect()
         self.drove_bus = list(set(bus_list))
         self.drove_bus.sort()
 
@@ -134,18 +132,20 @@ class DailyInfoStaker:
 
         days = days_in_list(start_date, end_date)
 
-        try:
-            self.get_drove_bus_list(days)
-        except Exception:
-            print(Exception)
-            self.error_message.append("SOMETHING WENT WRONG WHILE GETTING DRIVELOG FROM MONGODB")
-            self.error.add_error('MONGODBERROR')
-            self.time_spent = int((datetime.now() - time_started).seconds)
-            return self.refresh_result()
-
         # calculate
         for day in days:
-            #  gather_run_logs
+
+            #  get buses in a day
+            try:
+                self.get_drove_bus_list(day)
+            except Exception:
+                print(Exception)
+                self.error_message.append("SOMETHING WENT WRONG WHILE GETTING DRIVELOG FROM MONGODB")
+                self.error.add_error('MONGODBERROR')
+                self.time_spent = int((datetime.now() - time_started).seconds)
+                return self.refresh_result()
+
+            #  gather_run_logs from every buses
             try:
                 print(f"Processing date: {day.strftime('%Y-%m-%d')}")
                 print(f'There r {len(self.drove_bus)} buses to check')
