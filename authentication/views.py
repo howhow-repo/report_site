@@ -10,7 +10,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
+from django.template import loader
+
 from .forms import LoginForm, SignUpForm
 
 def login_view(request):
@@ -35,6 +37,8 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form, "msg" : msg})
 
 def register_user(request):
+    html_template = loader.get_template('page-404.html')
+    return HttpResponseNotFound(html_template.render({}, request))
 
     msg     = None
     success = False

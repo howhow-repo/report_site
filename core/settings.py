@@ -6,8 +6,6 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 from decouple import config
 from unipath import Path
-from dotenv import load_dotenv
-load_dotenv()
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -15,8 +13,7 @@ BASE_DIR = Path(__file__).parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
@@ -45,7 +42,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -93,11 +90,11 @@ BACKGROUND_TASK_RUN_ASYNC = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv("SITESQL_SCHEMA"),
-        'USER': os.getenv("SITESQL_USER"),
-        'PASSWORD': os.getenv("SITESQL_PW"),
-        'HOST': os.getenv("SITESQL_HOST"),
-        'PORT': os.getenv("SITESQL_PORT"),
+        'NAME': config('SITESQL_SCHEMA', default='bus'),
+        'USER': config('SITESQL_USER', default='root'),
+        'PASSWORD': config('SITESQL_PW', default='12345678'),
+        'HOST': config('SITESQL_HOST', default='localhost'),
+        'PORT': config('SITESQL_PORT', default='3306')
     }
 }
 

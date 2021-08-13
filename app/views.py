@@ -6,7 +6,7 @@ import os, json
 from datetime import datetime, timedelta
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django import template
@@ -62,12 +62,13 @@ def pages(request):
     except template.TemplateDoesNotExist:
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request))
-    except:
+
+    except Exception as e:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render(context, request))
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 def report_index(request):
     context = get_report_index_str()
 
@@ -79,7 +80,7 @@ def report_index(request):
         return HttpResponse(context['index_table'], content_type="application/json")
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 def report_prehandle(request):
     rtype = request.GET.get('rtype', None)
     if rtype is None:
@@ -114,7 +115,7 @@ def report_prehandle(request):
     return HttpResponse(html_template.render(context, request))
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 def report_view(request, rtype):
     if request.method == 'POST':
         body = json.loads(request.body.decode('utf-8'))
@@ -131,6 +132,7 @@ def report_view(request, rtype):
         return HttpResponseServerError(html_template.render({}, request))
 
 
+@login_required(login_url="/login/")
 def trigger_daily_task(request):
     if request.method == 'POST':
         d = {'start_date': None, 'end_date': None}
