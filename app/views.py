@@ -132,7 +132,7 @@ def report_view(request, rtype):
         return HttpResponseServerError(html_template.render({}, request))
 
 
-@login_required(login_url="/login/")
+# @login_required(login_url="/login/")
 def trigger_daily_task(request):
     if request.method == 'POST':
         d = {'start_date': None, 'end_date': None}

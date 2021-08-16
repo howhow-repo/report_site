@@ -50,7 +50,6 @@ class MongoDB:
     def get_distinct(self, datetime: datetime, collection_type: str, query_cmd: dict, field_name: str):
         datetime = datetime.strftime("%Y-%m-%d")
         collection_name = collection_type + "_" + datetime
-        print(query_cmd)
         if collection_name in self.db.collection_names():
             return self.db[collection_name].find(query_cmd).distinct(field_name)
         else:

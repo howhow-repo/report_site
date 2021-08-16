@@ -28,7 +28,7 @@
               <tbody>
                 {% for r in results%}
                 <tr {%if r.error_code != 0 or r.exception_bus_count != 0%} style="color: red; font-weight:bold " {%endif%} >
-                  <td>{{r.date|date:'Y / m / d' }}</td>
+                  <td>{{r.date|date:'Y / m / d (D)' }}</td>
                   <td>{{r.buses_count}}</td>
                   <td>{{r.runs_count}}</td>
                   <td>{{r.stoptostop_count}}</td>

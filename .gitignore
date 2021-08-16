@@ -16,6 +16,7 @@ env
 venv
 
 # other
+playground.py
 .DS_Store
 .idea
 .env
