@@ -17,30 +17,39 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 schema_view = get_schema_view(
-   openapi.Info(
+    openapi.Info(
         title="公車報表 API",
         default_version='v1',
         description="以API撈取報表，可回傳json/csv/html/pdf",
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # Django admin route
     path("", include("authentication.urls")),  # Auth routes - login / register
     path("", include("app.urls")),  # UI Kits Html files
-    path("api/", include("api.urls")), # for restful & swagger
+    path("api/", include("api.urls")),  # for restful & swagger
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
     # Matches any html file
     re_path(r'^.*\.*', pages, name='pages'),
 ]
 
-
 # Daily or scheduled job are submit here
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
+
+
+def my_listener(event):
+    if event.exception:
+        print('The job crashed :(')
+        print(event.exception)
+    else:
+        print('The job worked :)')
+    print(event)
+
 
 # scheduler.add_job(
 #     test,
@@ -71,6 +80,8 @@ scheduler.add_job(
     max_instances=1,
     replace_existing=True,
 )
+
+scheduler.add_listener(my_listener)
 
 try:
     scheduler.start()

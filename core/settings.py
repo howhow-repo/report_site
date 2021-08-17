@@ -77,19 +77,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 BACKGROUND_TASK_RUN_ASYNC = True
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-   }
-}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('SITESQL_SCHEMA', default='bus'),
+        'NAME': config('SITESQL_SCHEMA', default='reportsite'),
         'USER': config('SITESQL_USER', default='root'),
         'PASSWORD': config('SITESQL_PW', default='12345678'),
-        'HOST': config('SITESQL_HOST', default='localhost'),
+        'HOST': config('SITESQL_HOST', default='host.docker.internal'),
         'PORT': config('SITESQL_PORT', default='3306'),
         'CONN_MAX_AGE': 3600,
     }
