@@ -9,6 +9,7 @@ from django_apscheduler.jobstores import DjangoJobStore
 
 from apscheduler.triggers.cron import CronTrigger
 
+from app.views import pages
 from .tasks import delete_old_job_executions
 from app.tasks import test, stacking_runs_and_stoptostop
 from rest_framework import permissions
@@ -30,11 +31,10 @@ urlpatterns = [
     path("", include("authentication.urls")),  # Auth routes - login / register
     path("", include("app.urls")),  # UI Kits Html files
     path("api/", include("api.urls")), # for restful & swagger
-    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui')
-
+    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
     # Matches any html file
-    # re_path(r'^.*\.*', views.pages, name='pages'),
+    re_path(r'^.*\.*', pages, name='pages'),
 ]
 
 

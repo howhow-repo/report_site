@@ -117,13 +117,7 @@ def report_prehandle(request):
 
 @login_required(login_url="/login/")
 def report_view(request, rtype):
-    if request.method == 'POST':
-        body = json.loads(request.body.decode('utf-8'))
-        para_received = body
-        para_received = format_paras(para_received)
-        return parsing_post_report(request=request, rtype=rtype, para_received=para_received)
-
-    elif request.method == "GET":
+    if request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))
         return parsing_get_report(request=request, rtype=rtype, para_received=para_received)
 
