@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_apscheduler',
+    'drf_yasg',
+    'rest_framework',
+    'api',
     'app'  # Enable the inner app 
 ]
 
@@ -42,7 +45,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -74,18 +77,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 BACKGROUND_TASK_RUN_ASYNC = True
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME'  : 'db.sqlite3',
-#         'OPTIONS': {
-#             'timeout': 30,
-#         },
-#     }
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+   }
+}
 
 DATABASES = {
     'default': {
@@ -94,7 +90,8 @@ DATABASES = {
         'USER': config('SITESQL_USER', default='root'),
         'PASSWORD': config('SITESQL_PW', default='12345678'),
         'HOST': config('SITESQL_HOST', default='localhost'),
-        'PORT': config('SITESQL_PORT', default='3306')
+        'PORT': config('SITESQL_PORT', default='3306'),
+        'CONN_MAX_AGE': 3600,
     }
 }
 

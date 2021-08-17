@@ -165,6 +165,8 @@ def format_paras(para_received: dict):
     if "end_time" in para_received:
         para_received["end_time"] = datetime.strptime(para_received["end_time"], '%Y-%m-%d')
 
+    if "csrfmiddlewaretoken" in para_received:
+        del para_received['csrfmiddlewaretoken']
     return para_received
 
 

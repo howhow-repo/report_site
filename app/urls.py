@@ -18,9 +18,5 @@ urlpatterns = [
     path('report_index/triggertask/', views.trigger_daily_task, name='triggertask'),
     path('report_index/prehandle/', views.report_prehandle, name='report_prehandle'),
     path('report_index/<str:rtype>/', views.report_view, name='report_view'),
-
-    # Matches any html file
-    re_path(r'^.*\.*', views.pages, name='pages'),
-
 ]
 

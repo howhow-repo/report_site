@@ -22,7 +22,7 @@ class ReportCenter(object):
         a object that should able to call all kinds of reports
     '''
 
-    def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
+    def __init__(self, centerDB_conn_options={}, drivelogDB_conn_options={}):
         self._drivelogDB_conn_options = drivelogDB_conn_options
         self._centerDB_conn_options = centerDB_conn_options
         self.report_list = {

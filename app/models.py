@@ -61,7 +61,7 @@ def add_exception_bus(err_bus: list, date: datetime.date):
 
 
 def get_report_index_str():
-    rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
+    rc = ReportCenter()
     index_table = []
     for rn in rc.report_list:
         r = rc.create_empty_report(rn)
