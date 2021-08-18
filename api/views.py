@@ -1,7 +1,7 @@
 import inspect
 import json
 from datetime import datetime
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import parsing_post_report
@@ -19,6 +19,16 @@ class ListReports(APIView):
             index_table[i] = ({"report_name": rn, "title": r.title, "simple_description": r.simple_description,
                                 "args": list(inspect.signature(r.generate_report).parameters)})
         return JsonResponse(index_table)
+
+
+class ListJobs(APIView):
+    def get(self, request):
+        from core.urls import scheduler
+        j_json = {}
+        for i, j in enumerate(scheduler.get_jobs()):
+            j_json[str(i)] = {"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)}
+        return JsonResponse(j_json)
+
 
 class ReportAPIView(APIView):
 

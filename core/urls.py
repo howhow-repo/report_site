@@ -42,14 +42,6 @@ scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
-def my_listener(event):
-    if event.exception:
-        print('The job crashed :(')
-        print(event.exception)
-    else:
-        print('The job worked :)')
-    print(event)
-
 
 # scheduler.add_job(
 #     test,
@@ -64,7 +56,7 @@ def my_listener(event):
 scheduler.add_job(
     stacking_runs_and_stoptostop,
     trigger=CronTrigger(
-        hour="03", minute="30"  #
+        hour="04", minute="30"  #
     ),
     id="runsAndStopStacking",  # The `id` assigned to each job MUST be unique
     max_instances=1,
@@ -80,8 +72,6 @@ scheduler.add_job(
     max_instances=1,
     replace_existing=True,
 )
-
-scheduler.add_listener(my_listener)
 
 try:
     scheduler.start()

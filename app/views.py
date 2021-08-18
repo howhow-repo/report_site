@@ -4,6 +4,8 @@ Copyright (c) 2019 - present AppSeed.us
 """
 import os, json
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import inspect
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -14,8 +16,7 @@ from .models import get_report_index_str, parsing_post_report, parsing_get_repor
 from .models import get_parsing_result
 from .tasks import trigger_stacking
 from .reportsLib import ReportCenter, StationCenter
-from dotenv import load_dotenv
-import inspect
+
 
 load_dotenv()
 sql_options = json.loads(os.getenv("EBUS_SQLDB"))
@@ -23,20 +24,23 @@ mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
 
 def test_button(request):
-    r = get_parsing_result()
-    print(r)
-    print(type(r))
-    print(len(r))
-    print(r[0])
-    print(r[0].date)
-    print(type(r[0].date))
-    print(r[0].buses_count)
-    print(r[0].runs_count)
-    print(r[0].time_spent)
-    print(vars(r[0]))
-    print(vars(r[0])['date'])
-    print(type(vars(r[0])['date']))
-    return HttpResponse("ok")
+    from core.urls import scheduler
+    return HttpResponse(scheduler.get_jobs())
+
+def pause_jobs(request):
+    from core.urls import scheduler
+    scheduler.get_job('runsAndStopStacking').pause()
+    return HttpResponse(scheduler.get_jobs())
+
+def resume_jobs(request):
+    from core.urls import scheduler
+    scheduler.get_job('runsAndStopStacking').resume()
+    return HttpResponse(scheduler.get_jobs())
+
+def demo(request):
+    context = {}
+    html_template = loader.get_template('index.html')
+    return HttpResponse(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")
@@ -44,6 +48,10 @@ def index(request):
     context = {'segment': 'index'}
     results = get_parsing_result()
     context['results'] = [vars(r) for r in results]
+
+    from core.urls import scheduler
+    jobs = scheduler.get_jobs()
+    context['jobs'] = [{"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)} for j in jobs]
     html_template = loader.get_template('app/task_info.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -105,9 +113,9 @@ def report_prehandle(request):
         sc = StationCenter(sqlOption=sql_options)
         sc.connect()
         if 'rid' in rtype_paras:
-            context['rids'] = get_rid_options(sc)
+            context['rids'] = get_rid_select_options(sc)
         if 'vid' in rtype_paras:
-            context['vids'] = get_vid_options(sc)
+            context['vids'] = get_vid_select_options(sc)
         sc.disconnect()
 
     load_template = 'app/ui-report_prehandle.html'
@@ -164,7 +172,7 @@ def format_paras(para_received: dict):
     return para_received
 
 
-def get_rid_options(sc: StationCenter) -> list:
+def get_rid_select_options(sc: StationCenter) -> list:
     rids = []
     rdf = sc.get_routes_ch_name()
     for i in range(len(rdf['rid'])):
@@ -176,7 +184,7 @@ def get_rid_options(sc: StationCenter) -> list:
     return rids
 
 
-def get_vid_options(sc: StationCenter) -> list:
+def get_vid_select_options(sc: StationCenter) -> list:
     vids = []
     vdf = sc.get_vids_ch_name()
     for i in range(len(vdf['vid'])):
