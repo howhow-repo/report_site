@@ -76,8 +76,7 @@ class ReportAPIView(APIView):
         )
     )
     def post(self, request, report_name):
-        body = json.loads(request.body.decode('utf-8'))
-        para_received = body
+        para_received = request.data
         para_received = format_paras(para_received)
         return parsing_post_report(request=request, rtype=report_name, para_received=para_received)
 

@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django import template
-from .models import get_report_index_str, parsing_post_report, parsing_get_report
+from .models import get_report_index_str, parsing_get_report
 from .models import get_parsing_result
 from .tasks import trigger_stacking
 from .reportsLib import ReportCenter, StationCenter
