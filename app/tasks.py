@@ -13,8 +13,11 @@ from .models import add_exception_bus, add_parsing_result
 
 load_dotenv()
 
-def test():
-    print(f'{datetime.now()} loop test heart beat')
+
+def sql_conn_heartbeat():
+    from core.urls import scheduler
+    scheduler.get_jobs()
+    return 0
 
 
 def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime = None):
@@ -54,8 +57,8 @@ def send_line_notify(text):
     url = "https://notify-api.line.me/api/notify"
     headers = {
         'content-type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer '+TOKEN
+        'Authorization': 'Bearer ' + TOKEN
     }
     payload = parse.urlencode({'message': str(text)})
-    response = requests.post(url, data=payload, headers = headers)
+    response = requests.post(url, data=payload, headers=headers)
     return response

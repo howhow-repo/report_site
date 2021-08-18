@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.views import pages
 from .tasks import delete_old_job_executions
-from app.tasks import test, stacking_runs_and_stoptostop
+from app.tasks import sql_conn_heartbeat, stacking_runs_and_stoptostop
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -41,17 +41,15 @@ urlpatterns = [
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
-
-
-# scheduler.add_job(
-#     test,
-#     trigger=CronTrigger(
-#         second="0"  #
-#     ),
-#     id="testloop",  # The `id` assigned to each job MUST be unique
-#     max_instances=1,
-#     replace_existing=True,
-# )
+scheduler.add_job(
+    sql_conn_heartbeat,
+    trigger=CronTrigger(
+        minute="0"  #
+    ),
+    id="sql_conn_heartbeat",  # The `id` assigned to each job MUST be unique
+    max_instances=1,
+    replace_existing=True,
+)
 
 scheduler.add_job(
     stacking_runs_and_stoptostop,
