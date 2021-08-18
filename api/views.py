@@ -1,16 +1,21 @@
 import inspect
 import json
 from datetime import datetime
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import parsing_post_report
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 from app.reportsLib import ReportCenter
 
 
 class ListReports(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         rc = ReportCenter()
         index_table = {}
@@ -22,6 +27,9 @@ class ListReports(APIView):
 
 
 class ListJobs(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         from core.urls import scheduler
         j_json = {}
@@ -31,6 +39,8 @@ class ListJobs(APIView):
 
 
 class ReportAPIView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
