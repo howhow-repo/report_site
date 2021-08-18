@@ -54,7 +54,7 @@ scheduler.add_job(
 scheduler.add_job(
     stacking_runs_and_stoptostop,
     trigger=CronTrigger(
-        hour="04", minute="30"  #
+        hour="03", minute="30"  #
     ),
     id="runsAndStopStacking",  # The `id` assigned to each job MUST be unique
     max_instances=1,

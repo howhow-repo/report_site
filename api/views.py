@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import inspect
 import json
 from datetime import datetime
@@ -13,9 +14,14 @@ from app.reportsLib import ReportCenter
 
 
 class ListReports(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+    """
+        使用此api獲得支援的報表類型與敘述。
+        亦可在此查詢報表產生所需的參數。
+    """
 
+    @swagger_auto_schema(
+        operation_summary='Use to check supported reports and parameters.'
+    )
     def get(self, request):
         rc = ReportCenter()
         index_table = {}
@@ -27,9 +33,15 @@ class ListReports(APIView):
 
 
 class ListJobs(APIView):
+    """
+        列出背景執行程式及其狀態。
+    """
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary='Use to check background tasks status.'
+    )
     def get(self, request):
         from core.urls import scheduler
         j_json = {}
@@ -39,24 +51,30 @@ class ListJobs(APIView):
 
 
 class ReportAPIView(APIView):
+    """
+        可以使用 list report 的 api 來查詢可宮製作的報表。
+        使用時請傳入該報表所需的參數。 部分參數已有預設值，請參考下方說明。
+    """
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'start_time': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d'),
-            'end_time': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=today'),
-            'carno': openapi.Schema(type=openapi.TYPE_STRING, description='車牌號碼'),
-            'vid': openapi.Schema(type=openapi.TYPE_INTEGER, description='營運商id'),
-            'rid': openapi.Schema(type=openapi.TYPE_INTEGER, description='路線id'),
-            'type': openapi.Schema(type=openapi.TYPE_STRING, description='json/csv/html/pdf, default=json'),
-            'off_duty_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超出？秒即脫班, default=1200'),
-            'early_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間提早表訂時間逾?秒鐘，視為早發, default=60'),
-            'delay_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超過表訂時間逾?秒鐘，視為遲發, default=300'),
-
-        }
-    ))
+    @swagger_auto_schema(
+        operation_summary='Use to create different reports with parameters.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'start_time': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d'),
+                'end_time': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=start_time'),
+                'carno': openapi.Schema(type=openapi.TYPE_STRING, description='車牌號碼'),
+                'vid': openapi.Schema(type=openapi.TYPE_INTEGER, description='營運商id'),
+                'rid': openapi.Schema(type=openapi.TYPE_INTEGER, description='路線id'),
+                'type': openapi.Schema(type=openapi.TYPE_STRING, description='json/csv/html/pdf, default=json'),
+                'off_duty_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超出？秒即脫班, default=1200'),
+                'early_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間提早表訂時間逾?秒鐘，視為早發, default=60'),
+                'delay_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超過表訂時間逾?秒鐘，視為遲發, default=300'),
+            }
+        )
+    )
     def post(self, request, report_name):
         body = json.loads(request.body.decode('utf-8'))
         para_received = body
