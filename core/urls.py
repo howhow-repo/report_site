@@ -44,11 +44,11 @@ scheduler.add_jobstore(DjangoJobStore(), "default")
 scheduler.add_job(
     sql_conn_heartbeat,
     trigger=CronTrigger(
-        second="0"
+        minute="30"
     ),
     id="sql_conn_heartbeat",
     max_instances=1,
-    misfire_grace_time = 30,
+    misfire_grace_time=30,
     replace_existing=True,
 )
 
@@ -59,6 +59,7 @@ scheduler.add_job(
     ),
     id="runsAndStopStacking",
     max_instances=1,
+    misfire_grace_time=3600,
     replace_existing=True,
 )
 
