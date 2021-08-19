@@ -16,8 +16,7 @@ load_dotenv()
 
 def sql_conn_heartbeat():
     from core.urls import scheduler
-    print("sql_conn_heartbeat")
-    scheduler.get_jobs()
+    print(f"sql_conn_heartbeat: {scheduler.get_jobs()}")
     return 0
 
 

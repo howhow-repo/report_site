@@ -44,9 +44,9 @@ scheduler.add_jobstore(DjangoJobStore(), "default")
 scheduler.add_job(
     sql_conn_heartbeat,
     trigger=CronTrigger(
-        minute="0"  #
+        second="0"
     ),
-    id="sql_conn_heartbeat",  # The `id` assigned to each job MUST be unique
+    id="sql_conn_heartbeat",
     max_instances=1,
     replace_existing=True,
 )
@@ -54,9 +54,9 @@ scheduler.add_job(
 scheduler.add_job(
     stacking_runs_and_stoptostop,
     trigger=CronTrigger(
-        hour="03", minute="30"  #
+        hour="03", minute="30"
     ),
-    id="runsAndStopStacking",  # The `id` assigned to each job MUST be unique
+    id="runsAndStopStacking",
     max_instances=1,
     replace_existing=True,
 )
