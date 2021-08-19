@@ -16,14 +16,21 @@ class StationCenter(CenterDB):
         super().__init__(sqlOption)
 
     def get_weekdayType(self, date: datetime):
-        date = date.strftime("%Y-%m-%d")
+        """
+        get weekday type from database.
+        if database did not mention, weekday = 0, weekend = 1
+        """
+        date_str = date.strftime("%Y-%m-%d")
         sql_cmd = f"SELECT holidayCategoryType FROM bus.calendar " \
-                  f"where bus.calendar.date = '{date}'"
+                  f"where bus.calendar.date = '{date_str}'"
         type = self._get_single_data(sql_cmd)
-        if type is None:
-            return 0
-        else:
+        if type is not None:
             return type
+        else:
+            if date.weekday() > 5:
+                return 1
+            else:
+                return 0
 
     def get_rid_list_by_date(self, start_time: datetime, end_time: datetime = None) -> list:
         if end_time is None:

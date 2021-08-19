@@ -10,6 +10,13 @@ import pandas as pd
 from jinja2 import Environment, FileSystemLoader
 
 
+def to_sqllist(l: list) -> str:
+    l = str(l)
+    l = l.replace('[', '(')
+    l = l.replace(']', ')')
+    return l
+
+
 def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
     if report.empty:
         return pd.DataFrame(columns=['路線名稱', '班次數量', '平均到站率'])
@@ -22,7 +29,7 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
         index=main_report.index)
     main_report = main_report.astype({"runs_count": int})  # format each
 
-    main_report = main_report[['rid','rid_ch_name', 'runs_count', 'avg_run_stop_rate']]
+    main_report = main_report[['rid', 'rid_ch_name', 'runs_count', 'avg_run_stop_rate']]
 
     main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
@@ -38,6 +45,7 @@ class VendorRunStopRateReport(ReportBase):
     '''
         以單一營運商為單位建立各路線平均班次到站率。
     '''
+
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "營運商 平均路線到站率一覽表"
@@ -72,13 +80,14 @@ class VendorRunStopRateReport(ReportBase):
 
         rids_of_vid = station_center.get_rids_list_by_vid(self.vid)
         rids_in_schedule = station_center.get_rid_list_by_date(start_time=self.start_time, end_time=self.end_time)
-        self.total_rids = str(list(set(rids_of_vid).intersection(rids_in_schedule)))
-        self.total_rids = self.total_rids.replace('[', '(')
-        self.total_rids = self.total_rids.replace(']', ')')
 
-        self.report = station_center.get_run_stop_rate(start_time=self.start_time, end_time=self.end_time,
-                                                       other_filter=f"where rid in {self.total_rids}")
+        self.total_rids = list(set(rids_of_vid).intersection(rids_in_schedule))
+        if len(self.total_rids) != 0:
+            total_rids_sqllist = to_sqllist(self.total_rids)
+            self.report = station_center.get_run_stop_rate(start_time=self.start_time, end_time=self.end_time,
+                                                           other_filter=f"where rid in {total_rids_sqllist}")
         station_center.disconnect()
+        return self.report
 
     def parsing_df_for_user(self):
         return parsing_df_for_user(self.report)

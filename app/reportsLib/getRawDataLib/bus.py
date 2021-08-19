@@ -47,7 +47,7 @@ def split_logs_by_route_stop_sequence(logs: pd.DataFrame, schedule: pd.DataFrame
             elif station < 0:  # 該站sid = -1 則dont care
                 head_pointer += 1  # 指標指向drivelog下一站
                 continue
-            #  TODO: other situation handling
+            # TODO: other situation handling
 
         head_pointer += 1  # 指標指向drivelog下一站
 
@@ -174,6 +174,5 @@ class Bus(DriveLogDB):
         self.traveled_stops = []
         self.long_stay_logs = pd.DataFrame({})
         self.runs = []
-
         self.get_travel_logs(start_time=start_time,end_time=end_time)
         self.standardize_runs_logs()

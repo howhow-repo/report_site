@@ -12,6 +12,13 @@ import logging
 logger = logging.getLogger()
 
 
+def to_sqllist(l:list) -> str:
+    l = str(l)
+    l = l.replace('[', '(')
+    l = l.replace(']', ')')
+    return l
+
+
 def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
     if report.empty:
         return pd.DataFrame(columns=['日期', '應發車次數', '漏班次數', '非首站發車', '脫班次數', '正常發車次數', '準點率'])
@@ -83,15 +90,14 @@ class VendorRouteOnTimeRateReport(ReportBase):
         rids_of_vid = station_center.get_rids_list_by_vid(self.vid)
         rids_in_schedule = station_center.get_rid_list_by_date(start_time=start_time, end_time=end_time)
 
-        self.total_rids = str(list(set(rids_of_vid).intersection(rids_in_schedule)))
-        self.total_rids = self.total_rids.replace('[', '(')
-        self.total_rids = self.total_rids.replace(']', ')')
-        r = station_center.get_on_time_rate(start_time=start_time, off_duty_tol=off_duty_tol,
-                                            end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
-                                            other_filter=f" where rid in {self.total_rids}")
+        self.total_rids = list(set(rids_of_vid).intersection(rids_in_schedule))
+        if len(self.total_rids) != 0:
+            total_rids_sqllist = to_sqllist(self.total_rids)
+            self.report = station_center.get_on_time_rate(start_time=start_time, off_duty_tol=off_duty_tol,
+                                                end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
+                                                other_filter=f" where rid in {total_rids_sqllist}")
 
         station_center.disconnect()
-        self.report = r
         return self.report
 
     def parsing_df_for_user(self):
