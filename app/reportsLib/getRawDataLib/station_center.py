@@ -3,12 +3,9 @@ import os
 
 from .center_db import *
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-try:
-    load_dotenv()
-    TIME_SHIFT = int(os.getenv("TIME_SHIFT"))
-except Exception as e:
-    TIME_SHIFT = 0
+from decouple import config
+
+TIME_SHIFT = config('TIME_SHIFT', default='0')
 
 
 class StationCenter(CenterDB):

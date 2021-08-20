@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 import inspect
-import json
 from datetime import datetime
 from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+
+from app.tasks import stacking_runs_and_stoptostop
 from .models import parsing_post_report
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -79,6 +80,40 @@ class ReportAPIView(APIView):
         para_received = request.data
         para_received = format_paras(para_received)
         return parsing_post_report(request=request, rtype=report_name, para_received=para_received)
+
+
+class RunsAndStoptostopCalculation(APIView):
+    """
+        手動API觸發演算檔次與班次
+    """
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='Use to create different reports with parameters.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'confirm': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='use true to trigger'),
+                'start_date': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=yesterday'),
+                'end_date': openapi.Schema(type=openapi.TYPE_STRING,
+                                           description='format: %Y-%m-%d, default=start_time'),
+            }
+        )
+    )
+    def post(self, request):
+        d = {'start_date': None, 'end_date': None}
+        para_received = request.data
+        if (not ('confirm' in para_received)) or (para_received['confirm'] is not True):
+            return JsonResponse({'comment': 'confirm not True'})
+
+        if 'start_date' in para_received:
+            d['start_date'] = datetime.strptime(para_received["start_date"], '%Y-%m-%d')
+            if 'end_date' in para_received:
+                d['end_date'] = datetime.strptime(para_received["end_date"], '%Y-%m-%d')
+        result = stacking_runs_and_stoptostop(start_date=d['start_date'], end_date=d['end_date'])
+
+        return JsonResponse(result)
 
 
 def format_paras(para_received: dict):

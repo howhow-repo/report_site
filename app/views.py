@@ -14,7 +14,6 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerEr
 from django import template
 from .models import get_report_index_str, parsing_get_report
 from .models import get_parsing_result
-from .tasks import trigger_stacking
 from .reportsLib import ReportCenter, StationCenter
 
 
@@ -129,26 +128,6 @@ def report_view(request, rtype):
         para_received = format_paras(dict(request.GET.items()))
         return parsing_get_report(request=request, rtype=rtype, para_received=para_received)
 
-    else:
-        html_template = loader.get_template('page-500.html')
-        return HttpResponseServerError(html_template.render({}, request))
-
-
-# @login_required(login_url="/login/")
-def trigger_daily_task(request):
-    if request.method == 'POST':
-        d = {'start_date': None, 'end_date': None}
-        body = json.loads(request.body.decode('utf-8'))
-        para_received = body
-        if (not ('confirm' in para_received)) or (para_received['confirm'] != True):
-            return JsonResponse({'comment': 'confirm not True'})
-
-        if 'start_date' in para_received:
-            d['start_date'] = datetime.strptime(para_received["start_date"], '%Y-%m-%d')
-            if 'end_date' in para_received:
-                d['end_date'] = datetime.strptime(para_received["end_date"], '%Y-%m-%d')
-        result = trigger_stacking(start_date=d['start_date'], end_date=d['end_date'])
-        return JsonResponse(result)
     else:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render({}, request))
