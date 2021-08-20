@@ -47,7 +47,7 @@ class ListJobs(APIView):
         from core.urls import scheduler
         j_json = {}
         for i, j in enumerate(scheduler.get_jobs()):
-            j_json[str(i)] = {"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)}
+            j_json[str(i)] = {"name": j.name, "id":j.id, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)}
         return JsonResponse(j_json)
 
 
@@ -84,7 +84,7 @@ class ReportAPIView(APIView):
 
 class RunsAndStoptostopCalculation(APIView):
     """
-        手動API觸發演算檔次與班次
+        手動API觸發演算趟次與班次
     """
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
@@ -114,6 +114,36 @@ class RunsAndStoptostopCalculation(APIView):
         result = stacking_runs_and_stoptostop(start_date=d['start_date'], end_date=d['end_date'])
 
         return JsonResponse(result)
+
+class setJobStatus(APIView):
+    """
+        手動調整背景執行工作狀態
+    """
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='Use to set background Jod status.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'confirm': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='use true to trigger'),
+                'action': openapi.Schema(type=openapi.TYPE_STRING, description='action to job, pause/resume, default=none'),
+            }
+        )
+    )
+    def post(self, request, job_id):
+        para_received = request.data
+        from core.urls import scheduler
+        if para_received['action'] == 'pause':
+            scheduler.pause_job(job_id)
+        elif para_received['action'] == 'resume':
+            scheduler.resume_job(job_id)
+
+        j = scheduler.get_job(job_id)
+        j_json = {"name": j.name, "id": j.id, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)}
+
+        return JsonResponse(j_json)
 
 
 def format_paras(para_received: dict):

@@ -57,7 +57,7 @@ scheduler.add_job(
     trigger=CronTrigger(
         hour="03", minute="30"
     ),
-    id="runsAndStopStacking",
+    id="stacking_runs_and_stoptostop",
     max_instances=1,
     misfire_grace_time=3600,
     replace_existing=True,
