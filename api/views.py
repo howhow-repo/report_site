@@ -9,7 +9,7 @@ from app.tasks import stacking_runs_and_stoptostop
 from .models import parsing_post_report
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import BasicAuthentication
 
 from app.reportsLib import ReportCenter
 
@@ -115,7 +115,8 @@ class RunsAndStoptostopCalculation(APIView):
 
         return JsonResponse(result)
 
-class setJobStatus(APIView):
+
+class SetJobStatus(APIView):
     """
         手動調整背景執行工作狀態
     """
