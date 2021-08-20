@@ -139,6 +139,22 @@ class StationCenter(CenterDB):
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         return table
 
+    def get_run_logs_by_rid(self, rid: int, start_time: datetime, end_time: datetime = None,
+                                  off_duty_timedelta: int = 1200):
+        if end_time is None or end_time == start_time:
+            end_time = start_time
+        end_time = end_time + timedelta(days=1)
+        start_time = start_time.strftime("%Y-%m-%d")
+        end_time = end_time.strftime("%Y-%m-%d")
+
+        sql_cmd = f"""SELECT * FROM bus.runlogs
+                    where rid = {rid}
+                    and bus_departure_time between '{start_time}' and '{end_time}'
+                    order by bus_departure_time;"""
+
+        table = self._get_table_data("schedule", sql_cmd=sql_cmd)
+        return table
+
     def get_rid_schedule_run_logs(self, rid: int, start_time: datetime, end_time: datetime = None,
                                   off_duty_timedelta: int = 1200):
         if end_time is None or end_time == start_time:

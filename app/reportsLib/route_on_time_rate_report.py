@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pdfkit
 from datetime import datetime, timedelta
-from .route_schedule_departure_report import RouteScheduleDepartureReport
+from .route_schedule_departure_count_report import RouteScheduleDepartureCountReport
 from .report_base import ReportBase
 from jinja2 import Environment, FileSystemLoader
 
@@ -94,7 +94,7 @@ class RouteOnTimeRateReport(ReportBase):
 
         self.rid = rid
 
-        route_schedule_departure_report = RouteScheduleDepartureReport(
+        route_schedule_departure_report = RouteScheduleDepartureCountReport(
             centerDB_conn_options=self._centerDB_conn_options,
             drivelogDB_conn_options=self._drivelogDB_conn_options)
         route_schedule_departure_report.generate_report(start_time=self.start_time, rid=self.rid,

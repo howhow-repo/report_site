@@ -37,7 +37,7 @@ class ListJobs(APIView):
     """
         列出背景執行程式及其狀態。
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -56,7 +56,7 @@ class ReportAPIView(APIView):
         可以使用 list report 的 api 來查詢可宮製作的報表。
         使用時請傳入該報表所需的參數。 部分參數已有預設值，請參考下方說明。
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -86,7 +86,7 @@ class RunsAndStoptostopCalculation(APIView):
     """
         手動API觸發演算檔次與班次
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

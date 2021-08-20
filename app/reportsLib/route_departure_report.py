@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 def parsing_df_for_user(report: pd.DataFrame):
     if report.empty:
-        return pd.DataFrame(columns=['表定發車時間', '車號', '公車發車時間', '發車時間差(分)', '到站率'])
+        return pd.DataFrame(columns=['車號', '公車發車時間', '發車時間差(分)', '到站率'])
 
     main_report = report.copy()  # 開始處裡準點報表
 
@@ -27,21 +27,22 @@ def parsing_df_for_user(report: pd.DataFrame):
 
     main_report.replace([np.nan, None, "nan%"], '', inplace=True)
 
-    main_report = main_report[['starttime', 'carno', 'bus_departure_time', 'departure_timedelta', 'run_stop_rate']]
+    main_report = main_report[['carno', 'bus_departure_time', 'departure_timedelta', 'run_stop_rate']]
 
-    main_report.rename(columns={'starttime': '表定發車時間',
-                                'carno': '車號',
-                                'bus_departure_time': '公車發車時間',
-                                'departure_timedelta': '發車時間差(s)',
-                                'run_stop_rate': '到站率',
-                                }, inplace=True)
+    main_report.rename(columns={
+        'carno': '車號',
+        'bus_departure_time': '公車發車時間',
+        'departure_timedelta': '發車時間差(s)',
+        'run_stop_rate': '到站率',
+    }, inplace=True)
     main_report.index += 1  # index from 1
     return main_report
 
 
 class RouteDepartureReport(ReportBase):
     '''
-        呈現一個路線在時間內的發車紀錄。
+        呈現一個路線的各班次在時間內的發車紀錄。
+        僅以各班次作為計算基準，不計額外發車。
         report schema:[
             'rid': 'route id,
             'direct' ,
@@ -85,12 +86,7 @@ class RouteDepartureReport(ReportBase):
                                               'bus_departure_time', 'departure_timedelta', 'run_stop_rate',
                                               'error_code'])
 
-        self.report = station_center.get_schedule_logs_by_rid(rid=self.rid,
-                                                              start_time=start_time,
-                                                              end_time=end_time)
-
-        # 避免撈回來的班表(schedule)中，'starttime'有重複，但屬於不同的schedule_id
-        self.report.drop_duplicates(subset='starttime', inplace=True)
+        self.report = station_center.get_run_logs_by_rid(rid=self.rid, start_time=start_time, end_time=end_time)
 
         station_center.disconnect()
 

@@ -5,10 +5,10 @@ import os
 from .report_base import ReportBase
 from .bus_departure_count_report import BusDepartureCountReport
 from .bus_day_run_report import BusDayRunReport
-from .route_departure_report import RouteDepartureReport
+from .route_schedule_departure_report import RouteScheduleDepartureReport
 from .vendor_route_on_time_rate_report import VendorRouteOnTimeRateReport
 from .vendor_run_stop_rate_report import VendorRunStopRateReport
-from .route_schedule_departure_report import RouteScheduleDepartureReport
+from .route_schedule_departure_count_report import RouteScheduleDepartureCountReport
 from .route_on_time_rate_report import RouteOnTimeRateReport
 from .total_on_time_rate_report import TotalOnTimeRateReport
 from .total_run_stop_rate_report import TotalRunStopRateReport
@@ -28,8 +28,8 @@ class ReportCenter(object):
         self.report_list = {
             'bus_departure_count_report': BusDepartureCountReport,
             'bus_day_run_report': BusDayRunReport,
-            'route_departure_report': RouteDepartureReport,
-            'route_schedule_departure_report': RouteScheduleDepartureReport,
+            'route_departure_report': RouteScheduleDepartureReport,
+            'route_schedule_departure_report': RouteScheduleDepartureCountReport,
             'route_on_time_rate_report': RouteOnTimeRateReport,
             'vendor_route_on_time_rate_report': VendorRouteOnTimeRateReport,
             'total_on_time_rate_report': TotalOnTimeRateReport,
