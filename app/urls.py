@@ -18,7 +18,6 @@ urlpatterns = [
     path('report_index/testbutton/', views.test_button, name='test_button'),
     path('report_index/pause/', views.pause_jobs, name='pause_button'),
     path('report_index/resume/', views.resume_jobs, name='resume_button'),
-    path('report_index/triggertask/', views.trigger_daily_task, name='triggertask'),
     path('report_index/prehandle/', views.report_prehandle, name='report_prehandle'),
     path('report_index/<str:rtype>/', views.report_view, name='report_view'),
 ]
