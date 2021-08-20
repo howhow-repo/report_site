@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_apscheduler',
     'drf_yasg',
     'rest_framework',
+    'notify',
     'api',
     'app'  # Enable the inner app 
 ]

@@ -36,6 +36,7 @@ class ExceptionParsingBus(models.Model):
     date = models.DateField()
     carno = models.CharField(max_length=15)
 
+
 # class TaskControl:
 
 def get_parsing_result(latest: int = 7):

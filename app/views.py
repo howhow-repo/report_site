@@ -83,8 +83,9 @@ def report_index(request):
         load_template = 'app/ui-report_index.html'
         html_template = loader.get_template(load_template)
         return HttpResponse(html_template.render(context, request))
-    elif request.method == 'POST':
-        return HttpResponse(context['index_table'], content_type="application/json")
+    else:
+        html_template = loader.get_template('page-500.html')
+        return HttpResponseServerError(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")

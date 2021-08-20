@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
 from app.reportsLib import ReportCenter
+from app.tasks import task_report_notification
 
 
 class ListReports(APIView):
@@ -111,9 +112,12 @@ class RunsAndStoptostopCalculation(APIView):
             d['start_date'] = datetime.strptime(para_received["start_date"], '%Y-%m-%d')
             if 'end_date' in para_received:
                 d['end_date'] = datetime.strptime(para_received["end_date"], '%Y-%m-%d')
-        result = stacking_runs_and_stoptostop(start_date=d['start_date'], end_date=d['end_date'])
+        results = stacking_runs_and_stoptostop(start_date=d['start_date'], end_date=d['end_date'])
+        re = {}
+        for i, r in enumerate(results):
+            re[str(i)] = r
 
-        return JsonResponse(result)
+        return JsonResponse(re)
 
 
 class SetJobStatus(APIView):
@@ -145,6 +149,12 @@ class SetJobStatus(APIView):
         j_json = {"name": j.name, "id": j.id, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)}
 
         return JsonResponse(j_json)
+
+
+class SentReportNotify(APIView):
+    def post(self, request):
+        task_report_notification()
+        return JsonResponse({"response":"sent"})
 
 
 def format_paras(para_received: dict):

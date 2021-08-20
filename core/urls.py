@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.views import pages
 from .tasks import delete_old_job_executions
-from app.tasks import sql_conn_heartbeat, stacking_runs_and_stoptostop
+from app.tasks import sql_conn_heartbeat, stacking_runs_and_stoptostop, task_report_notification
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),  # Django admin route
     path("", include("authentication.urls")),  # Auth routes - login / register
     path("", include("app.urls")),  # UI Kits Html files
+    path("notify/", include("notify.urls")),
     path("api/", include("api.urls")),  # for restful & swagger
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
@@ -58,6 +59,17 @@ scheduler.add_job(
         hour="03", minute="30"
     ),
     id="stacking_runs_and_stoptostop",
+    max_instances=1,
+    misfire_grace_time=3600,
+    replace_existing=True,
+)
+
+scheduler.add_job(
+    task_report_notification,
+    trigger=CronTrigger(
+        hour="04", minute="00"
+    ),
+    id="task_report_notification",
     max_instances=1,
     misfire_grace_time=3600,
     replace_existing=True,

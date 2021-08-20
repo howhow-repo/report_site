@@ -8,5 +8,7 @@ urlpatterns = [
    path('list_jobs/', ListJobs.as_view(), name='list_jobs'),
    path('calculate/',RunsAndStoptostopCalculation.as_view(), name='stoptostop'),
    path('set_job/<str:job_id>', SetJobStatus.as_view(), name='set_job'),
-   path('<str:report_name>/', ReportAPIView.as_view(), name='report_api')
+   path('send_report_notify/',SentReportNotify.as_view(), name='sent_report_notify'),
+   path('<str:report_name>/', ReportAPIView.as_view(), name='report_api'),
+
 ]

@@ -5,7 +5,8 @@ from urllib import parse
 from datetime import datetime, timedelta
 from decouple import config
 from .reportsLib import DailyInfoStaker
-from .models import add_exception_bus, add_parsing_result
+from .models import add_exception_bus, add_parsing_result, DailyDriveLogParsingStatus, ExceptionParsingBus
+from notify.models import LineNotifyControl
 
 PROJECT_TITLE = config('PROJECT_TITLE', default='unnamed')
 
@@ -51,13 +52,45 @@ def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime
     return results
 
 
+def task_report_notification():
+    latest_data = DailyDriveLogParsingStatus.objects.order_by('-date')[0]
+    latest_date = latest_data.date
+    if latest_date != datetime.today().date() - timedelta(days=1):
+        send_line_notify(f"[{PROJECT_TITLE}][runs task]: \n !!WARNRING!! \n"
+                         f"The stacking_runs_and_stoptostop did not run yesterday!")
+        send_line_notify(f"{type(latest_data.date)}")
+    else:
+        send_line_notify(f"[{PROJECT_TITLE}][runs task]: \n"
+                         f"統計日期: {latest_data.date} \n"
+                         f"遍歷公車數量: {latest_data.buses_count} \n"
+                         f"結果趟次數量: {latest_data.runs_count} \n"
+                         f"站到站數量: {latest_data.stoptostop_count} \n"
+                         f"計算花費時間(s): {latest_data.time_spent} \n"
+                         f"例外公車: {ExceptionParsingBus.objects.order_by('-date')} \n"
+                         f"error_code: {latest_data.error_code}")
+
+
 def send_line_notify(text):
-    TOKEN = os.getenv("LINE_TOKEN")
-    url = "https://notify-api.line.me/api/notify"
-    headers = {
-        'content-type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer ' + TOKEN
-    }
-    payload = parse.urlencode({'message': str(text)})
-    response = requests.post(url, data=payload, headers=headers)
-    return response
+    people_to_sent = LineNotifyControl.objects.filter(activate=True)
+    for p in people_to_sent:
+        TOKEN = p.token
+        url = "https://notify-api.line.me/api/notify"
+        headers = {
+            'content-type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer ' + TOKEN
+        }
+        payload = parse.urlencode({'message': str(text)})
+        requests.post(url, data=payload, headers=headers)
+    t = config("LINE_TOKEN", default=None)
+
+    if t is not None:
+        TOKEN = t
+        url = "https://notify-api.line.me/api/notify"
+        headers = {
+            'content-type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer ' + TOKEN
+        }
+        payload = parse.urlencode({'message': str(text)})
+        requests.post(url, data=payload, headers=headers)
+
+    print("---send line notify done")
