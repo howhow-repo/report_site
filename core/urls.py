@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.views import pages
 from .tasks import delete_old_job_executions
-from app.tasks import sql_conn_heartbeat, stacking_runs_and_stoptostop, task_report_notification
+from app.tasks import sql_conn_keepalive, stacking_runs_and_stoptostop, task_report_notification
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -43,11 +43,11 @@ scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
 scheduler.add_job(
-    sql_conn_heartbeat,
+    sql_conn_keepalive,
     trigger=CronTrigger(
         minute="30"
     ),
-    id="sql_conn_heartbeat",
+    id="sql_conn_keepalive",
     max_instances=1,
     misfire_grace_time=30,
     replace_existing=True,

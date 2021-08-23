@@ -11,7 +11,7 @@ from notify.models import LineNotifyControl
 PROJECT_TITLE = config('PROJECT_TITLE', default='unnamed')
 
 
-def sql_conn_heartbeat():
+def sql_conn_keepalive():
     from core.urls import scheduler
     print(f"[{datetime.now()}] sql_conn_heartbeat: {scheduler.get_job('sql_conn_heartbeat')}")
     return 0
@@ -73,24 +73,34 @@ def task_report_notification():
 def send_line_notify(text):
     people_to_sent = LineNotifyControl.objects.filter(activate=True)
     for p in people_to_sent:
-        TOKEN = p.token
-        url = "https://notify-api.line.me/api/notify"
-        headers = {
-            'content-type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + TOKEN
-        }
-        payload = parse.urlencode({'message': str(text)})
-        requests.post(url, data=payload, headers=headers)
-    t = config("LINE_TOKEN", default=None)
+        try:
+            TOKEN = p.token
+            url = "https://notify-api.line.me/api/notify"
+            headers = {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Bearer ' + TOKEN
+            }
+            payload = parse.urlencode({'message': str(text)})
+            requests.post(url, data=payload, headers=headers)
+        except Exception as e:
+            print(f'sent notify to {p.name}:{p.token} fail.')
+            print(e)
+            continue
 
+    # if define in .env, also send
+    t = config("LINE_TOKEN", default=None)
     if t is not None:
-        TOKEN = t
-        url = "https://notify-api.line.me/api/notify"
-        headers = {
-            'content-type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + TOKEN
-        }
-        payload = parse.urlencode({'message': str(text)})
-        requests.post(url, data=payload, headers=headers)
+        try:
+            TOKEN = t
+            url = "https://notify-api.line.me/api/notify"
+            headers = {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Bearer ' + TOKEN
+            }
+            payload = parse.urlencode({'message': str(text)})
+            requests.post(url, data=payload, headers=headers)
+        except Exception as e:
+            print(f'sent notify to {t} in .env fail.')
+            print(e)
 
     print("---send line notify done")
