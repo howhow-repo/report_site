@@ -59,11 +59,6 @@ def index(request):
     context['segment'] = 'index'
     results = get_parsing_result()
     context['results'] = [vars(r) for r in results]
-
-    logger.debug('debug log')
-    logger.info('info log')
-    logger.warning('warning log')
-    logger.error('error log')
     # from core.urls import scheduler
     # jobs = scheduler.get_jobs()
     # context['jobs'] = [{"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)} for j in jobs]
