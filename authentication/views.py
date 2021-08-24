@@ -2,7 +2,7 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-
+from decouple import config
 from django.shortcuts import render
 
 # Create your views here.
@@ -14,6 +14,12 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
 
 from .forms import LoginForm, SignUpForm
+
+
+CONTEXT = {
+    "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed')
+}
+
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -34,7 +40,7 @@ def login_view(request):
         else:
             msg = 'Error validating the form'    
 
-    return render(request, "accounts/login.html", {"form": form, "msg" : msg})
+    return render(request, "accounts/login.html", {**CONTEXT, **{"form": form, "msg": msg}})
 
 def register_user(request):
     html_template = loader.get_template('page-404.html')
@@ -61,4 +67,4 @@ def register_user(request):
     else:
         form = SignUpForm()
 
-    return render(request, "accounts/register.html", {"form": form, "msg" : msg, "success" : success })
+    return render(request, "accounts/register.html", {**CONTEXT, **{"form": form, "msg": msg, "success": success}})

@@ -44,11 +44,6 @@ def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime
                            error_code=result['error_code'], time_spent=result['time_spent'])
         add_exception_bus(result['exception_buses'], day)
 
-        try:
-            send_line_notify(f"[{PROJECT_TITLE}][runs task]" + str(result))
-        except Exception as err:
-            pass
-
     return results
 
 
@@ -60,13 +55,16 @@ def task_report_notification():
                          f"The stacking_runs_and_stoptostop did not run yesterday!")
         send_line_notify(f"{type(latest_data.date)}")
     else:
+        excep_buses = ExceptionParsingBus.objects.filter(date=datetime.today().date() - timedelta(days=1)).order_by(
+            '-date')
+
         send_line_notify(f"[{PROJECT_TITLE}][runs task]: \n"
                          f"統計日期: {latest_data.date} \n"
                          f"遍歷公車數量: {latest_data.buses_count} \n"
                          f"結果趟次數量: {latest_data.runs_count} \n"
                          f"站到站數量: {latest_data.stoptostop_count} \n"
                          f"計算花費時間(s): {latest_data.time_spent} \n"
-                         f"例外公車: {ExceptionParsingBus.objects.order_by('-date')} \n"
+                         f"例外公車: {[b.carno for b in excep_buses]} \n"
                          f"error_code: {latest_data.error_code}")
 
 

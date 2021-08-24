@@ -8,8 +8,8 @@ import json
 import os
 
 import pdfkit
+from decouple import config
 from django.db import models
-from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import loader
 from dotenv import load_dotenv
@@ -41,6 +41,7 @@ class ExceptionParsingBus(models.Model):
 
 def get_parsing_result(latest: int = 7):
     return DailyDriveLogParsingStatus.objects.order_by('-date')[:latest]
+
 
 def add_parsing_result(date: datetime.date,
                        bus_count: int = 0, runs_count: int = 0, stoptostop_count: int = 0,
@@ -82,6 +83,7 @@ def parsing_get_report(request, rtype, para_received):
     report.generate_report(**para_received)
 
     context = {
+        "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
         'segment': 'report_index',
         'rtype': rtype,
         'title': report.title,

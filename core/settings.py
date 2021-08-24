@@ -20,7 +20,6 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
 ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', config('SERVER', default='127.0.0.1'), ]
-ALLOWED_HOSTS += ['172.20.10.5', '192.168.0.103', '192.168.30.177', '*']
 
 # Application definition
 
@@ -141,3 +140,49 @@ STATICFILES_DIRS = (
 )
 #############################################################
 #############################################################
+LOGGING_CONFIG = None
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'loggers': {
+        '': {
+            'handler': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django': {
+            'handler': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'root': {
+            'handler': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './log.log',
+            'formatter': 'simple',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'formatters': {
+        'normal': {
+            'format': '[%(levelname)s] %(asctime)s | %(name)s:%(lineno)d | %(message)s'
+        },
+        'simple': {
+            'format': '[%(levelname)s] %(message)s'
+        },
+    },
+}
+
+import logging.config
+logging.config.dictConfig(LOGGING)

@@ -10,6 +10,5 @@ from notify import views
 urlpatterns = [
 
     # The home page
-    path('', views.notify_index, name='nitify_index'),
+    path('', views.notify_index, name='notify_index'),
 ]
-

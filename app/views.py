@@ -4,6 +4,8 @@ Copyright (c) 2019 - present AppSeed.us
 """
 import os, json
 from datetime import datetime, timedelta
+
+from decouple import config
 from dotenv import load_dotenv
 import inspect
 
@@ -16,25 +18,34 @@ from .models import get_report_index_str, parsing_get_report
 from .models import get_parsing_result
 from .reportsLib import ReportCenter, StationCenter
 
+import logging
+logger = logging.getLogger('django')
 
 load_dotenv()
 sql_options = json.loads(os.getenv("EBUS_SQLDB"))
 mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
+
+CONTEXT = {
+    "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed')
+}
 
 
 def test_button(request):
     from core.urls import scheduler
     return HttpResponse(scheduler.get_jobs())
 
+
 def pause_jobs(request):
     from core.urls import scheduler
     scheduler.get_job('runsAndStopStacking').pause()
     return HttpResponse(scheduler.get_jobs())
 
+
 def resume_jobs(request):
     from core.urls import scheduler
     scheduler.get_job('runsAndStopStacking').resume()
     return HttpResponse(scheduler.get_jobs())
+
 
 def demo(request):
     context = {}
@@ -44,20 +55,25 @@ def demo(request):
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index'}
+    context = CONTEXT
+    context['segment'] = 'index'
     results = get_parsing_result()
     context['results'] = [vars(r) for r in results]
 
-    from core.urls import scheduler
-    jobs = scheduler.get_jobs()
-    context['jobs'] = [{"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)} for j in jobs]
+    logger.debug('debug log')
+    logger.info('info log')
+    logger.warning('warning log')
+    logger.error('error log')
+    # from core.urls import scheduler
+    # jobs = scheduler.get_jobs()
+    # context['jobs'] = [{"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)} for j in jobs]
     html_template = loader.get_template('app/task_info.html')
     return HttpResponse(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = {}
+    context = CONTEXT
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
     try:
@@ -77,7 +93,8 @@ def pages(request):
 
 @login_required(login_url="/login/")
 def report_index(request):
-    context = get_report_index_str()
+    context = CONTEXT
+    context = {**context, **get_report_index_str()}
 
     if request.method == 'GET':
         load_template = 'app/ui-report_index.html'
@@ -99,6 +116,7 @@ def report_prehandle(request):
     rtype_paras = list(inspect.signature(report.generate_report).parameters)
 
     context = {
+        "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
         'segment': 'report_index',
         "rtype": rtype,
         "title": report.title,
@@ -125,13 +143,15 @@ def report_prehandle(request):
 
 @login_required(login_url="/login/")
 def report_view(request, rtype):
+
     if request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))
         return parsing_get_report(request=request, rtype=rtype, para_received=para_received)
 
     else:
+        context = CONTEXT
         html_template = loader.get_template('page-500.html')
-        return HttpResponseServerError(html_template.render({}, request))
+        return HttpResponseServerError(html_template.render(context, request))
 
 
 def format_paras(para_received: dict):
