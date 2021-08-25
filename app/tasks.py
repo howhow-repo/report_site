@@ -13,7 +13,7 @@ PROJECT_TITLE = config('PROJECT_TITLE', default='unnamed')
 
 def sql_conn_keepalive():
     from core.urls import scheduler
-    print(f"[{datetime.now()}] sql_conn_heartbeat: {scheduler.get_job('sql_conn_heartbeat')}")
+    print(f"[{datetime.now()}] sql_conn_keepalive: {scheduler.get_job('sql_conn_keepalive')}")
     return 0
 
 
