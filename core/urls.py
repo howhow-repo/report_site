@@ -2,6 +2,7 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+import django.db.utils
 from django.contrib import admin
 from django.urls import path, include, re_path
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -39,54 +40,58 @@ urlpatterns = [
 ]
 
 # Daily or scheduled job are submit here
-scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), "default")
-
-scheduler.add_job(
-    sql_conn_keepalive,
-    trigger=CronTrigger(
-        minute="30"
-    ),
-    id="sql_conn_keepalive",
-    max_instances=1,
-    misfire_grace_time=30,
-    replace_existing=True,
-)
-
-scheduler.add_job(
-    stacking_runs_and_stoptostop,
-    trigger=CronTrigger(
-        hour="03", minute="30"
-    ),
-    id="stacking_runs_and_stoptostop",
-    max_instances=1,
-    misfire_grace_time=3600,
-    replace_existing=True,
-)
-
-scheduler.add_job(
-    task_report_notification,
-    trigger=CronTrigger(
-        hour="04", minute="00"
-    ),
-    id="task_report_notification",
-    max_instances=1,
-    misfire_grace_time=3600,
-    replace_existing=True,
-)
-
-scheduler.add_job(
-    delete_old_job_executions,
-    trigger=CronTrigger(
-        day_of_week="mon", hour="00", minute="00"
-    ),  # Midnight on Monday, before start of the next work week.
-    id="delete_old_job_executions",
-    max_instances=1,
-    replace_existing=True,
-)
-
 try:
-    scheduler.start()
-except KeyboardInterrupt:
-    scheduler.shutdown()
-###
+    scheduler = BackgroundScheduler()
+    scheduler.add_jobstore(DjangoJobStore(), "default")
+    scheduler.add_job(
+        sql_conn_keepalive,
+        trigger=CronTrigger(
+            minute="30"
+        ),
+        id="sql_conn_keepalive",
+        max_instances=1,
+        misfire_grace_time=30,
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        stacking_runs_and_stoptostop,
+        trigger=CronTrigger(
+            hour="03", minute="30"
+        ),
+        id="stacking_runs_and_stoptostop",
+        max_instances=1,
+        misfire_grace_time=3600,
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        task_report_notification,
+        trigger=CronTrigger(
+            hour="04", minute="00"
+        ),
+        id="task_report_notification",
+        max_instances=1,
+        misfire_grace_time=3600,
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        delete_old_job_executions,
+        trigger=CronTrigger(
+            day_of_week="mon", hour="00", minute="00"
+        ),  # Midnight on Monday, before start of the next work week.
+        id="delete_old_job_executions",
+        max_instances=1,
+        replace_existing=True,
+    )
+
+    try:
+        scheduler.start()
+        print("Starting apscheduler")
+    except KeyboardInterrupt:
+        scheduler.shutdown()
+    ###
+
+except django.db.utils.ProgrammingError:
+    pass
