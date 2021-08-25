@@ -115,9 +115,14 @@ class Run:
             self.bus_departure_stop = run_logs['station'].iloc[first_departure_index]
             self.bus_departure_sne = run_logs['sne'].iloc[first_departure_index]
 
-            # 往下找出距離最近的紀錄時間, 當作發車時間
-            next_departure_index = run_logs[(run_logs['station'] != first_rsid)].first_valid_index()
-            self.bus_departure_time = run_logs['date_gps'].iloc[next_departure_index]
+            try:  # 往下找出距離最近的紀錄時間, 當作發車時間
+                next_departure_index = run_logs[(run_logs['station'] != first_rsid)].first_valid_index()
+                self.bus_departure_time = run_logs['date_gps'].iloc[next_departure_index]
+            except TypeError:  # 若往下皆無出站紀錄，以第一筆進站作為departure_time
+                self.error.add_error('UNKNOWNERROR')
+                first_arrival_index = run_logs[(run_logs['station'] == first_rsid)].where(
+                    run_logs['type'] == 1).first_valid_index()
+                self.bus_departure_time = run_logs['station'].iloc[first_arrival_index]
 
         # 找最後一筆進站紀錄
         last_arrival_index = (
