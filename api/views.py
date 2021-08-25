@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import inspect
+import logging
 from datetime import datetime
 from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
@@ -13,6 +14,9 @@ from rest_framework.authentication import BasicAuthentication
 
 from app.reportsLib import ReportCenter
 from app.tasks import task_report_notification
+
+
+logger = logging.getLogger(__name__)
 
 
 class ListReports(APIView):

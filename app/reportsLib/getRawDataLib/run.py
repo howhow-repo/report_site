@@ -6,7 +6,7 @@ import logging
 from .stop_to_stop import StopToStop
 from datetime import timedelta
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def nearest_time_index(date: datetime, schedule: pd.DataFrame) -> int:

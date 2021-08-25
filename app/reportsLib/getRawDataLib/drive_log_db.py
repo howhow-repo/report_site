@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from .mongo_db_handler import MongoDB
 
 load_dotenv()
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 time_shift = int(os.getenv("TIME_SHIFT"))
 
 

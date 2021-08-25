@@ -145,7 +145,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handler': ['console', 'file'],
-            'level': 'INFO',
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
         'django.server': {
@@ -154,6 +154,21 @@ LOGGING = {
             'propagate': False,
         },
         '': {
+            'handlers': ['console', 'file'],
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'app': {
+            'handlers': ['console', 'file'],
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'api': {
+            'handlers': ['console', 'file'],
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'notify': {
             'handlers': ['console', 'file'],
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
             'propagate': False,
@@ -176,7 +191,7 @@ LOGGING = {
     },
     'formatters': {
         'simple': {
-            'format': '[%(levelname)s] %(asctime)s |  %(message)s',
+            'format': '[%(levelname)s]%(name)s |  %(asctime)s |  %(message)s',
         },
     },
 }

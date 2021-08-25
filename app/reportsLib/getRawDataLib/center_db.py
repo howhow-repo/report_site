@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 from sqlalchemy import create_engine
 
-logger = logging.getLogger('')
+logger = logging.getLogger(__name__)
 
 class CenterDB:
     def __init__(self, sqlOption: dict, DBName: str = "bus"):

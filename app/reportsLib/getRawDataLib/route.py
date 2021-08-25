@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 load_dotenv()
 
 TIME_SHIFT = int(os.getenv("TIME_SHIFT"))
