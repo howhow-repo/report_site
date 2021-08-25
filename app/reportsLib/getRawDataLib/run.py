@@ -122,7 +122,7 @@ class Run:
                 self.error.add_error('UNKNOWNERROR')
                 first_arrival_index = run_logs[(run_logs['station'] == first_rsid)].where(
                     run_logs['type'] == 1).first_valid_index()
-                self.bus_departure_time = run_logs['station'].iloc[first_arrival_index]
+                self.bus_departure_time = run_logs['date_gps'].iloc[first_arrival_index]
 
         # 找最後一筆進站紀錄
         last_arrival_index = (
