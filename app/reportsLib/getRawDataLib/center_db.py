@@ -21,7 +21,7 @@ class CenterDB:
                                        database=self.__DBName,
                                        )
             self.cursor = self._db.cursor()
-            logger.info("center DB connected: please remember disconnect after used")
+            logger.debug("center DB connected: please remember disconnect after used")
         except Exception as err:
             self.disconnect()
             raise ConnectionError(f"ebus center mysql connection error.\n"
@@ -36,7 +36,7 @@ class CenterDB:
             self._db = None
         # self.cursor.close()
         # self._db.close()
-        logger.info("close center DB connection")
+        logger.debug("close center DB connection")
 
     def test_connection(self):
         try:
@@ -56,7 +56,7 @@ class CenterDB:
             else:
                 return result[0]
         except Exception as err:
-            print(err)
+            logger.error(err)
             self.disconnect()
             raise ConnectionError("get data from ebus center mysql fail")
 

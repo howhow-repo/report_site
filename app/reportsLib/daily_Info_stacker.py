@@ -8,7 +8,7 @@ from .getRawDataLib import StationCenter, MongoDB, DriveLogDB
 from .getRawDataLib.error_codes import RunlogsTaskErrorCode
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def days_in_list(start_date: datetime, end_date: datetime = None):
@@ -83,15 +83,15 @@ class DailyInfoStaker:
         bus.connect()
         for i, bus_no in enumerate(bus_list):
             try:
-                print(f"Now processing carno {bus_no}, {i + 1}/{len(bus_list)}")
+                logger.info(f"Now processing carno {bus_no}, {i + 1}/{len(bus_list)}")
                 t = datetime.now()
                 bus.carno = bus_no
                 bus.setup(date)
                 for run in bus.runs:
-                    print(f"    THIS Run IS BEGIN FROM {run.bus_departure_sne} at {run.bus_departure_time}")
+                    logger.info(f"    THIS Run IS BEGIN FROM {run.bus_departure_sne} at {run.bus_departure_time}")
                     self.total_runs = self.total_runs.append(run.df_for_sql(), ignore_index=True)
                     self.total_stop_to_stop = self.total_stop_to_stop.append((run.stop_to_stop_df))
-                print(f"----Done, time spent: {datetime.now() - t}\n")
+                logger.info(f"----Done, time spent: {datetime.now() - t}\n")
 
             except Exception as e:
                 logger.warning(f"Met err while carno = {bus_no}, skip")
@@ -140,7 +140,7 @@ class DailyInfoStaker:
             try:
                 self.get_drove_bus_list(day)
             except Exception:
-                print(Exception)
+                logger.error(Exception)
                 self.error_message.append("SOMETHING WENT WRONG WHILE GETTING DRIVELOG FROM MONGODB")
                 self.error.add_error('MONGODBERROR')
                 self.time_spent = int((datetime.now() - time_started).seconds)
@@ -148,11 +148,11 @@ class DailyInfoStaker:
 
             #  gather_run_logs from every buses
             try:
-                print(f"Processing date: {day.strftime('%Y-%m-%d')}")
-                print(f'There r {len(self.drove_bus)} buses to check')
+                logger.info(f"Processing date: {day.strftime('%Y-%m-%d')}")
+                logger.info(f'There r {len(self.drove_bus)} buses to check')
                 self.gather_run_logs_by_buses(bus_list=self.drove_bus, date=day)
             except Exception:
-                print(Exception)
+                logger.error(Exception)
                 self.error_message.append("SOMETHING WENT WRONG WHILE GATHERING RUN LOGS")
                 self.error.add_error('RUNLOGSCALCULATEERROR')
                 self.time_spent = int((datetime.now() - time_started).seconds)
@@ -160,11 +160,11 @@ class DailyInfoStaker:
 
             # save to sql
             try:
-                print('Saving data to sql ... ')
+                logger.info('Saving data to sql ... ')
                 self.stack_to_sql(redo=redo, date=day)
-                print('Saving success')
+                logger.info('Saving success')
             except Exception:
-                print(Exception)
+                logger.error(Exception)
                 self.error_message.append("SOMETHING WENT WRONG WHILE SAVING RUN LOGS")
                 self.error.add_error('MYSQLSAVINGERROR')
                 self.time_spent = int((datetime.now() - time_started).seconds)
@@ -172,10 +172,10 @@ class DailyInfoStaker:
                 # return self.refresh_result()
 
         self.time_spent = int((datetime.now() - time_started).seconds)
-        print(f'----Time spent: {datetime.now() - time_started} ----')
+        logger.info(f'----Time spent: {datetime.now() - time_started} ----')
 
         if len(self.exception_bus) != 0:
-            print(f"err bus = {self.exception_bus}, \n please check manually.")
+            logger.info(f"err bus = {self.exception_bus}, \n please check manually.")
 
         self.result['date'] = days
         return self.refresh_result()

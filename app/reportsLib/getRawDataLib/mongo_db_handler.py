@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import logging
 
-logger = logging.getLogger('')
+logger = logging.getLogger(__name__)
 
 
 class MongoDB:
@@ -22,29 +22,29 @@ class MongoDB:
         try:
             self._conn = MongoClient(self.__ebusMongoDBPath)
             self.db = self._conn[self.DBName]
-            logger.info("drive DB connected: please remember disconnect after used")
+            logger.debug("drive DB connected: please remember disconnect after used")
         except Exception as err:
-            print("something went wrong")
+            logger.error("something went wrong")
             raise err
 
     def disconnect(self):
         if isinstance(self._conn,pymongo.MongoClient):
             self._conn.close()
             self._conn = None
-        logger.info("close drive DB connection")
+        logger.debug("close drive DB connection")
 
     def test_connection(self):
         try:
-            print(self._conn)
+            logger.info(self._conn)
         except Exception as err:
-            print("something went wrong")
+            logger.error("something went wrong")
             raise err
 
     def list_collections(self):
         try:
             return self.db.collection_names()
         except Exception as err:
-            print("something went wrong")
+            logger.error("something went wrong")
             raise err
 
     def get_distinct(self, datetime: datetime, collection_type: str, query_cmd: dict, field_name: str):

@@ -2,22 +2,21 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+import logging
+
 import django.db.utils
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from django.contrib import admin
 from django.urls import path, include, re_path
-from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 
-from apscheduler.triggers.cron import CronTrigger
-
+from app.tasks import sql_conn_keepalive, stacking_runs_and_stoptostop, task_report_notification
 from app.views import pages
 from .tasks import delete_old_job_executions
-from app.tasks import sql_conn_keepalive, stacking_runs_and_stoptostop, task_report_notification
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-import logging
-from logging_tree import printout
 
 logger = logging.getLogger(__name__)
 

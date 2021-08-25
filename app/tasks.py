@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import requests
 from urllib import parse
@@ -10,10 +11,11 @@ from notify.models import LineNotifyControl
 
 PROJECT_TITLE = config('PROJECT_TITLE', default='unnamed')
 
+logger = logging.getLogger(__name__)
 
 def sql_conn_keepalive():
     from core.urls import scheduler
-    print(f"[{datetime.now()}] sql_conn_keepalive: {scheduler.get_job('sql_conn_keepalive')}")
+    logger.info(f"[{datetime.now()}] sql_conn_keepalive: {scheduler.get_job('sql_conn_keepalive')}")
     return 0
 
 
@@ -81,8 +83,8 @@ def send_line_notify(text):
             payload = parse.urlencode({'message': str(text)})
             requests.post(url, data=payload, headers=headers)
         except Exception as e:
-            print(f'sent notify to {p.name}:{p.token} fail.')
-            print(e)
+            logger.error(f'sent notify to {p.name}:{p.token} fail.')
+            logger.error(e)
             continue
 
     # if define in .env, also send
@@ -98,7 +100,7 @@ def send_line_notify(text):
             payload = parse.urlencode({'message': str(text)})
             requests.post(url, data=payload, headers=headers)
         except Exception as e:
-            print(f'sent notify to {t} in .env fail.')
-            print(e)
+            logger.error(f'sent notify to {t} in .env fail.')
+            logger.error(e)
 
-    print("---send line notify done")
+    logger.info("---send line notify done")

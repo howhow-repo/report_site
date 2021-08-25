@@ -145,17 +145,17 @@ LOGGING = {
     'loggers': {
         'django': {
             'handler': ['console', 'file'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'django.server': {
             'handlers': ['console', 'file'],
-            'level': 'DEBUG',
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
         '': {
             'handlers': ['console', 'file'],
-            'level': 'INFO',
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
     },
@@ -182,5 +182,4 @@ LOGGING = {
 }
 
 import logging.config
-
 logging.config.dictConfig(LOGGING)
