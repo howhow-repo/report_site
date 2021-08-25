@@ -16,6 +16,10 @@ from app.tasks import sql_conn_keepalive, stacking_runs_and_stoptostop, task_rep
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+import logging
+from logging_tree import printout
+
+logger = logging.getLogger(__name__)
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -88,7 +92,7 @@ try:
 
     try:
         scheduler.start()
-        print("Starting apscheduler")
+        logger.info('Starting apscheduler')
     except KeyboardInterrupt:
         scheduler.shutdown()
     ###

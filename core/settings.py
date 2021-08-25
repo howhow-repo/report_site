@@ -7,7 +7,6 @@ import os
 from decouple import config
 from unipath import Path
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -140,33 +139,34 @@ STATICFILES_DIRS = (
 )
 #############################################################
 #############################################################
-LOGGING_CONFIG = None
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'loggers': {
-        '': {
-            'handler': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
         'django': {
             'handler': ['console', 'file'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
-        'root': {
-            'handler': ['console', 'file'],
+        'django.server': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
+        },
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': './log.log',
             'formatter': 'simple',
+            'backupCount': 1,  # keep at most 10 log files
+            'maxBytes': 5242880,  # 5*1024*1024 bytes (5MB)
         },
         'console': {
             'level': 'DEBUG',
@@ -175,14 +175,12 @@ LOGGING = {
         },
     },
     'formatters': {
-        'normal': {
-            'format': '[%(levelname)s] %(asctime)s | %(name)s:%(lineno)d | %(message)s'
-        },
         'simple': {
-            'format': '[%(levelname)s] %(message)s'
+            'format': '[%(levelname)s] %(asctime)s |  %(message)s',
         },
     },
 }
 
 import logging.config
+
 logging.config.dictConfig(LOGGING)
