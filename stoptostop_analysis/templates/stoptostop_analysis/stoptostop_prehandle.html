@@ -10,7 +10,7 @@
     <h3>請輸入下列資訊：</h3>
     <p>
         <br>
-        <h4><form action="/stoptostop/result/" method="get">
+        <h4><form action="/stoptostop/result/" method="post">
 
             路線: <select name="rid">
             {% for r in rids%}
@@ -20,10 +20,22 @@
 
             統計起始日: <input type="date" value={{default_values.d_date_begin}} name="date_begin"><br><br>
             統計截止日: <input type="date" value={{default_values.d_date_end}} name="date_end"><br><br>
-            統計起始時段: <input type="time" value={{default_values.d_hour_begin}} name="hour_begin"><br><br>
-            統計結束時段: <input type="time" value={{default_values.d_hour_end}} name="hour_end"><br><br>
 
-            複選：<select multiple name="weekdayType" id="weekdayType">
+            統計起始時段: <select name="hour_begin">
+                <option value=0> 0 </option>
+            {% for hour in "x"|rjust:"24"%}
+                <option value={{forloop.counter}}> {{forloop.counter}} </option>
+            {% endfor %}
+            </select><br><br>
+
+            統計結束時段: <select name="hour_end">
+                <option value=0> 0 </option>
+            {% for hour in "x"|rjust:"24" %}
+                <option {% if forloop.counter == 24 %} selected="selected" {% endif %} value={{forloop.counter}}> {{forloop.counter}} </option>
+            {% endfor %}
+            </select><br><br>
+
+            計算日種類(複選)：<select multiple="multiple" class="lstSelected" name="weekdayType" id="weekdayType">
                 <option selected value=0>平日</option>
                 <option selected value=1>週末</option>
                 <option selected value=2>國定假日</option>
@@ -33,7 +45,7 @@
                 <option selected value=6>特殊假日</option>
             </select>
             <br><br>
-            <input type="submit" class="btn btn-primary btn-round" value="Result">
+            <input type="submit" class="btn btn-primary btn-round" value="Analysis">
 
         </form></h4>
     </p>

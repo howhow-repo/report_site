@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header card-header-warning">
+            <h4 class="card-title" style= "font-weight:bold">路線-站到站 紀錄統計</h4>
+            <p class="card-category" style= "font-weight:bold">
+                路線：{{rid}}</br>
+                統計時間：{{date_begin|date:'Y/m/d'}} ~ {{date_end|date:'Y/m/d'}}</br>
+                統計時段：{{hour_begin|stringformat:"02d"}}:00 ~ {{hour_end|stringformat:"02d"}}:00</br>
+                日種類:{{weekdayType}}</p>
+          </div>
+          <div class="card-body table-responsive">
+            <table class="table table-hover">
+              <thead class="text-warning">
+                <th>出發站</th>
+                <th>抵達站</th>
+                <th>最大行使時間(s)</th>
+                <th>最小行使時間(s)</th>
+                <th>平均行使時間(s)</th>
+                <th>行使時間標準差(s)</th>
+                <th>變異係數</th>
+                <th>樣本數量</th>
+              </thead>
+              <tbody>
+                {% for r in result%}
+                <tr>
+                  <td>{{r.previous_name}}</td>
+                  <td>{{r.name }}</td>
+                  <td>{{r.max_arrival_time_spent|floatformat:-2}}</td>
+                  <td>{{r.min_arrival_time_spent|floatformat:-2}}</td>
+                  <td>{{r.avg_arrival_time_spent|floatformat:-2}}</td>
+                  <td>{{r.std_arrival_time_spent|floatformat:-2}}</td>
+                  <td>{{r.var_arrival_time_spent|floatformat:-2}}</td>
+                  <td>{{r.sample_count}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      md.initDashboardPageCharts();
+
+    });
+  </script>
+
+{% endblock javascripts %}
