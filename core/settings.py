@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'notify',
     'api',
-    'app'  # Enable the inner app 
+    'app',
+    'stoptostop_analysis',
 ]
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default

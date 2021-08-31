@@ -1,0 +1,44 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Report Parameters {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <h3>請輸入下列資訊：</h3>
+    <p>
+        <br>
+        <h4><form action="/stoptostop/result/" method="get">
+
+            路線: <select name="rid">
+            {% for r in rids%}
+                <option value={{r.rid}}>{{r.name}} </option>
+            {% endfor %}
+            </select><br><br>
+
+            統計起始日: <input type="date" value={{default_values.d_date_begin}} name="date_begin"><br><br>
+            統計截止日: <input type="date" value={{default_values.d_date_end}} name="date_end"><br><br>
+            統計起始時段: <input type="time" value={{default_values.d_hour_begin}} name="hour_begin"><br><br>
+            統計結束時段: <input type="time" value={{default_values.d_hour_end}} name="hour_end"><br><br>
+
+            複選：<select multiple name="weekdayType" id="weekdayType">
+                <option selected value=0>平日</option>
+                <option selected value=1>週末</option>
+                <option selected value=2>國定假日</option>
+                <option selected value=3>彈性放假</option>
+                <option selected value=4>補假</option>
+                <option selected value=5>補班</option>
+                <option selected value=6>特殊假日</option>
+            </select>
+            <br><br>
+            <input type="submit" class="btn btn-primary btn-round" value="Result">
+
+        </form></h4>
+    </p>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

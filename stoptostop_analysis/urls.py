@@ -1,0 +1,9 @@
+from django.conf.urls import url
+from django.urls import path
+from stoptostop_analysis import views
+
+
+urlpatterns = [
+   path('prehandle/', views.stoptostop_prehandle, name='stoptostop_prehandle'),
+
+]

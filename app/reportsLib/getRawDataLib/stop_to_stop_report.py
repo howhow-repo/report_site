@@ -1,16 +1,17 @@
 from app.reportsLib.getRawDataLib import CenterDB
 from datetime import datetime, timedelta
 
+
 class StopToStopResult(CenterDB):
-    def get_default_stop_to_stop_result(self, rid: int,
+    def get_default_stop_to_stop_by_rid(self, rid: int,
                                         date_begin: datetime = (datetime.today() - timedelta(days=30)).strftime(
                                             "%Y-%m-%d"),
                                         date_end: datetime = (datetime.today()).strftime("%Y-%m-%d"),
 
-                                        time_begin: str = '00',
-                                        time_end: str = '24',
-                                        weekType: tuple = (0, 1, 2, 3, 4, 5)):
-
+                                        hour_begin: int = 0,
+                                        hour_end: int = 24,
+                                        weekType: tuple = (0, 1, 2, 3, 4, 5, 6)):
+        assert (0 <= hour_begin <= 24) and (0 <= hour_end <= 24) and (hour_begin <= hour_end)
         sql_cmd = f"""SELECT 
             tt.rsid,
             rsnow.sid,
@@ -31,8 +32,8 @@ class StopToStopResult(CenterDB):
             FROM
                 bus.stoptostop
             WHERE
-                ((arrival_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(arrival_time) BETWEEN '{time_begin}:00:00' AND '{time_end}:00:00')
-                    OR (departure_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(departure_time) BETWEEN '{time_begin}:00:00' AND '{time_end}:00:00'))
+                ((arrival_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(arrival_time) BETWEEN '{hour_begin}:00:00' AND '{hour_end}:00:00')
+                    OR (departure_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(departure_time) BETWEEN '{hour_begin}:00:00' AND '{hour_end}:00:00'))
                     AND error_code = 0
                     AND isFirst != 1
                     AND weekdayType in {weekType}
