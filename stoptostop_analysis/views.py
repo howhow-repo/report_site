@@ -57,15 +57,20 @@ def stoptostop_view(request):
         para_received = format_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
-        context['result'] = sr.get_default_stop_to_stop_by_rid(**para_received).to_dict('records')
+        rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
+        context['chartMaxHight'] = max(rp['avg_arrival_time_spent'].tolist())
+        rp.fillna("", inplace=True)
+        context['result'] = rp.to_dict('records')
         sr.disconnect()
 
         context['rid'] = para_received['rid']
+        context['rid_name'] = para_received['rid_name']
         context['date_begin'] = para_received['date_begin']
         context['date_end'] = para_received['date_end']
         context['hour_begin'] = para_received['hour_begin']
         context['hour_end'] = para_received['hour_end']
         context['weekdayType'] = para_received['weekdayType']
+        print(rp['avg_arrival_time_spent'].tolist())
 
         html_template = loader.get_template('stoptostop_analysis/stoptostop_result.html')
         return HttpResponse(html_template.render(context, request))
@@ -75,12 +80,16 @@ def stoptostop_view(request):
 
 
 def format_paras(para_received: dict):
-    para_received["rid"] = int(para_received["rid"][0])
-    para_received["weekdayType"] = tuple([int(w) for w in para_received["weekdayType"]])
+    stat = dict(json.loads(para_received["rid_stat"][0]))
+    para_received["rid"] = int(stat['rid_stat'][0])
+    para_received["rid_name"] = stat['rid_stat'][1]
+    para_received["weekdayType"] = [int(w) for w in para_received["weekdayType"]]
     para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
     para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')
     para_received["hour_begin"] = int(para_received["hour_begin"][0])
     para_received["hour_end"] = int(para_received["hour_end"][0])
     if "csrfmiddlewaretoken" in para_received:
         del para_received['csrfmiddlewaretoken']
+    if "rid_stat" in para_received:
+        del para_received['rid_stat']
     return para_received

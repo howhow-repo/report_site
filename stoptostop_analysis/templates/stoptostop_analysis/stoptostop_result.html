@@ -6,6 +6,24 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+  <div class="col-md-12">
+        <div class="card card-chart">
+          <div class="card-header card-header-success">
+            <div class="ct-chart" id="testChart"></div>
+          </div>
+          <div class="card-body">
+            <h4 class="card-title">測試: 站間行駛時間</h4>
+            <p class="card-category">
+              到達站所花費時間(sec)
+            </p>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+            </div>
+          </div>
+        </div>
+      </div>
 
     <div class="row">
       <div class="col-md-12">
@@ -13,7 +31,7 @@
           <div class="card-header card-header-warning">
             <h4 class="card-title" style= "font-weight:bold">路線-站到站 紀錄統計</h4>
             <p class="card-category" style= "font-weight:bold">
-                路線：{{rid}}</br>
+                路線：{{rid_name}}, id:{{rid}}</br>
                 統計時間：{{date_begin|date:'Y/m/d'}} ~ {{date_end|date:'Y/m/d'}}</br>
                 統計時段：{{hour_begin|stringformat:"02d"}}:00 ~ {{hour_end|stringformat:"02d"}}:00</br>
                 日種類:{{weekdayType}}</p>
@@ -49,6 +67,7 @@
         </div>
       </div>
     </div>
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
@@ -58,8 +77,33 @@
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
       md.initDashboardPageCharts();
-
     });
+  </script>
+  <script>
+      function inittestChart() {
+          datatestChart = {
+              labels: [{% for r in result%} "{{r.name}}", {% endfor %}],
+              series: [
+                [{% for r in result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}]
+              ]
+          };
+          optionstestChart = {
+              lineSmooth: Chartist.Interpolation.cardinal({
+                  tension: 0
+              }),
+              low: 0,
+              high: {{chartMaxHight}}, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+              chartPadding: {
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  left: 0
+              },
+          }
+
+		var testChart = new Chartist.Line('#testChart', datatestChart, optionstestChart); md.startAnimationForLineChart(testChart);
+	}
+	inittestChart()
   </script>
 
 {% endblock javascripts %}

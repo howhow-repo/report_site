@@ -1,8 +1,16 @@
-from app.reportsLib.getRawDataLib import CenterDB
+from .station_center import StationCenter
 from datetime import datetime, timedelta
+import pandas as pd
 
 
-class StopToStopResult(CenterDB):
+def to_sqllist(l: list) -> str:
+    l = str(l)
+    l = l.replace('[', '(')
+    l = l.replace(']', ')')
+    return l
+
+
+class StopToStopResult(StationCenter):
     def get_default_stop_to_stop_by_rid(self, rid: int,
                                         date_begin: datetime = (datetime.today() - timedelta(days=30)).strftime(
                                             "%Y-%m-%d"),
@@ -10,8 +18,14 @@ class StopToStopResult(CenterDB):
 
                                         hour_begin: int = 0,
                                         hour_end: int = 24,
-                                        weekdayType: tuple = (0, 1, 2, 3, 4, 5, 6)):
+                                        weekdayType=None,
+                                        **kwargs) -> pd.DataFrame:
+        if weekdayType is None:
+            weekdayType = [0, 1, 2, 3, 4, 5, 6]
         assert (0 <= hour_begin <= 24) and (0 <= hour_end <= 24) and (hour_begin <= hour_end)
+        hour_begin = str(hour_begin).zfill(2)
+        hour_end = str(hour_end).zfill(2)
+        weekdayType = to_sqllist(weekdayType)
         sql_cmd = f"""SELECT 
             tt.rsid,
             rsnow.sid,
@@ -63,4 +77,18 @@ class StopToStopResult(CenterDB):
             bus.stop AS s ON s.id = rsnow.sid
                 LEFT JOIN
             bus.stop AS s_pre ON s_pre.id = rspre.sid"""
-        return self._get_table_data("schedule", sql_cmd=sql_cmd)
+        data = self._get_table_data("schedule", sql_cmd=sql_cmd)
+        sql_cmd = f"""
+                    SELECT 
+                rs.id AS rsid, sid, s.name
+            FROM
+                bus.routestop AS rs
+                    LEFT JOIN
+                bus.stop AS s ON s.id = rs.sid
+            WHERE
+                rid = {rid} AND valid = 1
+            ORDER BY seqno
+        """
+        rsids = (self._get_table_data("schedule", sql_cmd=sql_cmd).iloc[1:]).copy()
+
+        return pd.merge(rsids, data, on=['rsid', 'sid', 'name'], how='outer')
