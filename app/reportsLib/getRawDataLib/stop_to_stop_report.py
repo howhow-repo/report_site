@@ -142,5 +142,5 @@ class StopToStopResult(StationCenter):
         GROUP BY HOUR(sd.arrival_time) , sd.rsid , sd.previous_rsid
         """
         data = self._get_table_data("stoptostop", sql_cmd=sql_cmd)
-        h = pd.DataFrame({"hour_range":list(range(24+1))})
+        h = pd.DataFrame({"hour_range":list(range(24))})
         return pd.merge(h, data, on=['hour_range'], how='outer')
