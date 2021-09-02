@@ -54,11 +54,12 @@ def stoptostop_prehandle(request):
 def stoptostop_view(request):
     context = CONTEXT
     if request.method == "POST":
-        para_received = format_paras(dict(request.POST))
+        para_received = format_stoptostop_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
         rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
         context['chartMaxHight'] = max(rp['avg_arrival_time_spent'].tolist())
+
         rp.fillna("", inplace=True)
         context['result'] = rp.to_dict('records')
         sr.disconnect()
@@ -70,7 +71,6 @@ def stoptostop_view(request):
         context['hour_begin'] = para_received['hour_begin']
         context['hour_end'] = para_received['hour_end']
         context['weekdayType'] = para_received['weekdayType']
-        print(rp['avg_arrival_time_spent'].tolist())
 
         html_template = loader.get_template('stoptostop_analysis/stoptostop_result.html')
         return HttpResponse(html_template.render(context, request))
@@ -79,7 +79,36 @@ def stoptostop_view(request):
         return HttpResponseServerError(html_template.render(context, request))
 
 
-def format_paras(para_received: dict):
+@login_required(login_url="/login/")
+def stoptostop_hourly(request,rsid):
+    context = CONTEXT
+    if request.method == "POST":
+        para_received = format_hourly_paras(dict(request.POST))
+        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr.connect()
+        rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid,**para_received))
+        rp.fillna(0, inplace=True)
+        context['chartMaxHight'] = max(rp['avg_arrival_time_spent'].tolist())
+        context['result'] = rp.to_dict('records')
+        sr.disconnect()
+
+        context['rsid'] = rsid
+        context['rsid_name'] = para_received['rsid_name']
+        context['pre_rsid_name'] = para_received['pre_rsid_name']
+        context['rid'] = para_received['rid']
+        context['rid_name'] = para_received['rid_name']
+        context['date_begin'] = para_received['date_begin']
+        context['date_end'] = para_received['date_end']
+        context['weekdayType'] = para_received['weekdayType']
+
+        html_template = loader.get_template('stoptostop_analysis/stoptostop_hourly.html')
+        return HttpResponse(html_template.render(context, request))
+    else:
+        html_template = loader.get_template('page-500.html')
+        return HttpResponseServerError(html_template.render(context, request))
+
+
+def format_stoptostop_paras(para_received: dict):
     stat = dict(json.loads(para_received["rid_stat"][0]))
     para_received["rid"] = int(stat['rid_stat'][0])
     para_received["rid_name"] = stat['rid_stat'][1]
@@ -88,8 +117,21 @@ def format_paras(para_received: dict):
     para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')
     para_received["hour_begin"] = int(para_received["hour_begin"][0])
     para_received["hour_end"] = int(para_received["hour_end"][0])
+    del para_received['rid_stat']
     if "csrfmiddlewaretoken" in para_received:
         del para_received['csrfmiddlewaretoken']
-    if "rid_stat" in para_received:
-        del para_received['rid_stat']
+    return para_received
+
+
+def format_hourly_paras(para_received: dict):
+    print(para_received)
+    para_received['pre_rsid_name'] = para_received['pre_rsid_name'][0]
+    para_received['rid'] = para_received['rid'][0]
+    para_received['rid_name'] = para_received['rid_name'][0]
+    para_received['rsid_name'] = para_received['rsid_name'][0]
+    para_received["weekdayType"] = [int(w) for w in eval(para_received["weekdayType"][0])]
+    para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
+    para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')
+    if "csrfmiddlewaretoken" in para_received:
+        del para_received['csrfmiddlewaretoken']
     return para_received
