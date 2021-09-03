@@ -48,7 +48,8 @@ def resume_jobs(request):
 
 
 def demo(request):
-    context = {}
+    context = CONTEXT
+    context['segment'] = 'material'
     html_template = loader.get_template('index.html')
     return HttpResponse(html_template.render(context, request))
 
