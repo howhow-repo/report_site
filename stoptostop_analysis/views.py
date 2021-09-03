@@ -1,19 +1,15 @@
-import inspect
-import json, os
+import json
+import logging
+import os
+from datetime import datetime, timedelta
 
 from decouple import config
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseServerError
-from django.shortcuts import render, redirect
 from django.template import loader
-from datetime import datetime, timedelta
-
-# Create your views here.
 from dotenv import load_dotenv
 
-from app.reportsLib import ReportCenter, StationCenter, StopToStopResult
-import logging
-
+from app.reportsLib import StationCenter, StopToStopResult
 from app.views import get_rid_select_options
 
 logger = logging.getLogger('django')
@@ -35,8 +31,6 @@ def stoptostop_prehandle(request):
         "default_values": {
             "d_date_begin": (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
             "d_date_end": (datetime.now()).strftime("%Y-%m-%d"),
-            "d_hour_begin": "00:00:00",
-            "d_hour_end": "23:59:00",
         },
     }
 

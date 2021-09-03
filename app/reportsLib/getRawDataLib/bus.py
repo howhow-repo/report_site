@@ -147,7 +147,7 @@ class Bus(DriveLogDB):
         for run in runs:  # 把每個切完的rid再拿去跟路線順序比較，若是兩趟以上就再切
             route_stops = self.station_center.get_route_rsid(run['rid'].loc[0])
             route_schedule = self.station_center.get_schedule_by_rid(rid=run['rid'].loc[0],
-                                                                     start_time=run['date_gps'].loc[0].date())
+                                                                     start_time=run['date_gps'].loc[0])
             route_ch_name = self.station_center.get_route_ch_name(rid=run['rid'].loc[0])
             weekdayType = self.station_center.get_weekdayType(run['date_gps'].loc[0].date())
             splited_logs = split_logs_by_route_stop_sequence(run, route_stops)
