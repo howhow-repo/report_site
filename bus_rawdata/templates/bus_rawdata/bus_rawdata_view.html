@@ -1,0 +1,66 @@
+{% extends "layouts/base.html" %}
+
+<!-- Specific Page CSS goes HERE  -->
+
+{% block stylesheets %}{% endblock stylesheets %}
+{% block title %} {{title}} {% endblock %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <h2>車牌：{{carno}}</h2>
+    <h3>趟次總計：{{runs|length}}</h3>
+    </br></br>
+    <div class="row">
+        {% for r in runs%}
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title "><b>{{r.rid_ch_name}}, rid:{{r.rid}}</b>:</h4>
+                  <p class="card-category">
+                      <b>
+                          班次應發車時間：{{r.schedule_departure_time|date:'Y-m-d H:i' }}</br>
+                          起站：{{r.bus_departure_sne}}; 時間：{{r.bus_departure_time|date:'Y-m-d H:i'}}</br>
+                          末站：{{r.bus_arrival_sne}}; 時間：{{r.bus_arrival_time|date:'Y-m-d H:i'}}</br>
+                          到站率：{{r.run_stop_rate}}; error code：{{r.error_code}}
+                      </b>
+                  </p>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead class=" text-primary">
+                            <th>rid</th>
+                            <th>did</th>
+                            <th>date</th>
+                            <th>date_gps</th>
+                            <th>station</th>
+                            <th>sne</th>
+                            <th>event</th>
+                            <th>type</th>
+                        </thead>
+                        <tbody>
+                        {% for l in r.runs_log%}
+                            <tr>
+                                <td>{{l.rid}}</td>
+                                <td>{{l.did}}</td>
+                                <td>{{l.date}}</td>
+                                <td>{{l.date_gps}}</td>
+                                <td>{{l.station}}</td>
+                                <td>{{l.sne}}</td>
+                                <td>{{l.event}}</td>
+                                <td>{{l.type}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <a href="/" class="btn btn-primary btn-round">Home</a>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% endblock javascripts %}
