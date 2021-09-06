@@ -50,12 +50,12 @@ def bus_rawdata_view(request):
         context['carno'] = para_received['carno']
         context['start_time'] = para_received['start_time']
         context['end_time'] = para_received['end_time']
+        context['drivelog'] = bus.travel_logs.to_dict('records')
         context['runs'] = [r.df.to_dict('records')[0] for r in bus.runs]
         for i, r in enumerate(context['runs']):
             r['runs_log'] = bus.runs[i].logs.to_dict('records')
 
-        for l in context['runs']:
-            print(l)
+
         html_template = loader.get_template('bus_rawdata/bus_rawdata_view.html')
         return HttpResponse(html_template.render(context, request))
     else:
