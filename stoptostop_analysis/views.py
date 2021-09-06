@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from decouple import config
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
 
@@ -65,6 +65,7 @@ def stoptostop_view(request):
         context['hour_begin'] = para_received['hour_begin']
         context['hour_end'] = para_received['hour_end']
         context['weekdayType'] = para_received['weekdayType']
+        context['weekdayType_cn'] = para_received['weekdayType_cn']
 
         html_template = loader.get_template('stoptostop_analysis/stoptostop_result.html')
         return HttpResponse(html_template.render(context, request))
@@ -94,18 +95,30 @@ def stoptostop_hourly(request,rsid):
         context['date_begin'] = para_received['date_begin']
         context['date_end'] = para_received['date_end']
         context['weekdayType'] = para_received['weekdayType']
+        context['weekdayType_cn'] = para_received['weekdayType_cn']
 
         html_template = loader.get_template('stoptostop_analysis/stoptostop_hourly.html')
         return HttpResponse(html_template.render(context, request))
-    else:
-        html_template = loader.get_template('page-500.html')
-        return HttpResponseServerError(html_template.render(context, request))
 
+    else:
+        html_template = loader.get_template('page-404.html')
+        return HttpResponseNotFound(html_template.render(context, request))
+
+weekdayType_cn = {
+        "0": "平日",
+        "1": "週末",
+        "2": "國定假日",
+        "3": "彈性放假",
+        "4": "補假",
+        "5": "補班",
+        "6": "特殊假日",
+    }
 
 def format_stoptostop_paras(para_received: dict):
     stat = dict(json.loads(para_received["rid_stat"][0]))
     para_received["rid"] = int(stat['rid_stat'][0])
     para_received["rid_name"] = stat['rid_stat'][1]
+    para_received["weekdayType_cn"] = [weekdayType_cn[w] for w in para_received["weekdayType"]]
     para_received["weekdayType"] = [int(w) for w in para_received["weekdayType"]]
     para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
     para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')
@@ -118,11 +131,11 @@ def format_stoptostop_paras(para_received: dict):
 
 
 def format_hourly_paras(para_received: dict):
-    print(para_received)
     para_received['pre_rsid_name'] = para_received['pre_rsid_name'][0]
     para_received['rid'] = para_received['rid'][0]
     para_received['rid_name'] = para_received['rid_name'][0]
     para_received['rsid_name'] = para_received['rsid_name'][0]
+    para_received["weekdayType_cn"] = [weekdayType_cn[str(w)] for w in eval(para_received["weekdayType"][0])]
     para_received["weekdayType"] = [int(w) for w in eval(para_received["weekdayType"][0])]
     para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
     para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')

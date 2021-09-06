@@ -19,7 +19,7 @@ from .models import get_parsing_result
 from .reportsLib import ReportCenter, StationCenter
 
 import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 sql_options = json.loads(os.getenv("EBUS_SQLDB"))
@@ -56,6 +56,7 @@ def demo(request):
 
 @login_required(login_url="/login/")
 def index(request):
+    logger.info(f"Client Access From: {visitor_ip_address(request)}")
     context = CONTEXT
     context['segment'] = 'index'
     results = get_parsing_result()
@@ -190,3 +191,13 @@ def get_vid_select_options(sc: StationCenter) -> list:
         }
         vids.append(v)
     return vids
+
+
+def visitor_ip_address(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

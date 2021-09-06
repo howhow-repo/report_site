@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'app',
     'stoptostop_analysis',
     'bus_rawdata',
+    'bus_info',
 ]
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
