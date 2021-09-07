@@ -142,7 +142,7 @@ class Run:
         if len(self.route_stops) > 0:
             if self.bus_departure_stop != self.route_stops[0]:
                 self.error.add_error('NOTFROMFIRSTSTOP')
-            if self.bus_arrival_stop != self.route_stops[-1]:
+            if self.route_stops[-1] not in self.traveled_stops: # 歷程中有到終點站，及算有到達站
                 self.error.add_error('NOTARRIVETOLASTSTOP')
             stop_len_in_route = len(set(self.route_stops) - (set(self.route_stops) - set(self.traveled_stops)))
             self.run_stop_rate = stop_len_in_route / self.route_stops_count
