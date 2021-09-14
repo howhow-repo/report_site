@@ -17,3 +17,7 @@ def add_data_traffic_parsing_result(date: datetime.date, time_spent: int = 0, st
         'status': status,
     }
     DailyDataTrafficParsingStatus.objects.update_or_create(date=date, defaults=result)
+
+
+def get_data_traffic_parsing_result(latest: int = 7):
+    return DailyDataTrafficParsingStatus.objects.order_by('-date')[:latest]

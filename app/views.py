@@ -14,6 +14,8 @@ from django.shortcuts import render, redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django import template
+
+from data_traffic.models import get_data_traffic_parsing_result
 from .models import get_report_index_str, parsing_get_report
 from .models import get_parsing_result
 from .reportsLib import ReportCenter, StationCenter
@@ -59,8 +61,12 @@ def index(request):
     logger.info(f"Client Access From: {visitor_ip_address(request)}")
     context = CONTEXT
     context['segment'] = 'index'
+
     results = get_parsing_result()
+    data_traffic_results = get_data_traffic_parsing_result()
+
     context['results'] = [vars(r) for r in results]
+    context['data_traffic_results'] = [vars(r) for r in data_traffic_results]
     # from core.urls import scheduler
     # jobs = scheduler.get_jobs()
     # context['jobs'] = [{"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)} for j in jobs]
