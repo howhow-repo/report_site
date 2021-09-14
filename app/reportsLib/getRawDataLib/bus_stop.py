@@ -1,4 +1,4 @@
-from .drive_log_db import *
+from .drivelog_db import *
 
 
 class BusStop(DriveLogDB):

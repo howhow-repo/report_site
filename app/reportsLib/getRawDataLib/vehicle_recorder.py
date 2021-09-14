@@ -1,6 +1,6 @@
 import pandas as pd
 
-from .drive_log_db import *
+from .drivelog_db import *
 from datetime import datetime,timedelta
 
 

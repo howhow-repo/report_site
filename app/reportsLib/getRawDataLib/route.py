@@ -1,6 +1,6 @@
 import os
 
-from .drive_log_db import DriveLogDB
+from .drivelog_db import DriveLogDB
 from .station_center import StationCenter
 import pandas as pd
 from datetime import datetime, timedelta

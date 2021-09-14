@@ -55,7 +55,8 @@ class DailyInfoStaker:
             'error_message': [],
             'error_code': self.error.error_code,
         }
-    def refresh_result(self):
+
+    def refresh_result_df(self):
         self.result['bus_count'] = len(self.drove_bus)
         self.result['runs_count'] = len(self.total_runs)
         self.result['stoptostop_count'] = len(self.total_stop_to_stop)
@@ -144,7 +145,7 @@ class DailyInfoStaker:
                 self.error_message.append("SOMETHING WENT WRONG WHILE GETTING DRIVELOG FROM MONGODB")
                 self.error.add_error('MONGODBERROR')
                 self.time_spent = int((datetime.now() - time_started).seconds)
-                return self.refresh_result()
+                return self.refresh_result_df()
 
             #  gather_run_logs from every buses
             try:
@@ -156,7 +157,7 @@ class DailyInfoStaker:
                 self.error_message.append("SOMETHING WENT WRONG WHILE GATHERING RUN LOGS")
                 self.error.add_error('RUNLOGSCALCULATEERROR')
                 self.time_spent = int((datetime.now() - time_started).seconds)
-                return self.refresh_result()
+                return self.refresh_result_df()
 
             # save to sql
             try:
@@ -178,4 +179,4 @@ class DailyInfoStaker:
             logger.info(f"err bus = {self.exception_bus}, \n please check manually.")
 
         self.result['date'] = days
-        return self.refresh_result()
+        return self.refresh_result_df()
