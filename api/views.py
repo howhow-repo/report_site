@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from app.tasks import stacking_runs_and_stoptostop
+from data_traffic.tasks import stacking_data_traffic
 from .models import parsing_post_report
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -117,6 +118,42 @@ class RunsAndStoptostopCalculation(APIView):
             if 'end_date' in para_received:
                 d['end_date'] = datetime.strptime(para_received["end_date"], '%Y-%m-%d')
         results = stacking_runs_and_stoptostop(start_date=d['start_date'], end_date=d['end_date'])
+        re = {}
+        for i, r in enumerate(results):
+            re[str(i)] = r
+
+        return JsonResponse(re)
+
+class DataTrafficCalculation(APIView):
+    """
+        手動API觸發演算資料流量
+    """
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='Use to create different reports with parameters.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'confirm': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='use true to trigger'),
+                'start_date': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=yesterday'),
+                'end_date': openapi.Schema(type=openapi.TYPE_STRING,
+                                           description='format: %Y-%m-%d, default=start_time'),
+            }
+        )
+    )
+    def post(self, request):
+        d = {'start_date': None, 'end_date': None}
+        para_received = request.data
+        if (not ('confirm' in para_received)) or (para_received['confirm'] is not True):
+            return JsonResponse({'comment': 'confirm not True'})
+
+        if 'start_date' in para_received:
+            d['start_date'] = datetime.strptime(para_received["start_date"], '%Y-%m-%d')
+            if 'end_date' in para_received:
+                d['end_date'] = datetime.strptime(para_received["end_date"], '%Y-%m-%d')
+        results = stacking_data_traffic(start_date=d['start_date'], end_date=d['end_date'])
         re = {}
         for i, r in enumerate(results):
             re[str(i)] = r

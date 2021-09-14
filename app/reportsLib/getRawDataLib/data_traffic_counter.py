@@ -47,7 +47,7 @@ class DataTrafficCounter(GpsLogDB):
         self.bus_online = set(df_gpslog['carno'].tolist())
 
         return {
-            'date':datetime.replace(hour=hour),
+            'date':datetime.replace(hour=hour,minute=0,second=0,microsecond=0),
             'hour':hour,
             'gps_data_count':len(df_gpslog),
             'drivelog_data_count':len(df_drivelog),

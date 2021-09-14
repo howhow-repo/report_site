@@ -16,6 +16,7 @@ from rest_framework import permissions
 
 from app.tasks import sql_conn_keepalive, stacking_runs_and_stoptostop, task_report_notification
 from app.views import pages
+from data_traffic.tasks import stacking_data_traffic
 from .tasks import delete_old_job_executions
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ urlpatterns = [
     path("notify/", include("notify.urls")),
     path("stoptostop/", include("stoptostop_analysis.urls")),
     path("bus_rawdata/", include("bus_rawdata.urls")),
+    path("data_traffic/", include("data_traffic.urls")),
     path("api/", include("api.urls")),  # for restful & swagger
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
@@ -65,6 +67,17 @@ try:
             hour="03", minute="30"
         ),
         id="stacking_runs_and_stoptostop",
+        max_instances=1,
+        misfire_grace_time=3600,
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        stacking_data_traffic,
+        trigger=CronTrigger(
+            hour="03", minute="50"
+        ),
+        id="stacking_data_traffic",
         max_instances=1,
         misfire_grace_time=3600,
         replace_existing=True,

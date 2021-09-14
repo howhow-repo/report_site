@@ -27,9 +27,13 @@ class DailyDataTrafficStaker:
     def __init__(self, MongoDBOptions: dict, sqlOption: dict):
         self.data_traffic = DataTrafficCounter(MongoDBPath=MongoDBOptions, sqlOption=sqlOption)
 
-    def start(self, start_date: datetime = datetime.now() - timedelta(days=1), end_date: datetime = None,
+    def start(self, start_date: datetime = None, end_date: datetime = None,
               redo: bool = True):
         stime = datetime.now()
+
+        if start_date is None:
+            start_date = datetime.now() - timedelta(days=1)
+
         if end_date is None:
             end_date = start_date
         else:
@@ -39,6 +43,7 @@ class DailyDataTrafficStaker:
         exception_days = []
         self.data_traffic.connect()
         # calculate
+        status = True
         for day in days:
             ptime = datetime.now()
             print(f'  Parsing data traffic of date {day.strftime("%Y-%m-%d")} ...')
@@ -47,6 +52,7 @@ class DailyDataTrafficStaker:
                 self.data_traffic.save_data_to_sql(redo=redo)
             except Exception as e:
                 exception_days.append(day)
+                status = False
             print(f"  done, time spent {int((datetime.now()-ptime).seconds)} (s)\n")
 
         self.data_traffic.disconnect()
@@ -56,4 +62,5 @@ class DailyDataTrafficStaker:
             'date': [d.strftime("%Y-%m-%d") for d in days],
             'exception_days': [d.strftime("%Y-%m-%d") for d in exception_days],
             'time_spent': time_spent,
+            'status': status
         }

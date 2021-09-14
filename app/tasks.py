@@ -5,13 +5,15 @@ import requests
 from urllib import parse
 from datetime import datetime, timedelta
 from decouple import config
-from .reportsLib import DailyInfoStaker, DailyDataTrafficStaker
+
+from .reportsLib import DailyInfoStaker
 from .models import add_exception_bus, add_parsing_result, DailyDriveLogParsingStatus, ExceptionParsingBus
 from notify.models import LineNotifyControl
 
 PROJECT_TITLE = config('PROJECT_TITLE', default='unnamed')
 
 logger = logging.getLogger(__name__)
+
 
 def sql_conn_keepalive():
     from core.urls import scheduler
@@ -45,10 +47,7 @@ def stacking_runs_and_stoptostop(start_date: datetime = None, end_date: datetime
                            exception_bus_count=result['exception_bus_count'],
                            error_code=result['error_code'], time_spent=result['time_spent'])
         add_exception_bus(result['exception_buses'], day)
-    daily_traffic_stacker = DailyDataTrafficStaker(MongoDBOptions=json.loads(os.getenv("EBUS_MONGODB")),
-                                                   sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
 
-    daily_traffic_stacker.start()
     return results
 
 
