@@ -12,6 +12,13 @@ class StationCenter(CenterDB):
     def __init__(self, sqlOption: dict):
         super().__init__(sqlOption)
 
+    def get_data_traffic(self,date: datetime):
+        sql_cmd = f"""
+                SELECT date, hour, gps_data_count, drivelog_data_count, bus_on_rail_count, bus_online_count FROM bus.data_traffic
+                where date between '{date.strftime("%Y-%m-%d")}' and '{date.strftime("%Y-%m-%d")} 23:59:59' 
+                """
+        return self._get_table_data("data_traffic", sql_cmd=sql_cmd)
+
     def get_weekdayType(self, date: datetime):
         """
         get weekday type from database.
