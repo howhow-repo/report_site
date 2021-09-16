@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.template import loader
 
 from .forms import LoginForm, SignUpForm
@@ -42,29 +42,34 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {**CONTEXT, **{"form": form, "msg": msg}})
 
+
+def oauth_login_view(request):
+    return HttpResponseRedirect(f"http://110.25.88.242:60004/bus/?reurl=http://{config('SERVER', default='127.0.0.1')}:{config('SERVER_PORT', default='8000')}/")
+
+
 def register_user(request):
     html_template = loader.get_template('page-404.html')
     return HttpResponseNotFound(html_template.render({}, request))
 
-    msg     = None
-    success = False
-
-    if request.method == "POST":
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get("username")
-            raw_password = form.cleaned_data.get("password1")
-            user = authenticate(username=username, password=raw_password)
-
-            msg     = 'User created - please <a href="/login">login</a>.'
-            success = True
-            
-            #return redirect("/login/")
-
-        else:
-            msg = 'Form is not valid'    
-    else:
-        form = SignUpForm()
-
-    return render(request, "accounts/register.html", {**CONTEXT, **{"form": form, "msg": msg, "success": success}})
+    # msg     = None
+    # success = False
+    #
+    # if request.method == "POST":
+    #     form = SignUpForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         username = form.cleaned_data.get("username")
+    #         raw_password = form.cleaned_data.get("password1")
+    #         user = authenticate(username=username, password=raw_password)
+    #
+    #         msg     = 'User created - please <a href="/login">login</a>.'
+    #         success = True
+    #
+    #         #return redirect("/login/")
+    #
+    #     else:
+    #         msg = 'Form is not valid'
+    # else:
+    #     form = SignUpForm()
+    #
+    # return render(request, "accounts/register.html", {**CONTEXT, **{"form": form, "msg": msg, "success": success}})
