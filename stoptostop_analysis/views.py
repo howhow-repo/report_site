@@ -75,13 +75,13 @@ def stoptostop_view(request):
 
 
 @login_required(login_url="/login/")
-def stoptostop_hourly(request,rsid):
+def stoptostop_hourly(request, rsid):
     context = CONTEXT
     if request.method == "POST":
         para_received = format_hourly_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
-        rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid,**para_received))
+        rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid, **para_received))
         rp.fillna(0, inplace=True)
         context['chartMaxHight'] = max(rp['avg_arrival_time_spent'].tolist())
         context['result'] = rp.to_dict('records')
@@ -104,15 +104,17 @@ def stoptostop_hourly(request,rsid):
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request))
 
+
 weekdayType_cn = {
-        "0": "平日",
-        "1": "週末",
-        "2": "國定假日",
-        "3": "彈性放假",
-        "4": "補假",
-        "5": "補班",
-        "6": "特殊假日",
-    }
+    "0": "平日",
+    "1": "週末",
+    "2": "國定假日",
+    "3": "彈性放假",
+    "4": "補假",
+    "5": "補班",
+    "6": "特殊假日",
+}
+
 
 def format_stoptostop_paras(para_received: dict):
     stat = dict(json.loads(para_received["rid_stat"][0]))

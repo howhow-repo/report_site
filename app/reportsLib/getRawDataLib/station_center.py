@@ -159,10 +159,10 @@ class StationCenter(CenterDB):
                         LEFT JOIN bus.route AS r ON r.id = rl.rid 
                         WHERE 
                             bus_departure_time BETWEEN '{start_time}' AND '{end_time}' 
-                        GROUP BY rl.rid , r.name) AS org_t"""
+                        GROUP BY rl.rid , r.name) AS org_t """
 
         if other_filter is not None:
-            sql_cmd += other_filter
+            sql_cmd += (" " + other_filter)
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         return table
 
@@ -431,7 +431,7 @@ class StationCenter(CenterDB):
                     )as tt """
 
         if other_filter is not None:
-            sql_cmd += other_filter
+            sql_cmd += (" "+other_filter)
         sql_cmd += "group by rid,name"
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         return table

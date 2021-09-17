@@ -1,7 +1,9 @@
 # -*- coding: UTF-8 -*-
 import inspect
+import json
 import logging
-from datetime import datetime
+import os
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -13,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
-from app.reportsLib import ReportCenter
+from app.reportsLib import ReportCenter, StopToStopResult
 from app.tasks import task_report_notification
 
 
@@ -75,10 +77,10 @@ class ReportAPIView(APIView):
                 'carno': openapi.Schema(type=openapi.TYPE_STRING, description='車牌號碼'),
                 'vid': openapi.Schema(type=openapi.TYPE_INTEGER, description='營運商id'),
                 'rid': openapi.Schema(type=openapi.TYPE_INTEGER, description='路線id'),
-                'type': openapi.Schema(type=openapi.TYPE_STRING, description='json/csv/html/pdf, default=json'),
-                'off_duty_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超出？秒即脫班, default=1200'),
-                'early_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間提早表訂時間逾?秒鐘，視為早發, default=60'),
-                'delay_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超過表訂時間逾?秒鐘，視為遲發, default=300'),
+                'type': openapi.Schema(type=openapi.TYPE_STRING, description='json/csv/html/pdf, default=json',default='json'),
+                'off_duty_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超出？秒即脫班, default=1200', default=1200),
+                'early_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間提早表訂時間逾?秒鐘，視為早發, default=60', default=60),
+                'delay_tol': openapi.Schema(type=openapi.TYPE_INTEGER, description='發車時間超過表訂時間逾?秒鐘，視為遲發, default=300', default=300),
             }
         )
     )
@@ -86,6 +88,53 @@ class ReportAPIView(APIView):
         para_received = request.data
         para_received = format_paras(para_received)
         return parsing_post_report(request=request, rtype=report_name, para_received=para_received)
+
+
+class StoptoStopReport(APIView):
+    """
+        可以使用 list report 的 api 來查詢可宮製作的報表。
+        使用時請傳入所需的參數。 部分參數已有預設值，請參考下方說明。
+    """
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='Use to get a route stop to stop result with parameters.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['rid'],
+            properties={
+                'rid': openapi.Schema(type=openapi.TYPE_INTEGER, description='路線id'),
+                'date_begin': openapi.Schema(type=openapi.TYPE_STRING,
+                                             description='統計起始日；format: %Y-%m-%d, default=30 days earlier',
+                                             default=(datetime.today()-timedelta(days=30)).strftime("%Y-%m-%d")),
+                'date_end': openapi.Schema(type=openapi.TYPE_STRING,
+                                           description='統計為止日；format: %Y-%m-%d, default=today',
+                                           default=(datetime.today()).strftime("%Y-%m-%d")),
+
+                'hour_begin': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                             description='統計時間區間起始；0~24, default=0',
+                                             default=0),
+                'hour_end': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                           description='統計時間區間為止；0~24, default=24',
+                                           default=24),
+
+                'weekdayType': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                              items=openapi.Items(type=openapi.TYPE_INTEGER),
+                                              description='日的種類，如：平日、假日等',
+                                              default=[0, 1, 2, 3, 4, 5, 6]),
+            }
+        )
+    )
+    def post(self, request):
+        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        para_received = request.data
+        sr.connect()
+        rp = sr.get_default_stop_to_stop_by_rid(**para_received)
+        sr.disconnect()
+        r = rp.to_dict("records")
+        return JsonResponse(r, safe=False)
+
 
 
 class RunsAndStoptostopCalculation(APIView):
@@ -101,7 +150,9 @@ class RunsAndStoptostopCalculation(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 'confirm': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='use true to trigger'),
-                'start_date': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=yesterday'),
+                'start_date': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=yesterday',
+                                             default=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d")
+                                             ),
                 'end_date': openapi.Schema(type=openapi.TYPE_STRING,
                                            description='format: %Y-%m-%d, default=start_time'),
             }
@@ -124,6 +175,7 @@ class RunsAndStoptostopCalculation(APIView):
 
         return JsonResponse(re)
 
+
 class DataTrafficCalculation(APIView):
     """
         手動API觸發演算資料流量
@@ -137,7 +189,8 @@ class DataTrafficCalculation(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 'confirm': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='use true to trigger'),
-                'start_date': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=yesterday'),
+                'start_date': openapi.Schema(type=openapi.TYPE_STRING, description='format: %Y-%m-%d, default=yesterday',
+                                             default=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d")),
                 'end_date': openapi.Schema(type=openapi.TYPE_STRING,
                                            description='format: %Y-%m-%d, default=start_time'),
             }
@@ -174,7 +227,9 @@ class SetJobStatus(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 'confirm': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='use true to trigger'),
-                'action': openapi.Schema(type=openapi.TYPE_STRING, description='action to job, pause/resume, default=none'),
+                'action': openapi.Schema(type=openapi.TYPE_STRING,
+                                         description='action to job, pause/resume, default=none',
+                                         default=None),
             }
         )
     )
@@ -193,6 +248,9 @@ class SetJobStatus(APIView):
 
 
 class SentReportNotify(APIView):
+    """
+        重發送當日計算結果通知
+    """
     def post(self, request):
         task_report_notification()
         return JsonResponse({"response":"sent"})

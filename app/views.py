@@ -71,9 +71,6 @@ def index(request):
 
     context['results'] = [vars(r) for r in results]
     context['data_traffic_results'] = [vars(r) for r in data_traffic_results]
-    # from core.urls import scheduler
-    # jobs = scheduler.get_jobs()
-    # context['jobs'] = [{"name": j.name, "next_run_time": str(j.next_run_time), "trigger": str(j.trigger)} for j in jobs]
     html_template = loader.get_template('app/task_info.html')
     return HttpResponse(html_template.render(context, request))
 

@@ -7,7 +7,7 @@ import os
 import pdfkit
 from django.db import models
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from dotenv import load_dotenv
 
@@ -24,7 +24,8 @@ def parsing_post_report(request, rtype, para_received):
     report.generate_report(**para_received)
     if "type" in para_received.keys():
         if para_received['type'] == 'json':
-            return HttpResponse(report.report.to_json(), content_type="application/json")
+            r = report.report.to_dict("records")
+            return JsonResponse(r,safe=False)
 
         elif para_received['type'] == 'csv':
             return HttpResponse(report.report.to_csv(), content_type="application/csv")
@@ -51,4 +52,5 @@ def parsing_post_report(request, rtype, para_received):
                 'Content-Disposition'] = f'filename="{rtype + "_" + report.start_time.strftime("%Y_%m_%d")}.pdf"'
             return response
     else:
-        return HttpResponse(report.report.to_json(), content_type="application/json")
+        r = report.report.to_dict("records")
+        return JsonResponse(r, safe=False)
