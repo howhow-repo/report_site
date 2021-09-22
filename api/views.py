@@ -136,7 +136,6 @@ class StoptoStopReport(APIView):
         return JsonResponse(r, safe=False)
 
 
-
 class RunsAndStoptostopCalculation(APIView):
     """
         手動API觸發演算趟次與班次

@@ -15,7 +15,7 @@ from django.template import loader
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django import template
 
-from authentication.models import authcheck
+from authentication.views import authcheck
 from data_traffic.models import get_data_traffic_parsing_result
 from .models import get_report_index_str, parsing_get_report
 from .models import get_parsing_result
