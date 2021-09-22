@@ -35,9 +35,9 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
 
 
 class TotalRunStopRateReport(ReportBase):
-    '''
+    """
         各路線時間內的平均班次到站率。
-    '''
+    """
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
         self.title = "平均到站率一覽表"

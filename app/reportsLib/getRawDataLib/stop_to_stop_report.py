@@ -103,44 +103,44 @@ class StopToStopResult(StationCenter):
             weekdayType = [0, 1, 2, 3, 4, 5, 6]
         weekdayType = to_sqllist(weekdayType)
         sql_cmd = f"""
-        SELECT 
-            HOUR(sd.arrival_time) AS hour_range,
-            sd.rsid,
-            s.name,
-            sd.previous_rsid,
-            s_pre.name,
-            MAX(arrival_time_spent) AS max_arrival_time_spent,
-            MIN(arrival_time_spent) AS min_arrival_time_spent,
-            AVG(arrival_time_spent) AS avg_arrival_time_spent,
-            STDDEV(arrival_time_spent) AS std_arrival_time_spent,
-            VAR_POP(arrival_time_spent) AS var_arrival_time_spent,
-            MAX(stay_time) AS max_stay_time,
-            MIN(stay_time) AS min_stay_time,
-            AVG(stay_time) AS avg_stay_time,
-            STDDEV(stay_time) AS std_stay_time,
-            COUNT(*) AS sample_count
-        FROM
-            (SELECT 
-                *
+            SELECT 
+                HOUR(sd.arrival_time) AS hour_range,
+                sd.rsid,
+                s.name,
+                sd.previous_rsid,
+                s_pre.name,
+                MAX(arrival_time_spent) AS max_arrival_time_spent,
+                MIN(arrival_time_spent) AS min_arrival_time_spent,
+                AVG(arrival_time_spent) AS avg_arrival_time_spent,
+                STDDEV(arrival_time_spent) AS std_arrival_time_spent,
+                VAR_POP(arrival_time_spent) AS var_arrival_time_spent,
+                MAX(stay_time) AS max_stay_time,
+                MIN(stay_time) AS min_stay_time,
+                AVG(stay_time) AS avg_stay_time,
+                STDDEV(stay_time) AS std_stay_time,
+                COUNT(*) AS sample_count
             FROM
-                bus.stoptostop
-            WHERE
-                ((arrival_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(arrival_time) BETWEEN '00:00:00' AND '24:00:00')
-                    OR (departure_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(departure_time) BETWEEN '00:00:00' AND '24:00:00'))
-                    AND error_code = 0
-                    AND isFirst != 1
-                    AND weekdayType in {weekdayType}
-                    AND rsid = {rsid}) AS sd
-                LEFT JOIN
-            bus.routestop AS rsnow ON rsnow.id = sd.rsid
-                LEFT JOIN
-            bus.routestop AS rspre ON rspre.id = sd.previous_rsid
-                LEFT JOIN
-            bus.stop AS s ON s.id = rsnow.sid
-                LEFT JOIN
-            bus.stop AS s_pre ON s_pre.id = rspre.sid
-        GROUP BY HOUR(sd.arrival_time) , sd.rsid , sd.previous_rsid
+                (SELECT 
+                    *
+                FROM
+                    bus.stoptostop
+                WHERE
+                    ((arrival_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(arrival_time) BETWEEN '00:00:00' AND '24:00:00')
+                        OR (departure_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(departure_time) BETWEEN '00:00:00' AND '24:00:00'))
+                        AND error_code = 0
+                        AND isFirst != 1
+                        AND weekdayType in {weekdayType}
+                        AND rsid = {rsid}) AS sd
+                    LEFT JOIN
+                bus.routestop AS rsnow ON rsnow.id = sd.rsid
+                    LEFT JOIN
+                bus.routestop AS rspre ON rspre.id = sd.previous_rsid
+                    LEFT JOIN
+                bus.stop AS s ON s.id = rsnow.sid
+                    LEFT JOIN
+                bus.stop AS s_pre ON s_pre.id = rspre.sid
+            GROUP BY HOUR(sd.arrival_time) , sd.rsid , sd.previous_rsid
         """
         data = self._get_table_data("stoptostop", sql_cmd=sql_cmd)
-        h = pd.DataFrame({"hour_range":list(range(24))})
+        h = pd.DataFrame({"hour_range": list(range(24))})
         return pd.merge(h, data, on=['hour_range'], how='outer')

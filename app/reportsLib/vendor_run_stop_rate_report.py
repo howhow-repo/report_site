@@ -42,9 +42,9 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
 
 
 class VendorRunStopRateReport(ReportBase):
-    '''
+    """
         以單一營運商為單位建立各路線平均班次到站率。
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

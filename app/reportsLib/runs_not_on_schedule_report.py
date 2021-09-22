@@ -38,12 +38,12 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 
 class RunsNotOnScheduleReport(ReportBase):
-    '''
+    """
         顯示時間內有多少車次是無對應的班次。
         會在此表中的車有兩種情形：
             ＊ 日期中本身無相關班次。
             ＊ 發車時間+-20min內沒有班次能夠去對應
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

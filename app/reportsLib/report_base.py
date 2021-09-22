@@ -2,9 +2,9 @@ import pandas as pd
 
 
 class ReportBase:
-    '''
+    """
         Basic functions and args for reports
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         self._centerDB_conn_options = centerDB_conn_options

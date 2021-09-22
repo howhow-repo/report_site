@@ -24,13 +24,12 @@ def days_in_list(start_date: datetime, end_date: datetime = None):
 
 
 class DailyInfoStaker:
-    '''
+    """
         use to calculate everyday logs and seperate them into Runs;
         StopToStop info is also in Runs;
 
-
         also save these runs back into sql DB
-    '''
+    """
 
     def __init__(self, MongoDBOptions: dict, sqlOption: dict):
         self.__mongoDBOptions = MongoDBOptions

@@ -66,14 +66,14 @@ class RouteScheduleDepartureCountReport(ReportBase):
 
     def generate_report(self, start_time: datetime, rid: int, off_duty_tol: int = 1200,
                         early_tol: int = 60, delay_tol: int = 300, end_time: datetime = None, **kwargs):
-        '''
+        """
         input:
             start_time: 紀錄開始時間，以每日00:00開始計算。
             off_duty_tol: (秒) 若該班車與最接近的發車時間超過此，則為漏班，這趟車就不算在班次中。預設為1200
             early_tol: (秒) 若發車時間早於此秒數，則視為過早發車。預設為60
             delay_tol: (秒) 若發車時間晚於此秒數，則視為過晚發車。預設為300
             end_time: 紀錄結束時間，可不填入，則預設為start_time當天。
-        '''
+        """
         self.start_time = start_time - timedelta(hours=start_time.hour,minutes=start_time.minute,
                                                  seconds=start_time.second,microseconds=start_time.microsecond)
         if end_time is not None:

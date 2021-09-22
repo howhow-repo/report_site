@@ -19,9 +19,9 @@ from .runs_with_log_error_report import RunsWithLogErrorReport
 
 
 class ReportCenter(object):
-    '''
+    """
         a object that should able to call all kinds of reports
-    '''
+    """
 
     def __init__(self, centerDB_conn_options={}, drivelogDB_conn_options={}):
         self._drivelogDB_conn_options = drivelogDB_conn_options

@@ -39,12 +39,12 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 
 class RunsWithLogErrorReport(ReportBase):
-    '''
+    """
         顯示資訊回報有異常的班車，及其異常方式：
             ＊ 無法辨識的站牌
             ＊ 無路線站序
             ＊ 無首站出站紀錄
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

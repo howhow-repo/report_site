@@ -40,7 +40,7 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 
 class RouteScheduleDepartureReport(ReportBase):
-    '''
+    """
         呈現一個路線的各班次在時間內的發車紀錄。
         僅以各班次作為計算基準，不計額外發車。
         report schema:[
@@ -57,7 +57,7 @@ class RouteScheduleDepartureReport(ReportBase):
             'run_stop_rate',
             'error_code'
         ]
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

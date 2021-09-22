@@ -52,10 +52,10 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
 
 
 class VendorRouteOnTimeRateReport(ReportBase):
-    '''
+    """
         以單一營運商為單位建立路線的準點率一覽報表。
         利用路線準點報表(route_on_time_rate_report)為基礎運算。
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

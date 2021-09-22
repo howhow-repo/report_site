@@ -19,10 +19,10 @@ def days_in_list(start_date: datetime, end_date: datetime = None):
 
 
 class DailyDataTrafficStaker:
-    '''
+    """
         use to calculate everyday GPS log data count for each hour.
         To show how many data can be handle per hour.
-    '''
+    """
 
     def __init__(self, MongoDBOptions: dict, sqlOption: dict):
         self.data_traffic = DataTrafficCounter(MongoDBPath=MongoDBOptions, sqlOption=sqlOption)

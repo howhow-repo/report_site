@@ -12,6 +12,7 @@ load_dotenv()
 
 TIME_SHIFT = int(os.getenv("TIME_SHIFT"))
 
+
 class Route:
     def __init__(self, rid: int, MongoDBOptions: dict, sqlOption: dict):
         self.rid = rid

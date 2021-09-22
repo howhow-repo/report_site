@@ -166,8 +166,7 @@ class StationCenter(CenterDB):
         table = self._get_table_data("runlogs", sql_cmd=sql_cmd)
         return table
 
-    def get_run_logs_by_rid(self, rid: int, start_time: datetime, end_time: datetime = None,
-                                  off_duty_timedelta: int = 1200):
+    def get_run_logs_by_rid(self, rid: int, start_time: datetime, end_time: datetime = None):
         if end_time is None or end_time == start_time:
             end_time = start_time
         end_time = end_time + timedelta(days=1)

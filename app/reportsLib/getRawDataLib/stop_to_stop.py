@@ -73,12 +73,11 @@ class StopToStop:
             if previous_stop_info is not None:  # 非起始站
                 self.error_code.add_error('NOARRIVAL')
 
-
         if previous_stop_info is None:  # 起始站
             self.isFirst = True
             self.departure_time = logs['date_gps'].loc[type0_index]
 
-        elif next_rsid is None:  #  終點站
+        elif next_rsid is None:  # 終點站
             self.isLast = True
             self.arrival_time = logs['date_gps'].loc[type1_index]
             if previous_stop_info.departure_time is not None:
@@ -87,7 +86,7 @@ class StopToStop:
                 self.arrival_time_spent = None
                 self.error_code.add_error('NOTENOUGHPREVIOUSDATA')
 
-        else: # 一般站
+        else:  # 一般站
             self.departure_time = logs['date_gps'].loc[type0_index]
             self.arrival_time = logs['date_gps'].loc[type1_index]
             self.stay_time = int((self.departure_time - self.arrival_time).total_seconds())

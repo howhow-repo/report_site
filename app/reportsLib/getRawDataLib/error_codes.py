@@ -20,10 +20,10 @@ stop_to_stop_err_type = {
     'NOARRIVAL': 1,  # 此站紀錄無進站
     'NODEPARTURE': 2,  # 此戰紀錄無出站
     'TOOMANYLOGS': 4,  # 進出站紀錄連續不只一筆
-    'NOTFROMROUTELASTSTOP':8,  # 前一站不如預期
-    'NOTENOUGHPREVIOUSDATA':16,  # 前一站資料不足
+    'NOTFROMROUTELASTSTOP': 8,  # 前一站不如預期
+    'NOTENOUGHPREVIOUSDATA': 16,  # 前一站資料不足
     'LONGSTAYINSTOP': 32,  # 在站內有longstay紀錄
-    'LONGSTAYBETWEENSTOP': 64, # 從上一站過來的路上有longstay紀錄
+    'LONGSTAYBETWEENSTOP': 64,  # 從上一站過來的路上有longstay紀錄
 }
 
 runlogs_task_err_type = {

@@ -44,11 +44,9 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 
 class TotalOnTimeRateReport(ReportBase):
-    '''
+    """
         以個路線準點報表(route_on_time_rate_report_rnBase)為基礎，建立各路線準點率的報表。
-
-
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

@@ -19,9 +19,9 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 
 class BusDepartureCountReport(ReportBase):
-    '''
+    """
         顯示日期內有哪些車牌有出車，各執行了多少班，共經過多少站牌。
-    '''
+    """
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)

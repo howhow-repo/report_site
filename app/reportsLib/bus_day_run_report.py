@@ -16,6 +16,7 @@ report_schema = ['rid', 'rid_ch_name', 'schedule_departure_time',
                  'departure_timedelta', 'traveled_stops_count', 'bus_arrival_time',
                  'bus_arrival_stop', 'bus_arrival_sne', 'error_code']
 
+
 def parsing_df_for_user(report: pd.DataFrame):
     if report.empty:
         return pd.DataFrame(columns=['路線名稱', '日期', '結束日期', '應發車次數', '未發車次數',
