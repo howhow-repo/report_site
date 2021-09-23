@@ -165,7 +165,8 @@ def format_paras(para_received: dict):
                 para_received[para] = int(para_received[para])
         except Exception:
             continue
-
+    if "carno" in para_received:
+        para_received["carno"] = (para_received["carno"].lstrip()).rstrip()
     if "start_time" in para_received:
         para_received["start_time"] = datetime.strptime(para_received["start_time"], '%Y-%m-%d')
     if "end_time" in para_received:

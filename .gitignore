@@ -18,6 +18,7 @@ venv
 
 # other
 playground.py
+playground.html
 .DS_Store
 .idea
 .env

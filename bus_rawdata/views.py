@@ -65,7 +65,7 @@ def bus_rawdata_view(request):
 
 def format_paras(para_received: dict):
     logger.debug(f"parameters: {para_received}")
-    para_received["carno"] = para_received["carno"][0]
+    para_received["carno"] = (para_received["carno"][0].lstrip()).rstrip()
     para_received["start_time"] = datetime.strptime(para_received["start_time"][0], '%Y-%m-%d')
     para_received["end_time"] = datetime.strptime(para_received["end_time"][0], '%Y-%m-%d')
     return para_received
