@@ -119,7 +119,7 @@ Within the download you'll find the following directories and files:
    |    |
    |    |-- urls.py                        # Define authentication routes  
    |    |-- views.py                       # Handles login and registration  
-   |    |-- forms.py                       # Define auth forms  
+   |    |-- form.py                       # Define auth forms  
    |
    |-- app/                                # A simple app that serve HTML files
    |    |

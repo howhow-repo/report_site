@@ -10,13 +10,13 @@
     <h3>下列資訊用以調用資料流量紀錄：</h3>
     <p>
         <br>
-        <h4><form action="/data_traffic/result/" method="post">
-
-            日期: <input type="date" value={{default_values.d_date}} name="date"><br><br>
+        <form action="/data_traffic/result/" method="post">
+            <h4>{{para_form.label_tag}}</h4>
+            {{para_form}}
             <br><br>
             <input type="submit" class="btn btn-primary btn-round" value="GET DATA">
 
-        </form></h4>
+        </form>
     </p>
 {% endblock content %}
 

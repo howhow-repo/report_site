@@ -15,7 +15,6 @@ mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 class ReportPrehandle(forms.Field):
     def __init__(self, rtype):
         super().__init__()
-        pass
         rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
         report = rc.create_empty_report(rtype)
         rtype_paras = list(inspect.signature(report.generate_report).parameters)

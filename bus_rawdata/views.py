@@ -10,6 +10,7 @@ from django.template import loader
 from dotenv import load_dotenv
 
 from app.reportsLib import Bus
+from .form import ParaInput
 
 logger = logging.getLogger('django')
 
@@ -26,10 +27,7 @@ CONTEXT = {
 def bus_rawdata_prehandle(request):
     context = CONTEXT
     context["title"] = "公車 原始資料調用"
-    context["default_values"] = {"d_carno": "117-FX",
-                                 "d_start_time": (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d"),
-                                 "d_end_time": (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d"),
-                                 }
+    context["para_form"] = ParaInput()
 
     load_template = 'bus_rawdata/bus_rawdata_prehandle.html'
     html_template = loader.get_template(load_template)
@@ -54,7 +52,6 @@ def bus_rawdata_view(request):
         context['runs'] = [r.df.to_dict('records')[0] for r in bus.runs]
         for i, r in enumerate(context['runs']):
             r['runs_log'] = bus.runs[i].logs.to_dict('records')
-
 
         html_template = loader.get_template('bus_rawdata/bus_rawdata_view.html')
         return HttpResponse(html_template.render(context, request))

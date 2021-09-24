@@ -12,11 +12,9 @@
         <br>
         <h4><form action="/bus_rawdata/result/" method="post">
 
-            車號: <input  value={{default_values.d_carno}} name="carno"><br><br>
-
-            統計起始日: <input type="date" value={{default_values.d_start_time}} name="start_time"><br><br>
-            統計截止日: <input type="date" value={{default_values.d_end_time}} name="end_time"><br><br>
-
+            {% for f in para_form%}
+                {{f.label}}: {{f}}<br><br>
+            {% endfor %}
             <br><br>
             <input type="submit" class="btn btn-primary btn-round" value="GET DATA">
 
