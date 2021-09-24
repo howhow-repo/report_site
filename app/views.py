@@ -20,6 +20,7 @@ from data_traffic.models import get_data_traffic_parsing_result
 from .models import get_report_index_str, parsing_get_report
 from .models import get_parsing_result
 from .reportsLib import ReportCenter, StationCenter
+from .form import ParaInput
 
 import logging
 logger = logging.getLogger(__name__)
@@ -125,21 +126,8 @@ def report_prehandle(request):
         "rtype": rtype,
         "title": report.title,
         "rtype_paras": rtype_paras,
-        "default_values": {
-            "d_start_time": (datetime.today() - timedelta(days=1, hours=3)).strftime("%Y-%m-%d"),
-            "d_carno": "117-FX",
-        },
+        "para_form": ParaInput()
     }
-
-    if ('rid' in rtype_paras) or ('vid' in rtype_paras):
-        sc = StationCenter(sqlOption=sql_options)
-        sc.connect()
-        if 'rid' in rtype_paras:
-            context['rids'] = get_rid_select_options(sc)
-        if 'vid' in rtype_paras:
-            context['vids'] = get_vid_select_options(sc)
-        sc.disconnect()
-
     load_template = 'app/ui-report_prehandle.html'
     html_template = loader.get_template(load_template)
     return HttpResponse(html_template.render(context, request))
@@ -175,30 +163,6 @@ def format_paras(para_received: dict):
     if "csrfmiddlewaretoken" in para_received:
         del para_received['csrfmiddlewaretoken']
     return para_received
-
-
-def get_rid_select_options(sc: StationCenter) -> list:
-    rids = []
-    rdf = sc.get_routes_ch_name()
-    for i in range(len(rdf['rid'])):
-        r = {
-            "rid": rdf['rid'].loc[i],
-            "name": rdf['name'].loc[i]
-        }
-        rids.append(r)
-    return rids
-
-
-def get_vid_select_options(sc: StationCenter) -> list:
-    vids = []
-    vdf = sc.get_vids_ch_name()
-    for i in range(len(vdf['vid'])):
-        v = {
-            "vid": vdf['vid'].loc[i],
-            "name": vdf['name'].loc[i]
-        }
-        vids.append(v)
-    return vids
 
 
 def visitor_ip_address(request):

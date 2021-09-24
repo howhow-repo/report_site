@@ -11,50 +11,22 @@
     <p>
         <br>
         <h4><form action="/report_index/{{rtype}}/" method="get">
-            {% if "start_time" in rtype_paras %}
-                起始時間: <input type="date" value={{default_values.d_start_time}} name="start_time"><br><br>
-            {% endif %}
+            {% for f in para_form %}
+                {% if f.name in rtype_paras %}
+                    <h4> {{f.label}}: {{f}} </h4>
 
-            {% if "end_time" in rtype_paras %}
-                結束時間: <input type="date" value={{default_values.d_start_time}} name="end_time"><br><br>
-            {% endif %}
+                    {% if f.name == "off_duty_tol" %}
+                        <h5><p class="text-muted">  發車時間超出？秒即脫班</p></h5><br>
+                    {% elif f.name == "early_tol" %}
+                        <h5><p class="text-muted">  發車時間提早表訂時間逾?秒鐘</p></h5><br>
+                    {% elif f.name == "delay_tol" %}
+                        <h5><p class="text-muted">  發車時間超過表訂時間逾?秒鐘</p></h5><br>
+                    {% else %}
+                        <br>
+                    {% endif %}
 
-            {% if "rid" in rtype_paras %}
-                路線: <select name="rid">
-                {% for r in rids%}
-                    <option value={{r.rid}}>{{r.name}} </option>
-                {% endfor %}
-                </select><br><br>
-
-            {% endif %}
-
-            {% if "carno" in rtype_paras %}
-                車號: <input  value={{default_values.d_carno}} name="carno"><br><br>
-            {% endif %}
-
-            {% if "vid" in rtype_paras %}
-                營運商:<select name="vid">
-                {% for v in vids%}
-                    <option value={{v.vid}}>{{v.name}} </option>
-                {% endfor %}
-                </select><br><br>
-            {% endif %}
-
-            {% if "off_duty_tol" in rtype_paras %}
-                脫班: <input  value=1200 name="off_duty_tol">秒<br>
-                <p class="text-muted">  發車時間超出？秒即脫班</p><br>
-            {% endif %}
-
-            {% if "early_tol" in rtype_paras %}
-                早發: <input  value=60 name="early_tol">秒<br>
-                <p class="text-muted">  發車時間提早表訂時間逾?秒鐘</p><br>
-            {% endif %}
-
-            {% if "delay_tol" in rtype_paras %}
-                遲發: <input  value=300 name="delay_tol">秒<br>
-                <p class="text-muted">  發車時間超過表訂時間逾?秒鐘</p><br>
-            {% endif %}
-
+                {% endif %}
+            {% endfor %}
             <br><br>
             <input type="submit" class="btn btn-primary btn-round" value="Create">
 

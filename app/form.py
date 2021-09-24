@@ -1,28 +1,70 @@
-import datetime
-import json, os
-
+import json
+import os
+from datetime import datetime, timedelta
 from django import forms
-import inspect
-from dotenv import load_dotenv
-
-from .reportsLib import ReportCenter, StationCenter
-
-load_dotenv()
-sql_options = json.loads(os.getenv("EBUS_SQLDB"))
-mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
+from .reportsLib import StationCenter
 
 
-class ReportPrehandle(forms.Field):
-    def __init__(self, rtype):
-        super().__init__()
-        rc = ReportCenter(centerDB_conn_options=sql_options, drivelogDB_conn_options=mongo_options)
-        report = rc.create_empty_report(rtype)
-        rtype_paras = list(inspect.signature(report.generate_report).parameters)
-        if "start_time" in rtype_paras:
-            start_time = forms.DateField()
-            start_time.initial = datetime.datetime.today()
-        if "end_time" in rtype_paras:
-            end_time = forms.DateField()
-            end_time.initial = datetime.datetime.today()
-        if "rid" in rtype_paras:
-            pass
+def get_rid_select_options(sc: StationCenter) -> list:
+    rids = []
+    rdf = sc.get_routes_ch_name()
+    for i in range(len(rdf['rid'])):
+        r = (
+            rdf['rid'].loc[i],
+            rdf['name'].loc[i]
+        )
+        rids.append(r)
+    return rids
+
+
+def get_vid_select_options(sc: StationCenter) -> list:
+    vids = []
+    vdf = sc.get_vids_ch_name()
+    for i in range(len(vdf['vid'])):
+        v = (
+            vdf['vid'].loc[i],
+            vdf['name'].loc[i]
+        )
+        vids.append(v)
+    return vids
+
+
+sc = StationCenter(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+sc.connect()
+rids = get_rid_select_options(sc)
+vids = get_vid_select_options(sc)
+sc.disconnect()
+
+
+class DateInput(forms.DateInput):
+    input_type = "date"
+
+
+class ParaInput(forms.Form):
+    start_time = forms.DateField(widget=DateInput, initial=datetime.today() - timedelta(days=1))
+    start_time.label = "統計起始日"
+
+    end_time = forms.DateField(widget=DateInput, initial=datetime.today() - timedelta(days=1))
+    end_time.label = "統計截止日"
+
+    carno = forms.CharField(initial="117-FX")
+    carno.label = "車號"
+
+    vid = forms.IntegerField(
+        widget=forms.Select(choices=vids)
+    )
+    vid.label = "營運商"
+
+    rid = forms.IntegerField(
+        widget=forms.Select(choices=rids)
+    )
+    rid.label = "路線"
+
+    off_duty_tol = forms.IntegerField(initial=1200)
+    off_duty_tol.label = "脫班"
+
+    early_tol = forms.IntegerField(initial=60)
+    early_tol.label = "早發"
+
+    delay_tol = forms.IntegerField(initial=300)
+    delay_tol.label = "遲發"

@@ -10,7 +10,7 @@ from django.template import loader
 from dotenv import load_dotenv
 
 from app.reportsLib import Bus, StationCenter
-from .form import ParaForm
+from .form import ParaInput
 
 logger = logging.getLogger('django')
 
@@ -27,7 +27,7 @@ CONTEXT = {
 def data_traffic_prehandle(request):
     context = CONTEXT
     context["title"] = "資料流 流量統計"
-    context["para_form"] = ParaForm()
+    context["para_form"] = ParaInput()
 
     load_template = 'data_traffic/data_traffic_prehandle.html'
     html_template = loader.get_template(load_template)
@@ -39,7 +39,8 @@ def data_traffic_view(request):
     context = CONTEXT
     if request.method == "POST":
         para_received = (dict(request.POST))
-        date = datetime.strptime(para_received['date'], '%Y-%m-%d')
+        print(para_received)
+        date = datetime.strptime(para_received['date'][0], '%Y-%m-%d')
 
         sc = StationCenter(sqlOption=sql_options)
         sc.connect()

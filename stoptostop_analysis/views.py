@@ -10,7 +10,6 @@ from django.template import loader
 from dotenv import load_dotenv
 
 from app.reportsLib import StationCenter, StopToStopResult
-from app.views import get_rid_select_options
 
 logger = logging.getLogger('django')
 
@@ -20,6 +19,18 @@ sql_options = json.loads(os.getenv("EBUS_SQLDB"))
 CONTEXT = {
     "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed')
 }
+
+
+def get_rid_select_options(sc: StationCenter) -> list:
+    rids = []
+    rdf = sc.get_routes_ch_name()
+    for i in range(len(rdf['rid'])):
+        r = {
+            "rid": rdf['rid'].loc[i],
+            "name": rdf['name'].loc[i]
+        }
+        rids.append(r)
+    return rids
 
 
 @login_required(login_url="/login/")
