@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import ast
 from datetime import datetime, timedelta
 
 from decouple import config
@@ -10,6 +11,7 @@ from django.template import loader
 from dotenv import load_dotenv
 
 from app.reportsLib import StationCenter, StopToStopResult
+from .form import ParaInput
 
 logger = logging.getLogger('django')
 
@@ -39,16 +41,8 @@ def stoptostop_prehandle(request):
         "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
         'segment': 'stoptostop',
         "title": "站到站 資訊統計",
-        "default_values": {
-            "d_date_begin": (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
-            "d_date_end": (datetime.now()).strftime("%Y-%m-%d"),
-        },
+        "para_form": ParaInput()
     }
-
-    sc = StationCenter(sqlOption=sql_options)
-    sc.connect()
-    context['rids'] = get_rid_select_options(sc)
-    sc.disconnect()
 
     load_template = 'stoptostop_analysis/stoptostop_prehandle.html'
     html_template = loader.get_template(load_template)
@@ -128,9 +122,9 @@ weekdayType_cn = {
 
 
 def format_stoptostop_paras(para_received: dict):
-    stat = dict(json.loads(para_received["rid_stat"][0]))
-    para_received["rid"] = int(stat['rid_stat'][0])
-    para_received["rid_name"] = stat['rid_stat'][1]
+    stat = ast.literal_eval(para_received["rid_stat"][0])
+    para_received["rid"] = int(stat[0])
+    para_received["rid_name"] = stat[1]
     para_received["weekdayType_cn"] = [weekdayType_cn[w] for w in para_received["weekdayType"]]
     para_received["weekdayType"] = [int(w) for w in para_received["weekdayType"]]
     para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
