@@ -3,24 +3,6 @@ from django import forms
 from datetime import datetime, timedelta
 from app.reportsLib import StationCenter
 
-
-def get_rid_select_options(sc: StationCenter) -> list:
-    rids = []
-    rdf = sc.get_routes_ch_name()
-    for i in range(len(rdf['rid'])):
-        r = (
-            [rdf["rid"].loc[i], rdf["name"].loc[i]],
-            rdf["name"].loc[i]
-        )
-        rids.append(r)
-    return rids
-
-
-sc = StationCenter(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-sc.connect()
-rids = get_rid_select_options(sc)
-sc.disconnect()
-
 weekdayType_cn = (
     (0, "平日"),
     (1, "週末"),
@@ -34,20 +16,40 @@ weekdayType_cn = (
 hour_field = [(h, h) for h in range(25)]
 
 
+def get_rids(sc: StationCenter) -> list:
+    rids = []
+    rdf = sc.get_routes_ch_name()
+    for i in range(len(rdf['rid'])):
+        r = (
+            [rdf["rid"].loc[i], rdf["name"].loc[i]],
+            rdf["name"].loc[i]
+        )
+        rids.append(r)
+    return rids
+
+
+def get_rid_select_options():
+    sc = StationCenter(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+    sc.connect()
+    rids = get_rids(sc)
+    sc.disconnect()
+    return rids
+
+
 class DateInput(forms.DateInput):
     input_type = "date"
 
 
 class ParaInput(forms.Form):
     rid_stat = forms.CharField(
-        widget=forms.Select(choices=rids)
+        widget=forms.Select(choices=get_rid_select_options())
     )
     rid_stat.label = "路線"
 
-    date_begin = forms.DateField(widget=DateInput, initial=datetime.now() - timedelta(days=31))
+    date_begin = forms.DateField(widget=DateInput, initial=lambda: (datetime.now() - timedelta(days=31)))
     date_begin.label = "統計起始日"
 
-    date_end = forms.DateField(widget=DateInput, initial=datetime.today() - timedelta(days=1))
+    date_end = forms.DateField(widget=DateInput, initial=lambda: (datetime.today() - timedelta(days=1)))
     date_end.label = "統計截止日"
 
     hour_begin = forms.IntegerField(
