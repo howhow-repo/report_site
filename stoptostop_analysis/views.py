@@ -19,7 +19,9 @@ load_dotenv()
 sql_options = json.loads(os.getenv("EBUS_SQLDB"))
 
 CONTEXT = {
-    "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed')
+    "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
+    "segment": 'stoptostop',
+    "title": "站到站 資訊統計",
 }
 
 
@@ -37,12 +39,8 @@ def get_rid_select_options(sc: StationCenter) -> list:
 
 @login_required(login_url="/login/")
 def stoptostop_prehandle(request):
-    context = {
-        "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
-        'segment': 'stoptostop',
-        "title": "站到站 資訊統計",
-        "para_form": ParaInput()
-    }
+    context = CONTEXT
+    context["para_form"] = ParaInput()
 
     load_template = 'stoptostop_analysis/stoptostop_prehandle.html'
     html_template = loader.get_template(load_template)
@@ -50,7 +48,7 @@ def stoptostop_prehandle(request):
 
 
 @login_required(login_url="/login/")
-def stoptostop_view(request):
+def stoptostop_traveltime_view(request):
     context = CONTEXT
     if request.method == "POST":
         para_received = format_stoptostop_paras(dict(request.POST))
@@ -72,7 +70,7 @@ def stoptostop_view(request):
         context['weekdayType'] = para_received['weekdayType']
         context['weekdayType_cn'] = para_received['weekdayType_cn']
 
-        html_template = loader.get_template('stoptostop_analysis/stoptostop_result.html')
+        html_template = loader.get_template('stoptostop_analysis/stoptostop_traveltime_result.html')
         return HttpResponse(html_template.render(context, request))
     else:
         html_template = loader.get_template('page-500.html')
@@ -80,7 +78,38 @@ def stoptostop_view(request):
 
 
 @login_required(login_url="/login/")
-def stoptostop_hourly(request, rsid):
+def stoptostop_staytime_view(request):
+    context = CONTEXT
+    if request.method == "POST":
+        para_received = format_stoptostop_paras(dict(request.POST))
+        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr.connect()
+        rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
+        context['chartMaxHight'] = max(rp['avg_stay_time'].tolist())
+
+        rp.fillna("", inplace=True)
+        context['result'] = rp.to_dict('records')
+        sr.disconnect()
+
+        context['rid'] = para_received['rid']
+        context['rid_name'] = para_received['rid_name']
+        context['date_begin'] = para_received['date_begin']
+        context['date_end'] = para_received['date_end']
+        context['hour_begin'] = para_received['hour_begin']
+        context['hour_end'] = para_received['hour_end']
+        context['weekdayType'] = para_received['weekdayType']
+        context['weekdayType_cn'] = para_received['weekdayType_cn']
+
+        html_template = loader.get_template('stoptostop_analysis/stoptostop_staytime_result.html')
+        return HttpResponse(html_template.render(context, request))
+    else:
+        html_template = loader.get_template('page-500.html')
+        return HttpResponseServerError(html_template.render(context, request))
+
+
+
+@login_required(login_url="/login/")
+def stoptostop_traveltime_hourly(request, rsid):
     context = CONTEXT
     if request.method == "POST":
         para_received = format_hourly_paras(dict(request.POST))
@@ -102,12 +131,43 @@ def stoptostop_hourly(request, rsid):
         context['weekdayType'] = para_received['weekdayType']
         context['weekdayType_cn'] = para_received['weekdayType_cn']
 
-        html_template = loader.get_template('stoptostop_analysis/stoptostop_hourly.html')
+        html_template = loader.get_template('stoptostop_analysis/stoptostop_traveltime_hourly.html')
         return HttpResponse(html_template.render(context, request))
 
     else:
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def stoptostop_staytime_hourly(request, rsid):
+    context = CONTEXT
+    if request.method == "POST":
+        para_received = format_hourly_paras(dict(request.POST))
+        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr.connect()
+        rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid, **para_received))
+        rp.fillna(0, inplace=True)
+        context['chartMaxHight'] = max(rp['avg_stay_time'].tolist())
+        context['result'] = rp.to_dict('records')
+        sr.disconnect()
+
+        context['rsid'] = rsid
+        context['rsid_name'] = para_received['rsid_name']
+        context['rid'] = para_received['rid']
+        context['rid_name'] = para_received['rid_name']
+        context['date_begin'] = para_received['date_begin']
+        context['date_end'] = para_received['date_end']
+        context['weekdayType'] = para_received['weekdayType']
+        context['weekdayType_cn'] = para_received['weekdayType_cn']
+
+        html_template = loader.get_template('stoptostop_analysis/stoptostop_staytime_hourly.html')
+        return HttpResponse(html_template.render(context, request))
+
+    else:
+        html_template = loader.get_template('page-404.html')
+        return HttpResponseNotFound(html_template.render(context, request))
+
 
 
 weekdayType_cn = {
@@ -138,7 +198,8 @@ def format_stoptostop_paras(para_received: dict):
 
 
 def format_hourly_paras(para_received: dict):
-    para_received['pre_rsid_name'] = para_received['pre_rsid_name'][0]
+    if "pre_rsid_name" in para_received:
+        para_received['pre_rsid_name'] = para_received['pre_rsid_name'][0]
     para_received['rid'] = para_received['rid'][0]
     para_received['rid_name'] = para_received['rid_name'][0]
     para_received['rsid_name'] = para_received['rsid_name'][0]

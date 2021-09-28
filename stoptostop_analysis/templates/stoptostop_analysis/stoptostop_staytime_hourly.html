@@ -1,20 +1,21 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %}
+{% block title %} 站到站 資訊統計 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<h1>站內停留時間統計</h1><br>
   <div class="col-md-12">
         <div class="card card-chart">
           <div class="card-header card-header-success">
             <div class="ct-chart" id="testChart"></div>
           </div>
           <div class="card-body">
-            <h4 class="card-title">測試: 每小時統計 站間行駛時間</h4>
+            <h4 class="card-title">每小時統計 站內停留時間</h4>
             <p class="card-category">
-              平均行駛時間(sec)
+              平均停留時間(sec)
             </p>
           </div>
           <div class="card-footer">
@@ -40,10 +41,10 @@
             <table class="table table-hover">
               <thead class="text-warning">
                 <th>時間區間</th>
-                <th>最大行使時間(s)</th>
-                <th>最小行使時間(s)</th>
-                <th>平均行使時間(s)</th>
-                <th>行使時間標準差(s)</th>
+                <th>最大停留時間(s)</th>
+                <th>最小停留時間(s)</th>
+                <th>平均停留時間(s)</th>
+                <th>停留時間標準差(s)</th>
                 <th>變異係數</th>
                 <th>樣本數量</th>
               </thead>
@@ -51,11 +52,11 @@
                 {% for r in result%}
                 <tr data-link="https://www.google.com" data-target="_BLANK">
                   <td>{{r.hour_range}}</td>
-                  <td>{{r.max_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.min_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.avg_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.std_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.var_arrival_time_spent|floatformat:-2}}</td>
+                  <td>{{r.max_stay_time|floatformat:-2}}</td>
+                  <td>{{r.min_stay_time|floatformat:-2}}</td>
+                  <td>{{r.avg_stay_time|floatformat:-2}}</td>
+                  <td>{{r.std_stay_time|floatformat:-2}}</td>
+                  <td>{{r.var_stay_time|floatformat:-2}}</td>
                   <td>{{r.sample_count|floatformat:0}}</td>
                 </tr>
                 {% endfor %}
@@ -82,7 +83,7 @@
           datatestChart = {
               labels: [{% for r in result%} "{{r.hour_range}}", {% endfor %}],
               series: [
-                [{% for r in result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}]
+                [{% for r in result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}]
               ]
           };
           optionstestChart = {

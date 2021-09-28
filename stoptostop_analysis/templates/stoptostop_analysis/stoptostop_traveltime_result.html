@@ -1,18 +1,19 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %}
+{% block title %} 站到站 資訊統計 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<h1>站間行駛時間統計</h1><br>
 <div class="col-md-12" xmlns="http://www.w3.org/1999/html">
         <div class="card card-chart">
           <div class="card-header card-header-success">
             <div class="ct-chart" id="testChart"></div>
           </div>
           <div class="card-body">
-            <h4 class="card-title">測試: 站間行駛時間</h4>
+            <h4 class="card-title">站間行駛時間</h4>
             <p class="card-category">
               到達站所花費時間(sec)
             </p>
@@ -42,10 +43,10 @@
                 <th></th>
                 <th>出發站</th>
                 <th>抵達站</th>
-                <th>最大行使時間(s)</th>
-                <th>最小行使時間(s)</th>
-                <th>平均行使時間(s)</th>
-                <th>行使時間標準差(s)</th>
+                <th>最大行駛時間(s)</th>
+                <th>最小行駛時間(s)</th>
+                <th>平均行駛時間(s)</th>
+                <th>行駛時間標準差(s)</th>
                 <th>變異係數</th>
                 <th>樣本數量</th>
               </thead>
@@ -53,7 +54,7 @@
                 {% for r in result%}
                 <tr>
                   <td>
-                    <form action="/stoptostop/result/{{r.rsid}}" method="post">
+                    <form action="/stoptostop/traveltime_result/{{r.rsid}}" method="post">
                       <input type="hidden" value={{r.previous_name}} name="pre_rsid_name">
                       <input type="hidden" value={{r.name}} name="rsid_name">
                       <input type="hidden" value={{rid}} name="rid">

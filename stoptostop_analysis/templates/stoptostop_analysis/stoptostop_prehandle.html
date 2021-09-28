@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Report Parameters {% endblock %}
+{% block title %} 站到站 資訊統計 {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -10,14 +10,14 @@
     <h3>請輸入下列資訊：</h3>
     <p>
         <br>
-        <h4><form action="/stoptostop/result/" method="post">
+        <h4><form method="post">
 
             {% for f in para_form %}
                 <h4> {{f.label}}: {{f}} </h4>
             {% endfor %}
             <br><br>
-
-            <input type="submit" class="btn btn-primary btn-round" value="Analysis">
+            <input type="submit" class="btn btn-primary btn-round" value="站間行駛時間" onclick="javascript: form.action='/stoptostop/traveltime_result/';">
+            <input type="submit" class="btn btn-primary btn-round" value="站內停留時間" onclick="javascript: form.action='/stoptostop/staytime_result/';">
 
         </form></h4>
     </p>
