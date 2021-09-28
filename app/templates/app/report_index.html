@@ -24,7 +24,7 @@
                         <tbody>
                             {% for report in index_table %}
                             <tr>
-                                <td><a href="/report_index/prehandle/?rtype={{report.type}}">●</a></td>
+                                <td><a href="{% url 'report_prehandle' %}?rtype={{report.type}}">●</a></td>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{report.title}}</td>
                                 <td>{{report.simple_description}}</td>

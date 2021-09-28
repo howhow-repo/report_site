@@ -54,7 +54,7 @@
                 {% for r in result%}
                 <tr>
                   <td>
-                    <form action="/stoptostop/traveltime_result/{{r.rsid}}" method="post">
+                    <form action="{% url 'stoptostop_traveltime_hourly' rsid=r.rsid %}" method="post">
                       <input type="hidden" value={{r.previous_name}} name="pre_rsid_name">
                       <input type="hidden" value={{r.name}} name="rsid_name">
                       <input type="hidden" value={{rid}} name="rid">

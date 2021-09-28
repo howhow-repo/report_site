@@ -53,7 +53,7 @@
                 {% for r in result%}
                 <tr>
                   <td>
-                    <form action="/stoptostop/staytime_result/{{r.rsid}}" method="post">
+                    <form action="{% url 'stoptostop_staytime_hourly' rsid=r.rsid %}" method="post">
                       <input type="hidden" value={{r.name}} name="rsid_name">
                       <input type="hidden" value={{rid}} name="rid">
                       <input type="hidden" value='{{rid_name}}' name="rid_name">
@@ -104,7 +104,7 @@
                   tension: 0
               }),
               low: 0,
-              high: {{chartMaxHight}}, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+              high: {{chartMaxHight}},
               chartPadding: {
                   top: 0,
                   right: 0,

@@ -16,8 +16,8 @@
                 <h4> {{f.label}}: {{f}} </h4>
             {% endfor %}
             <br><br>
-            <input type="submit" class="btn btn-primary btn-round" value="站間行駛時間" onclick="javascript: form.action='/stoptostop/traveltime_result/';">
-            <input type="submit" class="btn btn-primary btn-round" value="站內停留時間" onclick="javascript: form.action='/stoptostop/staytime_result/';">
+            <input type="submit" class="btn btn-primary btn-round" value="站間行駛時間" onclick="javascript: form.action='{% url 'stoptostop_traveltime_result' %}';">
+            <input type="submit" class="btn btn-primary btn-round" value="站內停留時間" onclick="javascript: form.action='{% url 'stoptostop_staytime_result' %}';">
 
         </form></h4>
     </p>

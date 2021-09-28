@@ -32,7 +32,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # Django admin route
+    path('admin/', admin.site.urls, name='admin'),  # Django admin route
     path("", include("authentication.urls")),  # Auth routes - login / register
     path("", include("app.urls")),  # UI Kits Html files
     path("notify/", include("notify.urls")),

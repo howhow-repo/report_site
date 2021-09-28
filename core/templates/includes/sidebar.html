@@ -14,49 +14,49 @@
             </a>
           </li>
           <li class="nav-item {% if 'report_index' in segment %} active {% endif %}">
-            <a class="nav-link" href="/report_index/">
+            <a class="nav-link" href="{% url 'report_index' %}">
               <i class="material-icons">content_paste</i>
               <p><b>報表</b></p>
             </a>
           </li>
 
           <li class="nav-item {% if 'stoptostop' in segment %} active {% endif %}">
-            <a class="nav-link" href="/stoptostop/prehandle/">
+            <a class="nav-link" href="{% url 'stoptostop_prehandle' %}">
               <i class="material-icons">library_books</i>
               <p><b>站到站 資訊統計</b></p>
             </a>
           </li>
 
           <li class="nav-item {% if 'comparison' in segment %} active {% endif %}">
-            <a class="nav-link" href="/comparison/">
+            <a class="nav-link" href="{% url 'comparison_index' %}">
               <i class="material-icons">compare_arrows</i>
               <p><b>資料表比較</b></p>
             </a>
           </li>
 
           <li class="nav-item {% if 'notify' in segment %} active {% endif %}">
-            <a class="nav-link" href="/notify/">
+            <a class="nav-link" href="{% url 'notify_index' %}">
               <i class="material-icons">person</i>
               <p><b>通知推播名單</b></p>
             </a>
           </li>
 
           <li class="nav-item {% if 'bus_rawdata' in segment %} active {% endif %}">
-            <a class="nav-link" href="/bus_rawdata/prehandle/">
+            <a class="nav-link" href="{% url 'bus_rawdata_prehandle' %}">
               <i class="material-icons">data_exploration</i>
               <p><b>公車原始行駛資料</b></p>
             </a>
           </li>
 
           <li class="nav-item {% if 'data_traffic' in segment %} active {% endif %}">
-            <a class="nav-link" href="/data_traffic/prehandle/">
+            <a class="nav-link" href="{% url 'data_traffic_prehandle' %}">
               <i class="material-icons">perm_data_setting</i>
               <p><b>資料流量統計</b></p>
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="/docs/" target="_blank">
+            <a class="nav-link" href="{% url 'schema-swagger-ui' %}" target="_blank">
               <i class="material-icons">api</i>
               <p><b>Swagger</b></p>
             </a>
@@ -70,7 +70,7 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="/login/">
+            <a class="nav-link" href="{% url 'login' %}">
               <i class="material-icons">login</i>
               <p><b>Login</b></p>
             </a>

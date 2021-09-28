@@ -10,7 +10,7 @@
     <h3>下列資訊用以調用資料流量紀錄：</h3>
     <p>
         <br>
-        <form action="/data_traffic/result/" method="post">
+        <form action="{% url 'data_traffic_view' %}" method="post">
         {% for f in para_form %}
             <h4>{{f.label}}: {{f}}</h4>
         {% endfor %}

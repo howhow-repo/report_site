@@ -10,7 +10,7 @@
     <h3>下列資訊用以直接調用與呈現原始駕駛紀錄：</h3>
     <p>
         <br>
-        <h4><form action="/bus_rawdata/result/" method="post">
+        <h4><form action="{% url 'bus_rawdata_view' %}" method="post">
 
             {% for f in para_form%}
                 {{f.label}}: {{f}}<br><br>
