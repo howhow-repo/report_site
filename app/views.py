@@ -52,7 +52,7 @@ def resume_jobs(request):
 
 
 def demo(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     context['segment'] = 'material'
     html_template = loader.get_template('index.html')
     return HttpResponse(html_template.render(context, request))
@@ -64,7 +64,7 @@ def index(request):
         return re
 
     logger.info(f"Client Access From: {visitor_ip_address(request)}")
-    context = CONTEXT
+    context = CONTEXT.copy()
     context['segment'] = 'index'
 
     results = get_parsing_result()
@@ -78,7 +78,7 @@ def index(request):
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
     try:
@@ -98,7 +98,7 @@ def pages(request):
 
 @login_required(login_url="/login/")
 def report_index(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     context = {**context, **get_report_index_str()}
 
     if request.method == 'GET':
@@ -112,6 +112,7 @@ def report_index(request):
 
 @login_required(login_url="/login/")
 def report_prehandle(request):
+    context = CONTEXT.copy()
     rtype = request.GET.get('rtype', None)
     if rtype is None:
         return redirect("/report_index/")
@@ -120,14 +121,13 @@ def report_prehandle(request):
     report = rc.create_empty_report(rtype)
     rtype_paras = list(inspect.signature(report.generate_report).parameters)
 
-    context = {
-        "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
-        'segment': 'report_index',
+    context.update({
+        "segment": "report_index",
         "rtype": rtype,
         "title": report.title,
         "rtype_paras": rtype_paras,
         "para_form": ParaInput()
-    }
+    })
     load_template = 'app/report_prehandle.html'
     html_template = loader.get_template(load_template)
     return HttpResponse(html_template.render(context, request))
@@ -141,7 +141,7 @@ def report_view(request, rtype):
         return parsing_get_report(request=request, rtype=rtype, para_received=para_received)
 
     else:
-        context = CONTEXT
+        context = CONTEXT.copy()
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render(context, request))
 

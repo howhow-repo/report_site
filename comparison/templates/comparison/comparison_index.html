@@ -10,30 +10,32 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header card-header-primary">
+                <div class="card-header card-header-success">
                   <h4 class="card-title "><b>比較表種類一覽</b>:</h4>
                   <p class="card-category"><b>請點選左方“●”以進入參數設定</b></p>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
-                        <thead class=" text-primary">
+                        <thead class=" text-success">
                             <th>Link</th>
                             <th>SN</th>
                             <th>Report</th>
                             <th>Description</th>
                         </thead>
                         <tbody>
+                            {% for report in report_list %}
                             <tr>
-                                <td><a href="/"> ● </a> </td>
+                                <td><a href="{% url 'comparison_prehandle' rtype=report.rtype %}"> ● </a> </td>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{report.title}}</td>
-                                <td>{{report.simple_description}}</td>
+                                <td>{{report.description}}</td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <a href="/" class="btn btn-primary btn-round">Home</a>
+            <a href="/" class="btn btn-success btn-round">Home</a>
         </div>
     </div>
 {% endblock content %}

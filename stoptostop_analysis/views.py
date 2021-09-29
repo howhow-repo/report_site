@@ -39,7 +39,7 @@ def get_rid_select_options(sc: StationCenter) -> list:
 
 @login_required(login_url="/login/")
 def stoptostop_prehandle(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     context["para_form"] = ParaInput()
 
     load_template = 'stoptostop_analysis/stoptostop_prehandle.html'
@@ -49,7 +49,7 @@ def stoptostop_prehandle(request):
 
 @login_required(login_url="/login/")
 def stoptostop_traveltime_view(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_stoptostop_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -79,7 +79,7 @@ def stoptostop_traveltime_view(request):
 
 @login_required(login_url="/login/")
 def stoptostop_staytime_view(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_stoptostop_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -110,7 +110,7 @@ def stoptostop_staytime_view(request):
 
 @login_required(login_url="/login/")
 def stoptostop_traveltime_hourly(request, rsid):
-    context = CONTEXT
+    context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_hourly_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -141,7 +141,7 @@ def stoptostop_traveltime_hourly(request, rsid):
 
 @login_required(login_url="/login/")
 def stoptostop_staytime_hourly(request, rsid):
-    context = CONTEXT
+    context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_hourly_paras(dict(request.POST))
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))

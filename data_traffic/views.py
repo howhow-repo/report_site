@@ -25,7 +25,7 @@ CONTEXT = {
 # Create your views here.
 @login_required(login_url="/login/")
 def data_traffic_prehandle(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     context["title"] = "資料流 流量統計"
     context["para_form"] = ParaInput()
 
@@ -36,7 +36,7 @@ def data_traffic_prehandle(request):
 
 @login_required(login_url="/login/")
 def data_traffic_view(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     if request.method == "POST":
         para_received = (dict(request.POST))
         print(para_received)

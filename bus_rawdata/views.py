@@ -25,7 +25,7 @@ CONTEXT = {
 
 @login_required(login_url="/login/")
 def bus_rawdata_prehandle(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     context["title"] = "公車 原始資料調用"
     context["para_form"] = ParaInput()
 
@@ -36,7 +36,7 @@ def bus_rawdata_prehandle(request):
 
 @login_required(login_url="/login/")
 def bus_rawdata_view(request):
-    context = CONTEXT
+    context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_paras(dict(request.POST))
         bus = Bus(MongoDBPath=json.loads(os.getenv("EBUS_MONGODB")), sqlOption=json.loads(os.getenv("EBUS_SQLDB")))

@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 站到站 資訊統計 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <h3>請輸入下列資訊：</h3>
+    <p>
+        <br>
+        <h4><form action="{% url 'comparison_result' rtype=rtype %}" method="post" >
+            <h2>Chart A</h2><br>
+            {% for f in para_form %}
+                {% if f.name in rtype_paras_comm or f.name in rtype_paras_A %}
+                    <h4> {{f.label}}: {{f}} </h4>
+                {% endif %}
+            {% endfor %}
+            --------<br>
+            <h2>Chart B</h2><br>
+            {% for f in para_form %}
+                {% if f.name in rtype_paras_comm or f.name in rtype_paras_B %}
+                    <h4> {{f.label}}: {{f}} </h4>
+                {% endif %}
+            {% endfor %}
+            <br><br>
+
+            <input type="submit" class="btn btn-success btn-round" value="Analysis">
+
+        </form></h4>
+    </p>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}
