@@ -10,6 +10,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
 
+from app.reportsLib import StopToStopResult
 from .form import ParaInput
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,8 @@ report_list = [
             'description': '比較不同星期時，站與站之間的行駛時間。',
             'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
             'paras_A':['weekday_A'],
-            'paras_B':['weekday_B']
+            'paras_B':['weekday_B'],
+            'compare_value': 'avg_arrival_time_spent'
         },
         {
             'rtype': 'traveltime_weekdayType',
@@ -38,7 +40,8 @@ report_list = [
             'description': '比較不同種日時，站與站之間的行駛時間。',
             'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
             'paras_A':['weekdayType_A'],
-            'paras_B':['weekdayType_B']
+            'paras_B':['weekdayType_B'],
+            'compare_value': 'avg_arrival_time_spent'
         },
         {
             'rtype': 'stayltime_weekday',
@@ -46,7 +49,8 @@ report_list = [
             'description': '比較不同星期時，站內停留時間。',
             'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
             'paras_A':['weekday_A'],
-            'paras_B':['weekday_B']
+            'paras_B':['weekday_B'],
+            'compare_value': 'avg_stay_time'
         },
         {
             'rtype': 'stayltime_weekdayType',
@@ -54,7 +58,8 @@ report_list = [
             'description': '比較不同種日時，站內停留時間。',
             'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
             'paras_A':['weekdayType_A'],
-            'paras_B':['weekdayType_B']
+            'paras_B':['weekdayType_B'],
+            'compare_value': 'avg_stay_time'
         },
     ]
 
@@ -94,15 +99,58 @@ def comparison_prehandle(request, rtype):
 
 @login_required(login_url="/login/")
 def comparison_result(request, rtype):
+    context = CONTEXT.copy()
+    context['chart_A'] = {}
+    context['chart_B'] = {}
+
+    if rtype not in [r['rtype'] for r in report_list]:
+        html_template = loader.get_template('page-404.html')
+        return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
+
+    for r in report_list:
+        if r['rtype'] == rtype:
+            context['title'] = r['title']
+            context['description'] = r['description']
+            context['compare_value'] = r['compare_value']
+            compare_value = r['compare_value']
+
+    charA_paras, charB_paras = split_paras(request)
+    context['chart_A'].update({'paras': charA_paras})
+    context['chart_B'].update({'paras': charB_paras})
+
+    sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+    sr.connect()
+    rpA = (sr.get_default_stop_to_stop_by_rid(**charA_paras))
+    rpA.fillna(0, inplace=True)
+    rpB = (sr.get_default_stop_to_stop_by_rid(**charB_paras))
+    rpB.fillna(0, inplace=True)
+    sr.disconnect()
+
+    context['chart_A'].update({'result': rpA.to_dict('records')})
+    context['chart_B'].update({'result': rpB.to_dict('records')})
+
+    context['chartMaxHight'] = max([max(rpA[compare_value].tolist()), max(rpB[compare_value].tolist())])
+
+    load_template = 'comparison/comparison_view.html'
+    html_template = loader.get_template(load_template)
+    return HttpResponse(html_template.render(context, request))
+
+
+def split_paras(request) -> (dict, dict):
     r = (dict(request.POST))
+
     charA_paras = {
         "rid": (ast.literal_eval(r['rid_stat'][0]))[0],
         "rid_name": (ast.literal_eval(r['rid_stat'][0]))[1],
-        "date_begin": datetime.strptime(r['date_begin'][0],'%Y-%m-%d'),
+        "date_begin": datetime.strptime(r['date_begin'][0], '%Y-%m-%d'),
         "date_end": datetime.strptime(r['date_end'][0], '%Y-%m-%d'),
         "hour_begin": int(r['hour_begin'][0]),
         "hour_end": int(r['hour_end'][0]),
     }
+    if "weekdayType_A" in r:
+        charA_paras.update({'weekdayType': r['weekdayType_A']})
+    if 'weekday_A' in r:
+        charA_paras.update({'weekday': r['weekday_A']})
 
     charB_paras = {
         "rid": (ast.literal_eval(r['rid_stat'][1]))[0],
@@ -112,5 +160,9 @@ def comparison_result(request, rtype):
         "hour_begin": int(r['hour_begin'][1]),
         "hour_end": int(r['hour_end'][1]),
     }
+    if "weekdayType_B" in r:
+        charB_paras.update({'weekdayType': r['weekdayType_B']})
+    if 'weekday_B' in r:
+        charB_paras.update({'weekday': r['weekday_B']})
 
-    return JsonResponse([charA_paras, charB_paras], safe=False)
+    return charA_paras, charB_paras
