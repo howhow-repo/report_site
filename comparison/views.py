@@ -1,9 +1,11 @@
 import ast
 import json
 import logging
+import math
 import os
 from datetime import datetime
 
+import numpy
 from decouple import config
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
@@ -130,6 +132,10 @@ def comparison_result(request, rtype):
     context['chart_B'].update({'result': rpB.to_dict('records')})
 
     context['chartMaxHight'] = max([max(rpA[compare_value].tolist()), max(rpB[compare_value].tolist())])
+
+    context['diff'] = (abs(rpA[context['compare_value']] - rpB[context['compare_value']])).to_list()
+    context['diff'] = [0 if math.isnan(d) else d for d in context['diff']]
+    context['diff_max'] = max(context['diff'])
 
     load_template = 'comparison/comparison_view.html'
     html_template = loader.get_template(load_template)
