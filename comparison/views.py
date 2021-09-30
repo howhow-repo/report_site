@@ -133,6 +133,7 @@ def comparison_result(request, rtype):
 
     load_template = 'comparison/comparison_view.html'
     html_template = loader.get_template(load_template)
+
     return HttpResponse(html_template.render(context, request))
 
 
@@ -148,9 +149,9 @@ def split_paras(request) -> (dict, dict):
         "hour_end": int(r['hour_end'][0]),
     }
     if "weekdayType_A" in r:
-        charA_paras.update({'weekdayType': r['weekdayType_A']})
+        charA_paras.update({'weekdayType': [int(w) for w in r['weekdayType_A']]})
     if 'weekday_A' in r:
-        charA_paras.update({'weekday': r['weekday_A']})
+        charA_paras.update({'weekday': [int(w) for w in r['weekday_A']]})
 
     charB_paras = {
         "rid": (ast.literal_eval(r['rid_stat'][1]))[0],
@@ -161,8 +162,8 @@ def split_paras(request) -> (dict, dict):
         "hour_end": int(r['hour_end'][1]),
     }
     if "weekdayType_B" in r:
-        charB_paras.update({'weekdayType': r['weekdayType_B']})
+        charB_paras.update({'weekdayType': [int(w) for w in r['weekdayType_B']]})
     if 'weekday_B' in r:
-        charB_paras.update({'weekday': r['weekday_B']})
+        charB_paras.update({'weekday': [int(w) for w in r['weekday_B']]})
 
     return charA_paras, charB_paras

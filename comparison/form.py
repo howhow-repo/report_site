@@ -75,7 +75,7 @@ class ParaInput(forms.Form):
 
     weekday_A = forms.IntegerField(
         widget=forms.CheckboxSelectMultiple(choices=weekday_cn),
-        initial=[0, 1, 2, 3, 4, 5, 6],
+        initial=[0],
     )
     weekday_A.label = "星期(複選)"
 
@@ -87,7 +87,7 @@ class ParaInput(forms.Form):
 
     weekday_B = forms.IntegerField(
         widget=forms.CheckboxSelectMultiple(choices=weekday_cn),
-        initial=[0, 1, 2, 3, 4, 5, 6]
+        initial=[0]
     )
     weekday_B.label = "星期(複選)"
 
