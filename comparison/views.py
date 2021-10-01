@@ -5,15 +5,15 @@ import math
 import os
 from datetime import datetime
 
-import numpy
 from decouple import config
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
 
 from app.reportsLib import StopToStopResult
 from .form import ParaInput
+from .reportsLib import *
 
 logger = logging.getLogger(__name__)
 
@@ -26,50 +26,11 @@ CONTEXT = {
     "segment": 'comparison',
 }
 
-report_list = [
-        {
-            'rtype': 'traveltime_weekday',
-            'title': '行駛時間與星期比較表',
-            'description': '比較不同星期時，站與站之間的行駛時間。',
-            'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
-            'paras_A':['weekday_A'],
-            'paras_B':['weekday_B'],
-            'compare_value': 'avg_arrival_time_spent'
-        },
-        {
-            'rtype': 'traveltime_weekdayType',
-            'title': '行駛時間與日種類比較表',
-            'description': '比較不同種日時，站與站之間的行駛時間。',
-            'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
-            'paras_A':['weekdayType_A'],
-            'paras_B':['weekdayType_B'],
-            'compare_value': 'avg_arrival_time_spent'
-        },
-        {
-            'rtype': 'stayltime_weekday',
-            'title': '站內停留時間與星期比較表',
-            'description': '比較不同星期時，站內停留時間。',
-            'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
-            'paras_A':['weekday_A'],
-            'paras_B':['weekday_B'],
-            'compare_value': 'avg_stay_time'
-        },
-        {
-            'rtype': 'stayltime_weekdayType',
-            'title': '站內停留時間與日種類比較表',
-            'description': '比較不同種日時，站內停留時間。',
-            'paras_comm': ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end'],
-            'paras_A':['weekdayType_A'],
-            'paras_B':['weekdayType_B'],
-            'compare_value': 'avg_stay_time'
-        },
-    ]
-
 
 @login_required(login_url="/login/")
 def comparison_index(request):
     context = CONTEXT.copy()
-    context['report_list'] = report_list.copy()
+    context['report_list'] = ComparisonReportCenter.list_of_dict()
 
     load_template = 'comparison/comparison_index.html'
     html_template = loader.get_template(load_template)
@@ -80,6 +41,8 @@ def comparison_index(request):
 def comparison_prehandle(request, rtype):
     context = CONTEXT.copy()
     context['rtype'] = rtype
+    report_list = ComparisonReportCenter.list_of_dict()
+
     if rtype not in [r['rtype'] for r in report_list ]:
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request)) # return if rtype not in list
@@ -102,12 +65,12 @@ def comparison_prehandle(request, rtype):
 @login_required(login_url="/login/")
 def comparison_result(request, rtype):
     context = CONTEXT.copy()
+    r = (dict(request.POST))
+    print(r)
+
+    context['chart_comm'] = {}
     context['chart_A'] = {}
     context['chart_B'] = {}
-
-    if rtype not in [r['rtype'] for r in report_list]:
-        html_template = loader.get_template('page-404.html')
-        return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
 
     for r in report_list:
         if r['rtype'] == rtype:
@@ -115,8 +78,13 @@ def comparison_result(request, rtype):
             context['description'] = r['description']
             context['compare_value'] = r['compare_value']
             compare_value = r['compare_value']
+            para_spliter = ParaSpliter(r['paras_A'] + r['paras_comm'], r['paras_B'] + r['paras_comm'])
+        else:
+            para_spliter = ParaSpliter(r['paras_A'] + r['paras_comm'], r['paras_B'] + r['paras_comm'])
+            html_template = loader.get_template('page-404.html')
+            return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
 
-    charA_paras, charB_paras = split_paras(request)
+    charA_paras, charB_paras = para_spliter(request)
     context['chart_A'].update({'paras': charA_paras})
     context['chart_B'].update({'paras': charB_paras})
 
@@ -143,8 +111,30 @@ def comparison_result(request, rtype):
     return HttpResponse(html_template.render(context, request))
 
 
+
+
+
+class ParaSpliter:
+    def __init__(self, paras_for_A: list, paras_for_B):
+        self.paras_for_A = paras_for_A
+        self.paras_for_B = paras_for_B
+
+    def split(self,request):
+        resp = (dict(request.POST))
+        charA_paras = {}
+        charB_paras = {}
+
+        for r in resp:
+            if r in self.paras_for_A:
+                charA_paras.update(r)
+            if r in self.paras_for_B:
+                charB_paras.update(r)
+        return charA_paras, charB_paras
+
+
 def split_paras(request) -> (dict, dict):
     r = (dict(request.POST))
+
 
     charA_paras = {
         "rid": (ast.literal_eval(r['rid_stat'][0]))[0],
