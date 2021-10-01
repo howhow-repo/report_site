@@ -11,8 +11,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header card-header-warning">
-                  <h4 class="card-title" style= "font-weight:bold">班次分析計算結果</h4>
-                  <p class="card-category" style= "font-weight:bold">每日03:30自動計算前一天的班次執行狀態 與 站到站間資料統計。</p>
+                    <h4 class="card-title" style= "font-weight:bold">班次分析計算結果</h4>
+                    <p class="card-category" style= "font-weight:bold">每日03:30自動計算前一天的班次執行狀態 與 站到站間資料統計。</p>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
@@ -44,45 +44,45 @@
         </div>
     </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header card-header-primary">
-                <h4 class="card-title" style= "font-weight:bold">資料流量分析計算結果</h4>
-                <p class="card-category" style= "font-weight:bold">每日03:50自動計算前一天的資料流量資料統計。</p>
-            </div>
-            <div class="card-body table-responsive">
-                <table class="table table-hover">
-                    <thead class="text-primary">
-                        <th>統計日期</th>
-                        <th>計算花費時間(s)</th>
-                        <th>計算完成</th>
-                    </thead>
-                    <tbody>
-                        {% for r in data_traffic_results%}
-                        <tr {%if r.status is not True %} style="color: red; font-weight:bold " {%endif%} >
-                            <td>{{r.date|date:'Y / m / d (D)' }}</td>
-                            <td>{{r.time_spent}}</td>
-                            <td>{{r.status}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title" style= "font-weight:bold">資料流量分析計算結果</h4>
+                    <p class="card-category" style= "font-weight:bold">每日03:50自動計算前一天的資料流量資料統計。</p>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-primary">
+                            <th>統計日期</th>
+                            <th>計算花費時間(s)</th>
+                            <th>計算完成</th>
+                        </thead>
+                        <tbody>
+                            {% for r in data_traffic_results%}
+                            <tr {%if r.status is not True %} style="color: red; font-weight:bold " {%endif%} >
+                                <td>{{r.date|date:'Y / m / d (D)' }}</td>
+                                <td>{{r.time_spent}}</td>
+                                <td>{{r.status}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-<script>
-    $(document).ready(function() {
-        // Javascript method's body can be found in assets/js/demos.js
-        md.initDashboardPageCharts();
+    <script>
+        $(document).ready(function() {
+            // Javascript method's body can be found in assets/js/demos.js
+            md.initDashboardPageCharts();
 
-    });
-</script>
+        });
+    </script>
 
 {% endblock javascripts %}

@@ -6,81 +6,81 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-<h1>站間行駛時間統計</h1><br>
-<div class="col-md-12" xmlns="http://www.w3.org/1999/html">
+    <h1>站間行駛時間統計</h1><br>
+    <div class="col-md-12" xmlns="http://www.w3.org/1999/html">
         <div class="card card-chart">
-          <div class="card-header card-header-success">
-            <div class="ct-chart" id="testChart"></div>
-          </div>
-          <div class="card-body">
-            <h4 class="card-title">站間行駛時間</h4>
-            <p class="card-category">
-              到達站所花費時間(sec)
-            </p>
-          </div>
-          <div class="card-footer">
-            <div class="stats">
-<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+            <div class="card-header card-header-success">
+                <div class="ct-chart" id="testChart"></div>
             </div>
-          </div>
+            <div class="card-body">
+                <h4 class="card-title">站間行駛時間</h4>
+                <p class="card-category">
+                    到達站所花費時間(sec)
+                </p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
 
     <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header card-header-warning">
-            <h4 class="card-title" style= "font-weight:bold">路線-站到站 紀錄統計</h4>
-            <p class="card-category" style= "font-weight:bold">
-                路線：{{rid_name}}, id:{{rid}}</br>
-                統計時間：{{date_begin|date:'Y/m/d'}} ~ {{date_end|date:'Y/m/d'}}</br>
-                統計時段：{{hour_begin|stringformat:"02d"}}:00 ~ {{hour_end|stringformat:"02d"}}:00</br>
-                日種類:{{weekdayType_cn}}</p>
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-hover">
-              <thead class="text-warning">
-                <th></th>
-                <th>出發站</th>
-                <th>抵達站</th>
-                <th>最大行駛時間(s)</th>
-                <th>最小行駛時間(s)</th>
-                <th>平均行駛時間(s)</th>
-                <th>行駛時間標準差(s)</th>
-                <th>變異係數</th>
-                <th>樣本數量</th>
-              </thead>
-              <tbody>
-                {% for r in result%}
-                <tr>
-                  <td>
-                    <form action="{% url 'stoptostop_traveltime_hourly' rsid=r.rsid %}" method="post">
-                      <input type="hidden" value={{r.previous_name}} name="pre_rsid_name">
-                      <input type="hidden" value={{r.name}} name="rsid_name">
-                      <input type="hidden" value={{rid}} name="rid">
-                      <input type="hidden" value='{{rid_name}}' name="rid_name">
-                      <input type="hidden" value='{{weekdayType}}' name="weekdayType">
-                      <input type="hidden" value={{date_begin|date:'Y-m-d'}} name="date_begin">
-                      <input type="hidden" value={{date_end|date:'Y-m-d'}} name="date_end">
-                      <input type="submit" class="btn btn-primary btn-link" value="●">
-                    </form>
-                  </td>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-warning">
+                    <h4 class="card-title" style= "font-weight:bold">路線-站到站 紀錄統計</h4>
+                    <p class="card-category" style= "font-weight:bold">
+                        路線：{{rid_name}}, id:{{rid}}</br>
+                        統計時間：{{date_begin|date:'Y/m/d'}} ~ {{date_end|date:'Y/m/d'}}</br>
+                        統計時段：{{hour_begin|stringformat:"02d"}}:00 ~ {{hour_end|stringformat:"02d"}}:00</br>
+                        日種類:{{weekdayType_cn}}
+                    </p>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-warning">
+                            <th></th>
+                            <th>出發站</th>
+                            <th>抵達站</th>
+                            <th>最大行駛時間(s)</th>
+                            <th>最小行駛時間(s)</th>
+                            <th>平均行駛時間(s)</th>
+                            <th>行駛時間標準差(s)</th>
+                            <th>變異係數</th>
+                            <th>樣本數量</th>
+                        </thead>
+                        <tbody>
+                            {% for r in result%}
+                            <tr>
+                                <td>
+                                    <form action="{% url 'stoptostop_traveltime_hourly' rsid=r.rsid %}" method="post">
+                                        <input type="hidden" value={{r.previous_name}} name="pre_rsid_name">
+                                        <input type="hidden" value={{r.name}} name="rsid_name">
+                                        <input type="hidden" value={{rid}} name="rid">
+                                        <input type="hidden" value='{{rid_name}}' name="rid_name">
+                                        <input type="hidden" value='{{weekdayType}}' name="weekdayType">
+                                        <input type="hidden" value={{date_begin|date:'Y-m-d'}} name="date_begin">
+                                        <input type="hidden" value={{date_end|date:'Y-m-d'}} name="date_end">
+                                        <input type="submit" class="btn btn-primary btn-link" value="●">
+                                    </form>
+                                </td>
 
-                  <td>{{r.previous_name}}</td>
-                  <td>{{r.name }}</td>
-                  <td>{{r.max_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.min_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.avg_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.std_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.var_arrival_time_spent|floatformat:-2}}</td>
-                  <td>{{r.sample_count|floatformat:0}}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+                                <td>{{r.previous_name}}</td>
+                                <td>{{r.name }}</td>
+                                <td>{{r.max_arrival_time_spent|floatformat:-2}}</td>
+                                <td>{{r.min_arrival_time_spent|floatformat:-2}}</td>
+                                <td>{{r.avg_arrival_time_spent|floatformat:-2}}</td>
+                                <td>{{r.std_arrival_time_spent|floatformat:-2}}</td>
+                                <td>{{r.var_arrival_time_spent|floatformat:-2}}</td>
+                                <td>{{r.sample_count|floatformat:0}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
 {% endblock content %}
@@ -88,38 +88,38 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      md.initDashboardPageCharts();
-    });
-  </script>
-  <script>
-      function inittestChart() {
-          datatestChart = {
-              labels: [{% for r in result%} "{{r.name}}", {% endfor %}],
-              series: [
-                [{% for r in result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}]
-              ]
-          };
-          optionstestChart = {
-              lineSmooth: Chartist.Interpolation.cardinal({
-                  tension: 0
-              }),
-              low: 0,
-              high: {{chartMaxHight}}, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-              chartPadding: {
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0
-              },
-          }
+    <script>
+        $(document).ready(function() {
+            // Javascript method's body can be found in assets/js/demos.js
+            md.initDashboardPageCharts();
+        });
+    </script>
+    <script>
+        function inittestChart() {
+            datatestChart = {
+                labels: [{% for r in result%} "{{r.name}}", {% endfor %}],
+                series: [
+                    [{% for r in result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}]
+                ]
+            };
+            optionstestChart = {
+                lineSmooth: Chartist.Interpolation.cardinal({
+                    tension: 0
+                }),
+                low: 0,
+                high: {{chartMaxHight}}, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+                chartPadding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                },
+            }
 
-		var testChart = new Chartist.Line('#testChart', datatestChart, optionstestChart); md.startAnimationForLineChart(testChart);
-	}
-	inittestChart()
-  </script>
-
+            var testChart = new Chartist.Line('#testChart', datatestChart, optionstestChart);
+            md.startAnimationForLineChart(testChart);
+        }
+        inittestChart()
+    </script>
 
 {% endblock javascripts %}

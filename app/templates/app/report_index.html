@@ -10,8 +10,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header card-header-primary">
-                  <h4 class="card-title "><b>報表種類一覽</b>:</h4>
-                  <p class="card-category"><b>請點選左方“●”以進入報表參數設定</b></p>
+                    <h4 class="card-title "><b>報表種類一覽</b>:</h4>
+                    <p class="card-category"><b>請點選左方“●”以進入報表參數設定</b></p>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
@@ -23,12 +23,12 @@
                         </thead>
                         <tbody>
                             {% for report in index_table %}
-                            <tr>
-                                <td><a href="{% url 'report_prehandle' %}?rtype={{report.type}}">●</a></td>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{report.title}}</td>
-                                <td>{{report.simple_description}}</td>
-                            </tr>
+                                <tr>
+                                    <td><a href="{% url 'report_prehandle' %}?rtype={{report.type}}">●</a></td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{report.title}}</td>
+                                    <td>{{report.simple_description}}</td>
+                                </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -42,10 +42,10 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script>
-    $(document).ready(function() {
-        // Javascript method's body can be found in assets/js/demos.js
-        md.initDashboardPageCharts();
+        $(document).ready(function() {
+            // Javascript method's body can be found in assets/js/demos.js
+            md.initDashboardPageCharts();
 
-    });
+        });
     </script>
 {% endblock javascripts %}

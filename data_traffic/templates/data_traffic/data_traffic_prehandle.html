@@ -11,9 +11,9 @@
     <p>
         <br>
         <form action="{% url 'data_traffic_view' %}" method="post">
-        {% for f in para_form %}
-            <h4>{{f.label}}: {{f}}</h4>
-        {% endfor %}
+            {% for f in para_form %}
+                <h4>{{f.label}}: {{f}}</h4>
+            {% endfor %}
             <br><br>
             <input type="submit" class="btn btn-primary btn-round" value="GET DATA">
 

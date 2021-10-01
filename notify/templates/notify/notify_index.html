@@ -7,35 +7,36 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header card-header-primary">
-                <h4 class="card-title ">Server Notify members</h4>
-                <p class="card-category">系統推播通知時，將以Line notify對表格中成員做通知。</p>
-            </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead class=" text-primary">
-                        <th> 名稱 </th>
-                        <th> Token </th>
-                        <th> 啟用 </th>
-                    </thead>
-                    <tbody>
-                        {% for m in members%}
-                        <tr>
-                            <td>{{ m.name }}</td>
-                            <td>{{m.token}}</td>
-                            <td>{{m.activate}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title ">Server Notify members</h4>
+                    <p class="card-category">系統推播通知時，將以Line notify對表格中成員做通知。</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class=" text-primary">
+                                <th> 名稱 </th>
+                                <th> Token </th>
+                                <th> 啟用 </th>
+                            </thead>
+                            <tbody>
+                                {% for m in members%}
+                                <tr>
+                                    <td>{{ m.name }}</td>
+                                    <td>{{m.token}}</td>
+                                    <td>{{m.activate}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock content %}
 
