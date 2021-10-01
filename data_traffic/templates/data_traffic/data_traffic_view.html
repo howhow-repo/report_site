@@ -6,121 +6,111 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-<h1>統計日期： {{date|date:'Y/m/d (D)'}}</h1>
-</br>
-  <div class="col-md-12">
+<h1>統計日期： {{date|date:'Y/m/d (D)'}}</h1><br>
+<div class="col-md-12">
     <div class="card card-chart">
-      <div class="card-header card-header-success">
-        <div class="ct-chart" id="gps_data_chart"></div>
-      </div>
-      <div class="card-body">
-        <h4 class="card-title">每小時 gps紀錄筆數 (gps_data_count)</h4>
-        <p class="card-category">
-          單位：筆數
-        </p>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+        <div class="card-header card-header-success">
+            <div class="ct-chart" id="gps_data_chart"></div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">每小時 gps紀錄筆數 (gps_data_count)</h4>
+            <p class="card-category">
+                單位：筆數
+            </p>
+        </div>
+        <div class="card-footer">
+            <div class="stats"></div>
         </div>
       </div>
-    </div>
-  </div>
-</br>
-  <div class="col-md-12">
+</div><br>
+
+<div class="col-md-12">
     <div class="card card-chart">
-      <div class="card-header card-header-warning">
-        <div class="ct-chart" id="drivelog_data_chart"></div>
-      </div>
-      <div class="card-body">
-        <h4 class="card-title">每小時 事件上傳筆數 (drivelog_data_count)</h4>
-        <p class="card-category">
-          單位：筆數
-        </p>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+        <div class="card-header card-header-warning">
+            <div class="ct-chart" id="drivelog_data_chart"></div>
         </div>
-      </div>
+        <div class="card-body">
+            <h4 class="card-title">每小時 事件上傳筆數 (drivelog_data_count)</h4>
+            <p class="card-category">
+                單位：筆數
+            </p>
+        </div>
+        <div class="card-footer">
+            <div class="stats"> </div>
+        </div>
     </div>
-  </div>
-</br>
-  <div class="col-md-12">
+</div><br>
+
+<div class="col-md-12">
     <div class="card card-chart">
-      <div class="card-header card-header-success">
-        <div class="ct-chart" id="bus_on_rail_chart"></div>
-      </div>
-      <div class="card-body">
-        <h4 class="card-title">每小時 行駛中公車數量 (bus_on_rail_count)</h4>
-        <p class="card-category">
-          單位：台數
-        </p>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+        <div class="card-header card-header-success">
+            <div class="ct-chart" id="bus_on_rail_chart"></div>
         </div>
-      </div>
+        <div class="card-body">
+            <h4 class="card-title">每小時 行駛中公車數量 (bus_on_rail_count)</h4>
+            <p class="card-category">
+              單位：台數
+            </p>
+        </div>
+        <div class="card-footer">
+            <div class="stats"></div>
+        </div>
     </div>
-  </div>
-</br>
-  <div class="col-md-12">
+</div><br>
+
+<div class="col-md-12">
     <div class="card card-chart">
-      <div class="card-header card-header-warning">
-        <div class="ct-chart" id="bus_online_chart"></div>
-      </div>
-      <div class="card-body">
-        <h4 class="card-title">每小時 線上公車數量 (bus_online_count)</h4>
-        <p class="card-category">
-          單位：台數
-        </p>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+        <div class="card-header card-header-warning">
+            <div class="ct-chart" id="bus_online_chart"></div>
         </div>
-      </div>
+        <div class="card-body">
+            <h4 class="card-title">每小時 線上公車數量 (bus_online_count)</h4>
+            <p class="card-category">
+                單位：台數
+            </p>
+        </div>
+        <div class="card-footer">
+            <div class="stats"></div>
+        </div>
     </div>
-  </div>
+</div>
 
 
-  </br></br><b><hr>以下為圖表原始資料</b></br></br>
+</br></br><b><hr>以下為圖表原始資料</b></br></br>
 
 
     <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header card-header-primary">
-            <h4 class="card-title" style= "font-weight:bold">每日流量統計</h4>
-            <p class="card-category" style= "font-weight:bold">
-                日期：{{date|date:'Y/m/d'}}</br>
-
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-hover">
-              <thead class="text-warning">
-                <th>小時</th>
-                <th>gps_data_count</th>
-                <th>drivelog_data_count</th>
-                <th>bus_on_rail_count</th>
-                <th>bus_online_count</th>
-              </thead>
-              <tbody>
-                {% for r in report%}
-                <tr>
-                  <td>{{r.hour}} ~ {{r.hour|add:1}}</td>
-                  <td>{{r.gps_data_count}}</td>
-                  <td>{{r.drivelog_data_count}}</td>
-                  <td>{{r.bus_on_rail_count}}</td>
-                  <td>{{r.bus_online_count}}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title" style= "font-weight:bold">每日流量統計</h4>
+                    <p class="card-category" style= "font-weight:bold">
+                        日期：{{date|date:'Y/m/d'}}</br></p>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-warning">
+                            <th>小時</th>
+                            <th>gps_data_count</th>
+                            <th>drivelog_data_count</th>
+                            <th>bus_on_rail_count</th>
+                            <th>bus_online_count</th>
+                        </thead>
+                        <tbody>
+                            {% for r in report%}
+                            <tr>
+                                <td>{{r.hour}} ~ {{r.hour|add:1}}</td>
+                                <td>{{r.gps_data_count}}</td>
+                                <td>{{r.drivelog_data_count}}</td>
+                                <td>{{r.bus_on_rail_count}}</td>
+                                <td>{{r.bus_online_count}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
 {% endblock content %}
@@ -128,42 +118,42 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script>
+<script>
     $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      md.initDashboardPageCharts();
+        // Javascript method's body can be found in assets/js/demos.js
+        md.initDashboardPageCharts();
     });
-  </script>
-  <script>
-      function init_all_charts() {
-          gps_data_chart = {
-              labels: [{% for h in hour%} "{{h}}", {% endfor %}],
-              series: [
-                [{% for r in report%}{{r.gps_data_count}},{% endfor %}]
-              ]
-          };
-          options_gps_data_chart = {
-              lineSmooth: Chartist.Interpolation.cardinal({
-                  tension: 0
-              }),
-              low: 0,
-              high: {{gps_data_count_max}},
-              chartPadding: {
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0
-              },
-          }
-		var gps_data_chart = new Chartist.Line('#gps_data_chart', gps_data_chart, options_gps_data_chart);
-		md.startAnimationForLineChart(gps_data_chart);
-<!--  -->
-	    drivelog_data_chart = {
-              labels: [{% for h in hour%} "{{h}}", {% endfor %}],
-              series: [
+</script>
+<script>
+    function init_all_charts() {
+        gps_data_chart = {
+            labels: [{% for h in hour%} "{{h}}", {% endfor %}],
+            series: [
+              [{% for r in report%}{{r.gps_data_count}},{% endfor %}]
+            ]
+        };
+        options_gps_data_chart = {
+            lineSmooth: Chartist.Interpolation.cardinal({
+                tension: 0
+            }),
+            low: 0,
+            high: {{gps_data_count_max}},
+            chartPadding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+        }
+        var gps_data_chart = new Chartist.Line('#gps_data_chart', gps_data_chart, options_gps_data_chart);
+        md.startAnimationForLineChart(gps_data_chart);
+
+        drivelog_data_chart = {
+            labels: [{% for h in hour%} "{{h}}", {% endfor %}],
+            series: [
                 [{% for r in report%}{{r.drivelog_data_count}},{% endfor %}]
-              ]
-          };
+            ]
+        };
 
         options_drivelog_data_chart = {
             lineSmooth: Chartist.Interpolation.cardinal({
@@ -181,14 +171,12 @@
         var drivelog_data_chart = new Chartist.Line('#drivelog_data_chart', drivelog_data_chart, options_drivelog_data_chart);
         md.startAnimationForLineChart(drivelog_data_chart);
 
-<!--        -->
-
         bus_on_rail_chart = {
-              labels: [{% for h in hour%} "{{h}}", {% endfor %}],
-              series: [
+            labels: [{% for h in hour%} "{{h}}", {% endfor %}],
+            series: [
                 [{% for r in report%}{{r.bus_on_rail_count}},{% endfor %}]
-              ]
-          };
+            ]
+        };
 
         options_bus_on_rail_chart = {
             lineSmooth: Chartist.Interpolation.cardinal({
@@ -206,18 +194,16 @@
         var bus_on_rail_chart = new Chartist.Line('#bus_on_rail_chart', bus_on_rail_chart, options_bus_on_rail_chart);
         md.startAnimationForLineChart(bus_on_rail_chart);
 
-<!--        -->
-
         bus_online_chart = {
-              labels: [{% for h in hour%} "{{h}}", {% endfor %}],
-              series: [
+            labels: [{% for h in hour%} "{{h}}", {% endfor %}],
+            series: [
                 [{% for r in report%}{{r.bus_online_count}},{% endfor %}]
-              ]
-          };
+            ]
+        };
 
         options_bus_online_chart = {
             lineSmooth: Chartist.Interpolation.cardinal({
-                tension: 0
+              tension: 0
             }),
             low: 0,
             high: {{bus_online_count_max}},
@@ -230,9 +216,9 @@
         }
         var bus_online_chart = new Chartist.Line('#bus_online_chart', bus_online_chart, options_bus_online_chart);
         md.startAnimationForLineChart(bus_online_chart);
-	}
+    }
 
-	init_all_charts()
-  </script>
+    init_all_charts()
+</script>
 
 {% endblock javascripts %}

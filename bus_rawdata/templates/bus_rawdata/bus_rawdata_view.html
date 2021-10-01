@@ -16,15 +16,15 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header card-header-primary">
-                  <h4 class="card-title "><b>{{r.rid_ch_name}}, rid:{{r.rid}}</b>:</h4>
-                  <p class="card-category">
-                      <b>
-                          班次應發車時間：{{r.schedule_departure_time|date:'Y-m-d H:i:s' }}</br>
-                          起站：{{r.bus_departure_sne}}; 時間：{{r.bus_departure_time|date:'Y-m-d H:i:s'}}</br>
-                          末站：{{r.bus_arrival_sne}}; 時間：{{r.bus_arrival_time|date:'Y-m-d H:i:s'}}</br>
-                          到站率：{{r.run_stop_rate}}; error code：{{r.error_code}}
-                      </b>
-                  </p>
+                    <h4 class="card-title "><b>{{r.rid_ch_name}}, rid:{{r.rid}}</b>:</h4>
+                    <p class="card-category">
+                        <b>
+                            班次應發車時間：{{r.schedule_departure_time|date:'Y-m-d H:i:s' }}</br>
+                            起站：{{r.bus_departure_sne}}; 時間：{{r.bus_departure_time|date:'Y-m-d H:i:s'}}</br>
+                            末站：{{r.bus_arrival_sne}}; 時間：{{r.bus_arrival_time|date:'Y-m-d H:i:s'}}</br>
+                            到站率：{{r.run_stop_rate}}; error code：{{r.error_code}}
+                        </b>
+                    </p>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
@@ -61,43 +61,41 @@
 
     </br></br><b><hr>以下為未切分趟次原始資料</b></br></br>
     <div class="row">
-          <div class="col-md-12">
+        <div class="col-md-12">
             <div class="card">
-              <div class="card-header card-header-warning">
+                <div class="card-header card-header-warning">
                 <h4 class="card-title" style= "font-weight:bold">原始資料</h4>
-                <p class="card-category" style= "font-weight:bold">
-                    </p>
-              </div>
-              <div class="card-body table-responsive">
-                <table class="table table-hover">
-                  <thead class="text-warning">
-                    <th>rid</th>
-                    <th>did</th>
-                    <th>date</th>
-                    <th>date_gps</th>
-                    <th>station</th>
-                    <th>sne</th>
-                    <th>event</th>
-                    <th>type</th>
-                  </thead>
-                  <tbody>
-                    {% for dl in drivelog%}
-                    <tr>
-                        <td>{{dl.rid}}</td>
-                        <td>{{dl.did}}</td>
-                        <td>{{dl.date|date:'Y-m-d H:i:s'}}</td>
-                        <td>{{dl.date_gps|date:'Y-m-d H:i:s'}}</td>
-                        <td>{{dl.station}}</td>
-                        <td>{{dl.sne}}</td>
-                        <td>{{dl.event}}</td>
-                        <td>{{dl.type}}</td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                <p class="card-category" style= "font-weight:bold"></p>
             </div>
-          </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead class="text-warning">
+                        <th>rid</th>
+                        <th>did</th>
+                        <th>date</th>
+                        <th>date_gps</th>
+                        <th>station</th>
+                        <th>sne</th>
+                        <th>event</th>
+                        <th>type</th>
+                    </thead>
+                    <tbody>
+                        {% for dl in drivelog%}
+                            <tr>
+                                <td>{{dl.rid}}</td>
+                                <td>{{dl.did}}</td>
+                                <td>{{dl.date|date:'Y-m-d H:i:s'}}</td>
+                                <td>{{dl.date_gps|date:'Y-m-d H:i:s'}}</td>
+                                <td>{{dl.station}}</td>
+                                <td>{{dl.sne}}</td>
+                                <td>{{dl.event}}</td>
+                                <td>{{dl.type}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div><a href="/" class="btn btn-primary btn-round">Home</a></div>
 {% endblock content %}

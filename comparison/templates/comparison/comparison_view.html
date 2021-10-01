@@ -8,160 +8,160 @@
 {% block content %}
 <h1>{{title}}</h1><br>
 <h3>{{description}}</h3>
-  <div class="col-md-12">
+    <div class="col-md-12">
         <div class="card card-chart">
-          <div class="card-header card-header-success">
-            <div class="ct-chart" id="ChartA"></div>
-          </div>
-          <div class="card-body">
-            <h4 class="card-title">{{chart_A.paras.rid_name}}</h4>
-            <p class="card-category">
-                {{chart_A.paras}}
-            </p>
-          </div>
-          <div class="card-footer">
-            <div class="stats">
-<!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+            <div class="card-header card-header-success">
+                <div class="ct-chart" id="ChartA"></div>
             </div>
-          </div>
+            <div class="card-body">
+                <h4 class="card-title">{{chart_A.paras.rid_name}}</h4>
+                <p class="card-category">
+                    {{chart_A.paras}}
+                </p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                <!--            <i class="material-icons">access_time</i> updated 4 minutes ago-->
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
 
-      <div class="card card-chart">
-          <div class="card-header card-header-primary">
+    <div class="card card-chart">
+        <div class="card-header card-header-primary">
             <div class="ct-chart" id="ChartB"></div>
-          </div>
-          <div class="card-body">
+        </div>
+        <div class="card-body">
             <h4 class="card-title">{{chart_B.paras.rid_name}}</h4>
             <p class="card-category">
                 {{chart_B.paras}} <br>
             </p>
-          </div>
-          <div class="card-footer">
+        </div>
+        <div class="card-footer">
             <div class="stats">
             </div>
-          </div>
         </div>
-      </div>
+    </div>
 
-      <div class="card card-chart">
-          <div class="card-header card-header-rose">
+
+    <div class="card card-chart">
+        <div class="card-header card-header-rose">
             <div class="ct-chart" id="ChartDiff"></div>
-          </div>
-          <div class="card-body">
+        </div>
+        <div class="card-body">
             <h4 class="card-title">差異絕對值</h4>
             <p class="card-category">
                 |Chart A - Chart B| <br>
                 MAX: {{diff_max|floatformat:-2}}
             </p>
-          </div>
-          <div class="card-footer">
+        </div>
+        <div class="card-footer">
             <div class="stats">
             </div>
-          </div>
         </div>
-      </div>
+    </div>
+
 
     <div class="row">
-      <div class="col-md-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header card-header-success">
+                    <h4 class="card-title" style= "font-weight:bold">Chart A</h4>
+                    <p class="card-category" style= "font-weight:bold">
+                    {{compare_value}}
+                </div>
+                <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead class="text-success">
+                        <th>SN</th>
+                        <th>Chart A(s)</th>
+                    </thead>
+                    <tbody>
+                        {% if compare_value == 'avg_arrival_time_spent' %}
+                            {% for r in chart_A.result%}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{r.avg_arrival_time_spent|floatformat:-2}}<td>
+                                </tr>
+                            {% endfor %}
+
+                        {% elif compare_value == 'avg_stay_time' %}
+                            {% for r in chart_A.result%}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{r.avg_stay_time|floatformat:-2}}</td>
+                                </tr>
+                            {% endfor %}
+
+                        {% endif %}
+                    </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
         <div class="card">
-          <div class="card-header card-header-success">
-            <h4 class="card-title" style= "font-weight:bold">Chart A</h4>
-            <p class="card-category" style= "font-weight:bold">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title" style= "font-weight:bold">Chart B</h4>
+                <p class="card-category" style= "font-weight:bold">
                 {{compare_value}}
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-hover">
-              <thead class="text-success">
-                <th>SN</th>
-                <th>Chart A(s)</th>
-              </thead>
-              <tbody>
-                {% if compare_value == 'avg_arrival_time_spent' %}
-                    {% for r in chart_A.result%}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{r.avg_arrival_time_spent|floatformat:-2}}<td>
-                        </tr>
-                    {% endfor %}
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead class="text-primary">
+                        <th>SN</th>
+                        <th>Chart B(s)</th>
+                    </thead>
+                    <tbody>
+                        {% if compare_value == 'avg_arrival_time_spent' %}
+                            {% for r in chart_B.result%}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{r.avg_arrival_time_spent|floatformat:-2}}<td>
+                                </tr>
+                            {% endfor %}
 
-                {% elif compare_value == 'avg_stay_time' %}
-                    {% for r in chart_A.result%}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{r.avg_stay_time|floatformat:-2}}</td>
-                        </tr>
-                    {% endfor %}
+                        {% elif compare_value == 'avg_stay_time' %}
+                            {% for r in chart_B.result%}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{r.avg_stay_time|floatformat:-2}}</td>
+                                </tr>
+                            {% endfor %}
 
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header card-header-primary">
-            <h4 class="card-title" style= "font-weight:bold">Chart B</h4>
-            <p class="card-category" style= "font-weight:bold">
-                {{compare_value}}
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-hover">
-              <thead class="text-primary">
-                <th>SN</th>
-                <th>Chart B(s)</th>
-              </thead>
-              <tbody>
-                {% if compare_value == 'avg_arrival_time_spent' %}
-                    {% for r in chart_B.result%}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{r.avg_arrival_time_spent|floatformat:-2}}<td>
-                        </tr>
-                    {% endfor %}
-
-                {% elif compare_value == 'avg_stay_time' %}
-                    {% for r in chart_B.result%}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{r.avg_stay_time|floatformat:-2}}</td>
-                        </tr>
-                    {% endfor %}
-
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header card-header-rose">
-            <h4 class="card-title" style= "font-weight:bold">Absolute Difference</h4>
-            <p class="card-category" style= "font-weight:bold">
-                |ChartA - ChartB|
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-hover">
-              <thead class="text-rose">
-                <th>SN</th>
-                <th>ABS DIFF(s)</th>
-              </thead>
-              <tbody>
-                {% for d in diff%}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ d|floatformat:-2}}</td>
-                    </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header card-header-rose">
+                    <h4 class="card-title" style= "font-weight:bold">Absolute Difference</h4>
+                    <p class="card-category" style= "font-weight:bold">
+                        |ChartA - ChartB|
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-rose">
+                            <th>SN</th>
+                            <th>ABS DIFF(s)</th>
+                        </thead>
+                        <tbody>
+                            {% for d in diff%}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ d|floatformat:-2}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
 {% endblock content %}
@@ -169,97 +169,97 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script>
+    <script>
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
       md.initDashboardPageCharts();
     });
   </script>
-  <script>
-      function initCharts() {
-          dataChartA = {
-              labels: [{% for r in chart_A.result%} "{{r.name}}", {% endfor %}],
-              series: [
-                [
-                    {% if compare_value == 'avg_arrival_time_spent' %}
-                        {% for r in chart_A.result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}
-                    {% elif compare_value == 'avg_stay_time' %}
-                        {% for r in chart_A.result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}
-                    {% endif %}
+    <script>
+        function initCharts() {
+            dataChartA = {
+                labels: [{% for r in chart_A.result%} "{{r.name}}", {% endfor %}],
+                series: [
+                    [
+                        {% if compare_value == 'avg_arrival_time_spent' %}
+                            {% for r in chart_A.result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}
+                        {% elif compare_value == 'avg_stay_time' %}
+                            {% for r in chart_A.result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}
+                        {% endif %}
+                    ]
                 ]
-              ]
-          };
-          optionsChartA = {
-              lineSmooth: Chartist.Interpolation.cardinal({
-                  tension: 0
-              }),
-              low: 0,
-              high: {{chartMaxHight}},
-              chartPadding: {
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0
-              },
-          }
+            };
+            optionsChartA = {
+                lineSmooth: Chartist.Interpolation.cardinal({
+                    tension: 0
+                }),
+                low: 0,
+                high: {{chartMaxHight}},
+                chartPadding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                },
+            }
 
-          dataChartB = {
-              labels: [{% for r in chart_B.result%} "{{r.name}}", {% endfor %}],
-              series: [
-                [
-                    {% if compare_value == 'avg_arrival_time_spent' %}
-                        {% for r in chart_B.result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}
-                    {% elif compare_value == 'avg_stay_time' %}
-                        {% for r in chart_B.result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}
-                    {%endif%}
+            dataChartB = {
+                labels: [{% for r in chart_B.result%} "{{r.name}}", {% endfor %}],
+                series: [
+                    [
+                        {% if compare_value == 'avg_arrival_time_spent' %}
+                            {% for r in chart_B.result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}
+                        {% elif compare_value == 'avg_stay_time' %}
+                            {% for r in chart_B.result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}
+                        {%endif%}
+                    ]
                 ]
-              ]
-          };
-          optionsChartB = {
-              lineSmooth: Chartist.Interpolation.cardinal({
-                  tension: 0
-              }),
-              low: 0,
-              high: {{chartMaxHight}},
-              chartPadding: {
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0
-              },
-          }
+            };
+            optionsChartB = {
+                lineSmooth: Chartist.Interpolation.cardinal({
+                    tension: 0
+                }),
+                low: 0,
+                high: {{chartMaxHight}},
+                chartPadding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                },
+            }
 
-          dataChartDiff = {
-              labels: [{% for r in chart_A.result%} "{{r.name}}", {% endfor %}],
-              series: [
-                [
-                    {% for d in diff %}{{d|floatformat:-2}},{% endfor %}
+            dataChartDiff = {
+                labels: [{% for r in chart_A.result%} "{{r.name}}", {% endfor %}],
+                series: [
+                    [
+                        {% for d in diff %}{{d|floatformat:-2}},{% endfor %}
+                    ]
                 ]
-              ]
-          };
-          optionsChartDiff = {
-              lineSmooth: Chartist.Interpolation.cardinal({
-                  tension: 0
-              }),
-              low: 0,
-              high: {{diff_max}},
-              chartPadding: {
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0
-              },
-          }
+            };
+            optionsChartDiff = {
+                lineSmooth: Chartist.Interpolation.cardinal({
+                    tension: 0
+                }),
+                low: 0,
+                high: {{diff_max}},
+                chartPadding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                },
+            }
 
-		var ChartA = new Chartist.Line('#ChartA', dataChartA, optionsChartA);
-		var ChartB = new Chartist.Line('#ChartB', dataChartB, optionsChartB);
-		var CharDiff = new Chartist.Bar('#ChartDiff', dataChartDiff, optionsChartDiff);
-		md.startAnimationForLineChart(ChartA);
-		md.startAnimationForLineChart(ChartB);
-		md.startAnimationForBarChart(ChartDiff);
-	}
-	initCharts()
-  </script>
+            var ChartA = new Chartist.Line('#ChartA', dataChartA, optionsChartA);
+            var ChartB = new Chartist.Line('#ChartB', dataChartB, optionsChartB);
+            var CharDiff = new Chartist.Bar('#ChartDiff', dataChartDiff, optionsChartDiff);
+            md.startAnimationForLineChart(ChartA);
+            md.startAnimationForLineChart(ChartB);
+            md.startAnimationForBarChart(ChartDiff);
+        }
+        initCharts()
+    </script>
 
 
 {% endblock javascripts %}

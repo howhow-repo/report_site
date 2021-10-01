@@ -8,11 +8,13 @@
 {% block content %}
 
     <div id="report_html">
-    {% include "app/report_simple.html" %}
+        {% include "app/report_simple.html" %}
     </div>
 
     <br>
-    <center><a onclick="window.open('{{ request.get_full_path }}&type=pdf')" class="btn btn-primary btn-round">Download as pdf</a></center>
+    <center>
+        <a onclick="window.open('{{ request.get_full_path }}&type=pdf')" class="btn btn-primary btn-round">Download as pdf</a>
+    </center>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
