@@ -40,22 +40,18 @@ def comparison_index(request):
 @login_required(login_url="/login/")
 def comparison_prehandle(request, rtype):
     context = CONTEXT.copy()
-    context['rtype'] = rtype
-    report_list = ComparisonReportCenter.list_of_dict()
-
-    if rtype not in [r['rtype'] for r in report_list ]:
+    report = ComparisonReportCenter.find_report_type(rtype)
+    if report.rtype is None:
         html_template = loader.get_template('page-404.html')
-        return HttpResponseNotFound(html_template.render(context, request)) # return if rtype not in list
+        return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
 
-    for r in report_list:
-        if r['rtype'] == rtype:
-            context['title'] = r['title']
-            context['rtype_paras_comm'] = r['paras_comm']
-            context['rtype_paras_A'] = r['paras_A']
-            context['rtype_paras_B'] = r['paras_B']
-            break
+    context['rtype'] = rtype
+    context['title'] = report.title
+    context['paras_comm'] = report.paras_comm
+    context['paras_A'] = report.paras_A
+    context['paras_B'] = report.paras_B
 
-    context['para_form'] = ParaInput()
+    context['paras_form'] = ParaInput()
 
     load_template = 'comparison/comparison_prehandle.html'
     html_template = loader.get_template(load_template)
@@ -65,101 +61,36 @@ def comparison_prehandle(request, rtype):
 @login_required(login_url="/login/")
 def comparison_result(request, rtype):
     context = CONTEXT.copy()
-    r = (dict(request.POST))
-    print(r)
+    report = ComparisonReportCenter.find_report_type(rtype)()
+    if report.rtype is None:
+        html_template = loader.get_template('page-404.html')
+        return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
 
-    context['chart_comm'] = {}
-    context['chart_A'] = {}
-    context['chart_B'] = {}
+    request_paras = (dict(request.POST))
+    report.split_request_paras(request_paras=request_paras)
+    report.format_paras(report.chart_A)
+    report.format_paras(report.chart_B)
+    report.calculate_results()
 
-    for r in report_list:
-        if r['rtype'] == rtype:
-            context['title'] = r['title']
-            context['description'] = r['description']
-            context['compare_value'] = r['compare_value']
-            compare_value = r['compare_value']
-            para_spliter = ParaSpliter(r['paras_A'] + r['paras_comm'], r['paras_B'] + r['paras_comm'])
-        else:
-            para_spliter = ParaSpliter(r['paras_A'] + r['paras_comm'], r['paras_B'] + r['paras_comm'])
-            html_template = loader.get_template('page-404.html')
-            return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
+    context['chart_A'] = report.chart_A
+    context['chart_B'] = report.chart_B
+    context['compare_value'] = report.compare_value
 
-    charA_paras, charB_paras = para_spliter(request)
-    context['chart_A'].update({'paras': charA_paras})
-    context['chart_B'].update({'paras': charB_paras})
+    print(report.chart_A['result'])
+    print(report.chart_B['result'])
 
-    sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-    sr.connect()
-    rpA = (sr.get_default_stop_to_stop_by_rid(**charA_paras))
-    rpA.fillna(0, inplace=True)
-    rpB = (sr.get_default_stop_to_stop_by_rid(**charB_paras))
-    rpB.fillna(0, inplace=True)
-    sr.disconnect()
+    l_of_result_A = [r[report.compare_value] for r in report.chart_A['result']]
+    l_of_result_B = [r[report.compare_value] for r in report.chart_B['result']]
 
-    context['chart_A'].update({'result': rpA.to_dict('records')})
-    context['chart_B'].update({'result': rpB.to_dict('records')})
+    context['chartMaxHight'] = max([
+        max(l_of_result_A),
+        max(l_of_result_B),
+    ])
 
-    context['chartMaxHight'] = max([max(rpA[compare_value].tolist()), max(rpB[compare_value].tolist())])
-
-    context['diff'] = (abs(rpA[context['compare_value']] - rpB[context['compare_value']])).to_list()
-    context['diff'] = [0 if math.isnan(d) else d for d in context['diff']]
+    context['diff'] = (abs(report.result_A[report.compare_value] - report.result_B[report.compare_value]).to_list())
     context['diff_max'] = max(context['diff'])
 
     load_template = 'comparison/comparison_view.html'
     html_template = loader.get_template(load_template)
 
     return HttpResponse(html_template.render(context, request))
-
-
-
-
-
-class ParaSpliter:
-    def __init__(self, paras_for_A: list, paras_for_B):
-        self.paras_for_A = paras_for_A
-        self.paras_for_B = paras_for_B
-
-    def split(self,request):
-        resp = (dict(request.POST))
-        charA_paras = {}
-        charB_paras = {}
-
-        for r in resp:
-            if r in self.paras_for_A:
-                charA_paras.update(r)
-            if r in self.paras_for_B:
-                charB_paras.update(r)
-        return charA_paras, charB_paras
-
-
-def split_paras(request) -> (dict, dict):
-    r = (dict(request.POST))
-
-
-    charA_paras = {
-        "rid": (ast.literal_eval(r['rid_stat'][0]))[0],
-        "rid_name": (ast.literal_eval(r['rid_stat'][0]))[1],
-        "date_begin": datetime.strptime(r['date_begin'][0], '%Y-%m-%d'),
-        "date_end": datetime.strptime(r['date_end'][0], '%Y-%m-%d'),
-        "hour_begin": int(r['hour_begin'][0]),
-        "hour_end": int(r['hour_end'][0]),
-    }
-    if "weekdayType_A" in r:
-        charA_paras.update({'weekdayType': [int(w) for w in r['weekdayType_A']]})
-    if 'weekday_A' in r:
-        charA_paras.update({'weekday': [int(w) for w in r['weekday_A']]})
-
-    charB_paras = {
-        "rid": (ast.literal_eval(r['rid_stat'][1]))[0],
-        "rid_name": (ast.literal_eval(r['rid_stat'][1]))[1],
-        "date_begin": datetime.strptime(r['date_begin'][1], '%Y-%m-%d'),
-        "date_end": datetime.strptime(r['date_end'][1], '%Y-%m-%d'),
-        "hour_begin": int(r['hour_begin'][1]),
-        "hour_end": int(r['hour_end'][1]),
-    }
-    if "weekdayType_B" in r:
-        charB_paras.update({'weekdayType': [int(w) for w in r['weekdayType_B']]})
-    if 'weekday_B' in r:
-        charB_paras.update({'weekday': [int(w) for w in r['weekday_B']]})
-
-    return charA_paras, charB_paras

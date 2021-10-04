@@ -27,7 +27,7 @@
     </div>
 
     <div class="card card-chart">
-        <div class="card-header card-header-primary">
+        <div class="card-header card-header-info">
             <div class="ct-chart" id="ChartB"></div>
         </div>
         <div class="card-body">
@@ -101,7 +101,7 @@
 
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header card-header-primary">
+                <div class="card-header card-header-info">
                     <h4 class="card-title" style= "font-weight:bold">Chart B</h4>
                     <p class="card-category" style= "font-weight:bold">
                     {{compare_value}}
@@ -185,7 +185,7 @@
                         {% elif compare_value == 'avg_stay_time' %}
                             {% for r in chart_A.result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}
                         {% endif %}
-                    ]
+                    ],
                 ]
             };
             optionsChartA = {
@@ -205,6 +205,14 @@
             dataChartB = {
                 labels: [{% for r in chart_B.result%} "{{r.name}}", {% endfor %}],
                 series: [
+                    [
+                        {% if compare_value == 'avg_arrival_time_spent' %}
+                            {% for r in chart_A.result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}
+                        {% elif compare_value == 'avg_stay_time' %}
+                            {% for r in chart_A.result%}{{r.avg_stay_time|floatformat:-2}},{% endfor %}
+                        {% endif %}
+                    ],
+                    [],
                     [
                         {% if compare_value == 'avg_arrival_time_spent' %}
                             {% for r in chart_B.result%}{{r.avg_arrival_time_spent|floatformat:-2}},{% endfor %}
@@ -253,9 +261,6 @@
             var ChartA = new Chartist.Line('#ChartA', dataChartA, optionsChartA);
             var ChartB = new Chartist.Line('#ChartB', dataChartB, optionsChartB);
             var CharDiff = new Chartist.Bar('#ChartDiff', dataChartDiff, optionsChartDiff);
-            md.startAnimationForLineChart(ChartA);
-            md.startAnimationForLineChart(ChartB);
-            md.startAnimationForBarChart(ChartDiff);
         }
         initCharts()
     </script>

@@ -56,6 +56,9 @@ class ParaInput(forms.Form):
     )
     rid_stat.label = "路線"
 
+    rsid = forms.IntegerField()
+    rid_stat.label = "路線站ID(rsid)"
+
     date_begin = forms.DateField(widget=DateInput, initial=lambda: (datetime.now() - timedelta(days=61)))
     date_begin.label = "統計起始日"
 

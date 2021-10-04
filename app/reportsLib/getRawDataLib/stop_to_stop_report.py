@@ -29,9 +29,8 @@ class StopToStopResult(StationCenter):
             filterby = 'weekday'
             weekday = to_sqllist(weekday)
         else:
-            weekdayType = [0, 1, 2, 3, 4, 5, 6]
+            weekdayType = (0, 1, 2, 3, 4, 5, 6)
             filterby = 'weekdayType'
-
 
         assert (0 <= hour_begin <= 24) and (0 <= hour_end <= 24) and (hour_begin <= hour_end)
         hour_begin = str(hour_begin).zfill(2)
