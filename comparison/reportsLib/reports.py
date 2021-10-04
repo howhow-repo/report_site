@@ -16,12 +16,20 @@ class ComparisonReportBase:
     paras_A = []
     paras_B = []
     compare_value = ''
+    chart_type = ''
 
     def __init__(self):
         self.result_A = pandas.DataFrame()
         self.result_B = pandas.DataFrame()
         self.chart_A = {'paras': {}, 'result': {}}
         self.chart_B = {'paras': {}, 'result': {}}
+
+    def split_request_paras(self, request_paras):
+        for r in request_paras:
+            if r in self.paras_A or r in self.paras_comm:
+                self.chart_A['paras'].update({r: request_paras[r]})
+            if r in self.paras_B or r in self.paras_comm:
+                self.chart_B['paras'].update({r: request_paras[r]})
 
     def format_paras(self, chart):
         ls = [p for p in chart['paras']]
@@ -50,6 +58,18 @@ class ComparisonReportBase:
                 })
                 del chart['paras']['weekday_B']
 
+            elif p == "weekdayType_A":
+                chart['paras'].update({
+                    "weekdayType": [int(w) for w in chart['paras']['weekdayType_A']]
+                })
+                del chart['paras']['weekdayType_A']
+
+            elif p == "weekdayType_B":
+                chart['paras'].update({
+                    "weekdayType": [int(w) for w in chart['paras']['weekdayType_B']]
+                })
+                del chart['paras']['weekdayType_B']
+
             elif p == "date_begin":
                 chart['paras'].update({
                     'date_begin': datetime.strptime(chart['paras']['date_begin'][0], '%Y-%m-%d')
@@ -70,13 +90,6 @@ class ComparisonReportBase:
                     'hour_end': int(chart['paras']['hour_end'][0])
                 })
 
-    def split_request_paras(self, request_paras):
-        for r in request_paras:
-            if r in self.paras_A or r in self.paras_comm:
-                self.chart_A['paras'].update({r: request_paras[r]})
-            if r in self.paras_B or r in self.paras_comm:
-                self.chart_B['paras'].update({r: request_paras[r]})
-
     def calculate_results(self):
         raise NotImplementedError
 
@@ -89,6 +102,7 @@ class TraveltimeWeekday(ComparisonReportBase):
     paras_A = ['weekday_A']
     paras_B = ['weekday_B']
     compare_value = 'avg_arrival_time_spent'
+    chart_type = 'stops'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -116,6 +130,7 @@ class TraveltimeWeekdayType(ComparisonReportBase):
     paras_A = ['weekdayType_A']
     paras_B = ['weekdayType_B']
     compare_value = 'avg_arrival_time_spent'
+    chart_type = 'stops'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -142,6 +157,7 @@ class StaytimeWeekday(ComparisonReportBase):
     paras_A = ['weekday_A']
     paras_B = ['weekday_B']
     compare_value = 'avg_stay_time'
+    chart_type = 'stops'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -168,6 +184,7 @@ class StaytimeWeekdayType(ComparisonReportBase):
     paras_A = ['weekdayType_A']
     paras_B = ['weekdayType_B']
     compare_value = 'avg_stay_time'
+    chart_type = 'stops'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -194,6 +211,7 @@ class RsidTraveltimeWeekday(ComparisonReportBase):
     paras_A = ['weekday_A']
     paras_B = ['weekday_B']
     compare_value = 'avg_arrival_time_spent'
+    chart_type = 'hour'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -220,6 +238,7 @@ class RsidTraveltimeWeekdayType(ComparisonReportBase):
     paras_A = ['weekdayType_A']
     paras_B = ['weekdayType_B']
     compare_value = 'avg_arrival_time_spent'
+    chart_type = 'hour'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -246,6 +265,7 @@ class RsidStaytimeWeekday(ComparisonReportBase):
     paras_A = ['weekday_A']
     paras_B = ['weekday_B']
     compare_value = 'avg_stay_time'
+    chart_type = 'hour'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
@@ -272,6 +292,7 @@ class RsidStaytimeWeekdayType(ComparisonReportBase):
     paras_A = ['weekdayType_A']
     paras_B = ['weekdayType_B']
     compare_value = 'avg_stay_time'
+    chart_type = 'hour'
 
     def calculate_results(self):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))

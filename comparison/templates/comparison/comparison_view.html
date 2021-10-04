@@ -177,7 +177,13 @@
     <script>
         function initCharts() {
             dataChartA = {
-                labels: [{% for r in chart_A.result%} "{{r.name}}", {% endfor %}],
+                labels: [
+                    {% if chart_type == 'stops' %}
+                        {% for r in chart_A.result%} "{{r.name}}", {% endfor %}
+                    {% elif chart_type == 'hour' %}
+                        {% for h in hour_range%} "{{h}}", {% endfor %}
+                    {% endif %}
+                ],
                 series: [
                     [
                         {% if compare_value == 'avg_arrival_time_spent' %}
@@ -203,7 +209,13 @@
             }
 
             dataChartB = {
-                labels: [{% for r in chart_B.result%} "{{r.name}}", {% endfor %}],
+                labels: [
+                    {% if chart_type == 'stops' %}
+                        {% for r in chart_A.result%} "{{r.name}}", {% endfor %}
+                    {% elif chart_type == 'hour' %}
+                        {% for h in hour_range%} "{{h}}", {% endfor %}
+                    {% endif %}
+                ],
                 series: [
                     [
                         {% if compare_value == 'avg_arrival_time_spent' %}
@@ -237,7 +249,13 @@
             }
 
             dataChartDiff = {
-                labels: [{% for r in chart_A.result%} "{{r.name}}", {% endfor %}],
+                labels: [
+                    {% if chart_type == 'stops' %}
+                        {% for r in chart_A.result%} "{{r.name}}", {% endfor %}
+                    {% elif chart_type == 'hour' %}
+                        {% for h in hour_range%} "{{h}}", {% endfor %}
+                    {% endif %}
+                ],
                 series: [
                     [
                         {% for d in diff %}{{d|floatformat:-2}},{% endfor %}

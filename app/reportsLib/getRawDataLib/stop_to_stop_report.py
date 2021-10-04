@@ -115,10 +115,24 @@ class StopToStopResult(StationCenter):
                                             "%Y-%m-%d"),
                                         date_end: datetime = (datetime.today()).strftime("%Y-%m-%d"),
                                         weekdayType=None,
+                                        weekday=None,
                                         **kwargs) -> pd.DataFrame:
-        if weekdayType is None:
-            weekdayType = [0, 1, 2, 3, 4, 5, 6]
-        weekdayType = to_sqllist(weekdayType)
+        if weekdayType is not None:
+            filterby = 'weekdayType'
+            weekday = None
+            weekdayType = to_sqllist(weekdayType)
+        elif weekday is not None and weekdayType is None:
+            filterby = 'weekday'
+            weekday = to_sqllist(weekday)
+        else:
+            weekdayType = (0, 1, 2, 3, 4, 5, 6)
+            filterby = 'weekdayType'
+
+        if filterby == "weekdayType":
+            weekFilter = f" weekdayType in {weekdayType} "
+        else:
+            weekFilter = f" (weekday(departure_time) in {weekday} or weekday(arrival_time) in {weekday}) "
+
         sql_cmd = f"""
                     SELECT 
                         HOUR(sd.arrival_time) AS hour_range,
@@ -146,7 +160,7 @@ class StopToStopResult(StationCenter):
                                 OR (departure_time BETWEEN '{date_begin}' AND '{date_end}' AND TIME(departure_time) BETWEEN '00:00:00' AND '24:00:00'))
                                 AND error_code = 0
                                 AND isFirst != 1
-                                AND weekdayType in {weekdayType}
+                                AND {weekFilter} 
                                 AND rsid = {rsid}) AS sd
                             LEFT JOIN
                         bus.routestop AS rsnow ON rsnow.id = sd.rsid

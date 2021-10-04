@@ -61,6 +61,7 @@ def comparison_prehandle(request, rtype):
 @login_required(login_url="/login/")
 def comparison_result(request, rtype):
     context = CONTEXT.copy()
+    context['rtype'] = rtype
     report = ComparisonReportCenter.find_report_type(rtype)()
     if report.rtype is None:
         html_template = loader.get_template('page-404.html')
@@ -74,17 +75,14 @@ def comparison_result(request, rtype):
 
     context['chart_A'] = report.chart_A
     context['chart_B'] = report.chart_B
+
     context['compare_value'] = report.compare_value
-
-    print(report.chart_A['result'])
-    print(report.chart_B['result'])
-
-    l_of_result_A = [r[report.compare_value] for r in report.chart_A['result']]
-    l_of_result_B = [r[report.compare_value] for r in report.chart_B['result']]
+    context['chart_type'] = report.chart_type
+    context['hour_range'] = list(range(24))
 
     context['chartMaxHight'] = max([
-        max(l_of_result_A),
-        max(l_of_result_B),
+        max([r[report.compare_value] for r in report.chart_A['result']]),
+        max([r[report.compare_value] for r in report.chart_B['result']]),
     ])
 
     context['diff'] = (abs(report.result_A[report.compare_value] - report.result_B[report.compare_value]).to_list())
