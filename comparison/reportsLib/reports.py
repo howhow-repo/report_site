@@ -150,7 +150,7 @@ class TraveltimeWeekdayType(ComparisonReportBase):
 
 
 class StaytimeWeekday(ComparisonReportBase):
-    rtype = 'traveltime_weekdayType'
+    rtype = 'staytime_weekday'
     title = '站內停留時間與星期比較表'
     description = '比較不同星期時，站內停留時間。'
     paras_comm = ['rid_stat', 'date_begin', 'date_end', 'hour_begin', 'hour_end']

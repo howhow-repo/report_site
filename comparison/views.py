@@ -1,9 +1,4 @@
-import ast
-import json
 import logging
-import math
-import os
-from datetime import datetime
 
 from decouple import config
 from django.contrib.auth.decorators import login_required
@@ -11,7 +6,6 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
 
-from app.reportsLib import StopToStopResult
 from .form import ParaInput
 from .reportsLib import *
 
