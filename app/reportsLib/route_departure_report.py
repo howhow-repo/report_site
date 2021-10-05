@@ -58,11 +58,11 @@ class RouteDepartureReport(ReportBase):
             'error_code'
         ]
     """
+    title = "路線發車紀錄"
+    simple_description = '呈現一個路線在時間內的發車紀錄。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "路線發車紀錄"
-        self.simple_description = '呈現一個路線在時間內的發車紀錄。'
         self.start_time = None
         self.end_time = None
         self.rid = None

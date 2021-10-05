@@ -45,11 +45,11 @@ class VendorRunStopRateReport(ReportBase):
     """
         以單一營運商為單位建立各路線平均班次到站率。
     """
+    title = "營運商 平均路線到站率一覽表"
+    simple_description = "以單一營運商為單位建立各路線平均班次到站率。"
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "營運商 平均路線到站率一覽表"
-        self.simple_description = '以單一營運商為單位建立各路線平均班次到站率。'
         self.vid = None
         self.vid_ch_name = None
         self.start_time = None

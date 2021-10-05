@@ -58,11 +58,11 @@ class RouteScheduleDepartureReport(ReportBase):
             'error_code'
         ]
     """
+    title = "路線班次發車紀錄"
+    simple_description = '呈現一個路線的各班次，在時間內的發車紀錄。不計算額外發車。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "路線班次發車紀錄"
-        self.simple_description = '呈現一個路線的各班次，在時間內的發車紀錄。不計算額外發車。'
         self.start_time = None
         self.end_time = None
         self.rid = None

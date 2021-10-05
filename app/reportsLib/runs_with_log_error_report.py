@@ -45,11 +45,11 @@ class RunsWithLogErrorReport(ReportBase):
             ＊ 無路線站序
             ＊ 無首站出站紀錄
     """
+    title = "公車班次紀錄回報異常一覽表"
+    simple_description = '顯示資訊回報有異常的班車，及其異常方式。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "公車班次紀錄回報異常一覽表"
-        self.simple_description = '顯示資訊回報有異常的班車，及其異常方式。'
         self.start_time = None
         self.end_time = None
         self.report = None

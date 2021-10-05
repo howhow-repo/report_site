@@ -5,14 +5,14 @@ class ReportBase:
     """
         Basic functions and args for reports
     """
+    title = None
+    simple_description = ''
+    sub_title = ''
+    sub_title2 = ''
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         self._centerDB_conn_options = centerDB_conn_options
         self._drivelogDB_conn_options = drivelogDB_conn_options
-        self.title = None
-        self.simple_description = ''
-        self.sub_title = ''
-        self.sub_title2 = ''
         self.report = None
         self.start_time = None
         self.end_time = None

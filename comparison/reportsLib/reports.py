@@ -17,6 +17,7 @@ class ComparisonReportBase:
     paras_B = []
     compare_value = ''
     chart_type = ''
+    func = None
 
     def __init__(self):
         self.result_A = pandas.DataFrame()
@@ -91,7 +92,24 @@ class ComparisonReportBase:
                 })
 
     def calculate_results(self):
-        raise NotImplementedError
+        if self.func is None:
+            raise NotImplementedError("function undefined")
+
+        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr.connect()
+
+        rpA = getattr(sr, self.func)(**self.chart_A['paras'])
+        rpA.fillna(0, inplace=True)
+
+        rpB = getattr(sr, self.func)(**self.chart_B['paras'])
+        rpB.fillna(0, inplace=True)
+
+        sr.disconnect()
+
+        self.result_A = rpA
+        self.result_B = rpB
+        self.chart_A.update({'result': rpA.to_dict('records')})
+        self.chart_B.update({'result': rpB.to_dict('records')})
 
 
 class TraveltimeWeekday(ComparisonReportBase):
@@ -103,23 +121,7 @@ class TraveltimeWeekday(ComparisonReportBase):
     paras_B = ['weekday_B']
     compare_value = 'avg_arrival_time_spent'
     chart_type = 'stops'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-
-        rpA = (sr.get_default_stop_to_stop_by_rid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_default_stop_to_stop_by_rid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_default_stop_to_stop_by_rid'
 
 
 class TraveltimeWeekdayType(ComparisonReportBase):
@@ -131,22 +133,7 @@ class TraveltimeWeekdayType(ComparisonReportBase):
     paras_B = ['weekdayType_B']
     compare_value = 'avg_arrival_time_spent'
     chart_type = 'stops'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_default_stop_to_stop_by_rid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_default_stop_to_stop_by_rid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_default_stop_to_stop_by_rid'
 
 
 class StaytimeWeekday(ComparisonReportBase):
@@ -158,22 +145,7 @@ class StaytimeWeekday(ComparisonReportBase):
     paras_B = ['weekday_B']
     compare_value = 'avg_stay_time'
     chart_type = 'stops'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_default_stop_to_stop_by_rid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_default_stop_to_stop_by_rid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_default_stop_to_stop_by_rid'
 
 
 class StaytimeWeekdayType(ComparisonReportBase):
@@ -185,22 +157,7 @@ class StaytimeWeekdayType(ComparisonReportBase):
     paras_B = ['weekdayType_B']
     compare_value = 'avg_stay_time'
     chart_type = 'stops'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_default_stop_to_stop_by_rid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_default_stop_to_stop_by_rid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_default_stop_to_stop_by_rid'
 
 
 class RsidTraveltimeWeekday(ComparisonReportBase):
@@ -212,22 +169,7 @@ class RsidTraveltimeWeekday(ComparisonReportBase):
     paras_B = ['weekday_B']
     compare_value = 'avg_arrival_time_spent'
     chart_type = 'hour'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_stop_to_stop_hourly_by_rsid'
 
 
 class RsidTraveltimeWeekdayType(ComparisonReportBase):
@@ -239,22 +181,7 @@ class RsidTraveltimeWeekdayType(ComparisonReportBase):
     paras_B = ['weekdayType_B']
     compare_value = 'avg_arrival_time_spent'
     chart_type = 'hour'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_stop_to_stop_hourly_by_rsid'
 
 
 class RsidStaytimeWeekday(ComparisonReportBase):
@@ -266,22 +193,7 @@ class RsidStaytimeWeekday(ComparisonReportBase):
     paras_B = ['weekday_B']
     compare_value = 'avg_stay_time'
     chart_type = 'hour'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_stop_to_stop_hourly_by_rsid'
 
 
 class RsidStaytimeWeekdayType(ComparisonReportBase):
@@ -293,22 +205,7 @@ class RsidStaytimeWeekdayType(ComparisonReportBase):
     paras_B = ['weekdayType_B']
     compare_value = 'avg_stay_time'
     chart_type = 'hour'
-
-    def calculate_results(self):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        sr.connect()
-        rpA = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_A['paras']))
-        rpA.fillna(0, inplace=True)
-
-        rpB = (sr.get_stop_to_stop_hourly_by_rsid(**self.chart_B['paras']))
-        rpB.fillna(0, inplace=True)
-
-        sr.disconnect()
-
-        self.result_A = rpA
-        self.result_B = rpB
-        self.chart_A.update({'result': rpA.to_dict('records')})
-        self.chart_B.update({'result': rpB.to_dict('records')})
+    func = 'get_stop_to_stop_hourly_by_rsid'
 
 
 class ComparisonReportCenter:

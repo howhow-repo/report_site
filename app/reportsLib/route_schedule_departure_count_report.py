@@ -52,11 +52,11 @@ class RouteScheduleDepartureCountReport(ReportBase):
         * not_on_time_bus_count = early_bus_count + delay_bus_count
         * from_first_stop: 純粹看發車位置，與發車時間無關。
     """
+    title = '路線班次發車次數統計'
+    simple_description = '以路線班次為基準，計算各班次有多少車，發車是否為準時。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = '路線班次發車次數統計'
-        self.simple_description = '以路線班次為基準，計算各班次有多少車，發車是否為準時。'
         self.start_time = None
         self.end_time = None
         self.rid = None

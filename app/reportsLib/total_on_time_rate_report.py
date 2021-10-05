@@ -47,11 +47,11 @@ class TotalOnTimeRateReport(ReportBase):
     """
         以個路線準點報表(route_on_time_rate_report_rnBase)為基礎，建立各路線準點率的報表。
     """
+    title = "準點率一覽表"
+    simple_description = '以各路線準點報表(單一路線準點率)為基礎，建立各路線準點率的報表。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "準點率一覽表"
-        self.simple_description = '以各路線準點報表(單一路線準點率)為基礎，建立各路線準點率的報表。'
         self.start_time = None
         self.end_time = None
         self.total_rids = []

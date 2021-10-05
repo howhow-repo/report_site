@@ -62,11 +62,11 @@ class RouteOnTimeRateReport(ReportBase):
         * 'duty_count' = 'off_duty' + 'not_from_first_stop' + 'early_departure' + 'delay_departure' + 'on_time_departure'
 
     """
+    title = '單一路線準點率'
+    simple_description = '統計一個路線的時間內的班次發車情形，並計算準點率。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = '單一路線準點率'
-        self.simple_description = '統計一個路線的時間內的班次發車情形，並計算準點率。'
         self.start_time = None
         self.end_time = None
         self.rid = None

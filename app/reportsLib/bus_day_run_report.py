@@ -51,7 +51,7 @@ def parsing_df_for_user(report: pd.DataFrame):
 
 
 class BusDayRunReport(ReportBase):
-    '''
+    """
         顯示一台車(車號)，在日期內執行過哪些班次任務，及各班次執行狀態。
         資料來源為drive log來自MongoDB
 
@@ -68,11 +68,12 @@ class BusDayRunReport(ReportBase):
             'bus_arrival_stop',
             'error_code'
         }
-    '''
+    """
+    title = "公車任務執行紀錄"
+    simple_description = '顯示一台車(車號)，在日期內執行過哪些班次任務，及各班次執行狀態。'
+
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "公車任務執行紀錄"
-        self.simple_description = '顯示一台車(車號)，在日期內執行過哪些班次任務，及各班次執行狀態。'
         self.start_time = None
         self.end_time = None
         self.carno = None

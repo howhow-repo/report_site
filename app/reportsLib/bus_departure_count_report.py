@@ -22,11 +22,11 @@ class BusDepartureCountReport(ReportBase):
     """
         顯示日期內有哪些車牌有出車，各執行了多少班，共經過多少站牌。
     """
+    title = "發車次數統計一覽表"
+    simple_description = '顯示日期內有哪些車牌有出車，各執行了多少班，共經過多少站牌。'
 
     def __init__(self, centerDB_conn_options, drivelogDB_conn_options):
         super().__init__(centerDB_conn_options, drivelogDB_conn_options)
-        self.title = "發車次數統計一覽表"
-        self.simple_description = '顯示日期內有哪些車牌有出車，各執行了多少班，共經過多少站牌。'
         self.start_time = None
         self.end_time = None
         self.drove_bus = []
