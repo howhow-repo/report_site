@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 
 from decouple import config
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
 
-from app.reportsLib import Bus, StationCenter
+from app.reportsLib import StationCenter
 from .form import ParaInput
 
 logger = logging.getLogger('django')
@@ -22,7 +22,7 @@ CONTEXT = {
     "segment": 'data_traffic',
 }
 
-# Create your views here.
+
 @login_required(login_url="/login/")
 def data_traffic_prehandle(request):
     context = CONTEXT.copy()
@@ -38,25 +38,30 @@ def data_traffic_prehandle(request):
 def data_traffic_view(request):
     context = CONTEXT.copy()
     if request.method == "POST":
-        para_received = (dict(request.POST))
-        print(para_received)
-        date = datetime.strptime(para_received['date'][0], '%Y-%m-%d')
-
+        form = ParaInput(request.POST)
+        if form.is_valid():
+            date = form.cleaned_data['date']
+        else:
+            date = datetime.today()-timedelta(days=1)
+            logger.warning("Cannot handle form request.")
         sc = StationCenter(sqlOption=sql_options)
         sc.connect()
         df = sc.get_data_traffic(date)
         sc.disconnect()
 
-        context['hour'] = list(range(0,24))
-        context['date'] = date
-        context['gps_data_count_max'] = max(df['gps_data_count'])
-        context['drivelog_data_count_max'] = max(df['drivelog_data_count'])
-        context['bus_on_rail_count_max'] = max(df['bus_on_rail_count'])
-        context['bus_online_count_max'] = max(df['bus_online_count'])
-        context['report'] = df.to_dict('records')
-
-        html_template = loader.get_template('data_traffic/data_traffic_view.html')
-        return HttpResponse(html_template.render(context, request))
+        if df.empty:
+            html_template = loader.get_template('page-404.html')
+            return HttpResponseNotFound(html_template.render(context, request))
+        else:
+            context['hour'] = list(range(0, 24))
+            context['date'] = date
+            context['gps_data_count_max'] = max(df['gps_data_count'])
+            context['drivelog_data_count_max'] = max(df['drivelog_data_count'])
+            context['bus_on_rail_count_max'] = max(df['bus_on_rail_count'])
+            context['bus_online_count_max'] = max(df['bus_online_count'])
+            context['report'] = df.to_dict('records')
+            html_template = loader.get_template('data_traffic/data_traffic_view.html')
+            return HttpResponse(html_template.render(context, request))
     else:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render(context, request))

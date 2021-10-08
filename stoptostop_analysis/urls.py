@@ -1,4 +1,3 @@
-from django.conf.urls import url
 from django.urls import path
 from stoptostop_analysis import views
 

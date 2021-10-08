@@ -23,8 +23,7 @@ class DriveLogDB(MongoDB):
                                         field_name='rid'))
 
     def get_drove_buses(self, datetime: datetime):
-        datetime = datetime - timedelta(hours=datetime.hour, minutes=datetime.minute, seconds=datetime.second,
-                                        microseconds=datetime.microsecond)
+        datetime = datetime.replace(hour=0, minute=0, second=0)
         bus_list = self.get_distinct(datetime, 'drivelog', {}, 'carno')
         bus_list = bus_list + (self.get_distinct(datetime + timedelta(days=1), 'drivelog',
                                        {
@@ -36,8 +35,7 @@ class DriveLogDB(MongoDB):
         return drove_buses
 
     def _get_drive_logs(self, datetime: datetime, query_cmd: dict, projection_cmd: dict = None):
-        datetime = datetime - timedelta(hours=datetime.hour, minutes=datetime.minute, seconds=datetime.second,
-                                        microseconds=datetime.microsecond)
+        datetime = datetime.replace(hour=0, minute=0, second=0)
         logs = self._get_logs(datetime=datetime, collection_type='drivelog', query_cmd=query_cmd,
                               projection_cmd=projection_cmd)
         logs = logs.append(

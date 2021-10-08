@@ -38,31 +38,25 @@ def bus_rawdata_prehandle(request):
 def bus_rawdata_view(request):
     context = CONTEXT.copy()
     if request.method == "POST":
-        para_received = format_paras(dict(request.POST))
-        bus = Bus(MongoDBPath=json.loads(os.getenv("EBUS_MONGODB")), sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-        bus.connect()
-        bus.carno = para_received['carno']
-        bus.setup(start_time=para_received['start_time'], end_time=para_received['end_time'])
-        bus.disconnect()
+        para_received = ParaInput(request.POST)
+        if para_received.is_valid():
+            bus = Bus(MongoDBPath=json.loads(os.getenv("EBUS_MONGODB")), sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+            bus.connect()
+            bus.carno = para_received.cleaned_data['carno']
+            bus.setup(start_time=datetime.combine(para_received.cleaned_data['start_time'], datetime.min.time()),
+                      end_time=datetime.combine(para_received.cleaned_data['end_time'], datetime.min.time()))
+            bus.disconnect()
 
-        context['carno'] = para_received['carno']
-        context['start_time'] = para_received['start_time']
-        context['end_time'] = para_received['end_time']
-        context['drivelog'] = bus.travel_logs.to_dict('records')
-        context['runs'] = [r.df.to_dict('records')[0] for r in bus.runs]
-        for i, r in enumerate(context['runs']):
-            r['runs_log'] = bus.runs[i].logs.to_dict('records')
+            context['carno'] = para_received.cleaned_data['carno']
+            context['start_time'] = para_received.cleaned_data['start_time']
+            context['end_time'] = para_received.cleaned_data['end_time']
+            context['drivelog'] = bus.travel_logs.to_dict('records')
+            context['runs'] = [r.df.to_dict('records')[0] for r in bus.runs]
+            for i, r in enumerate(context['runs']):
+                r['runs_log'] = bus.runs[i].logs.to_dict('records')
 
-        html_template = loader.get_template('bus_rawdata/bus_rawdata_view.html')
-        return HttpResponse(html_template.render(context, request))
-    else:
-        html_template = loader.get_template('page-500.html')
-        return HttpResponseServerError(html_template.render(context, request))
+            html_template = loader.get_template('bus_rawdata/bus_rawdata_view.html')
+            return HttpResponse(html_template.render(context, request))
 
-
-def format_paras(para_received: dict):
-    logger.debug(f"parameters: {para_received}")
-    para_received["carno"] = (para_received["carno"][0].lstrip()).rstrip()
-    para_received["start_time"] = datetime.strptime(para_received["start_time"][0], '%Y-%m-%d')
-    para_received["end_time"] = datetime.strptime(para_received["end_time"][0], '%Y-%m-%d')
-    return para_received
+    html_template = loader.get_template('page-500.html')
+    return HttpResponseServerError(html_template.render(context, request))

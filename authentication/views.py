@@ -93,7 +93,7 @@ def oauth_is_required(request):
     id = request.GET.get('id', None)
     token = request.GET.get('token', None)
     level = request.GET.get('level', None)
-    if check_oauth(id,token):
+    if check_oauth(id, token):
         return False
     else:
         return True
@@ -101,7 +101,7 @@ def oauth_is_required(request):
 
 def authcheck(request, redirect_to="/oauth_login/"):
     if request.user.is_authenticated:
-        return None # Donothing
+        return None  # Donothing
     else:
         if oauth_is_required(request=request):
             return HttpResponseRedirect(redirect_to)

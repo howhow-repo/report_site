@@ -21,7 +21,6 @@ sql_options = json.loads(os.getenv("EBUS_SQLDB"))
 mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
 
-# Create your models here.
 class DailyDriveLogParsingStatus(models.Model):
     date = models.DateField()
     buses_count = models.PositiveIntegerField()

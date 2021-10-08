@@ -2,6 +2,7 @@ import logging
 
 from decouple import config
 from django.contrib.auth.decorators import login_required
+from django import forms
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
@@ -60,6 +61,26 @@ def comparison_result(request, rtype):
     if report.rtype is None:
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
+
+    paras_form = ParaInput(request.POST)
+    print("====")
+    print(paras_form.is_valid())
+    # print(paras_form.cleaned_data)
+    print(type(paras_form.cleaned_data['date_begin']))
+    #
+    # print(paras_form.cleaned_data['date_begin'])
+    # print('----')
+    for f in paras_form.data:
+        try:
+            if (paras_form.data.get(f) is not None
+                    and type(paras_form.fields[f].widget) == forms.widgets.CheckboxSelectMultiple):
+                item = paras_form.cleaned_data[f]
+            else:
+                item = paras_form.cleaned_data[f]
+            print(f"{f} -> {item}")
+        except:
+            print(f"{f} -> error")
+    print("====")
 
     request_paras = (dict(request.POST))
     report.split_request_paras(request_paras=request_paras)

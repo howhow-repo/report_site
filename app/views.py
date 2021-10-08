@@ -23,6 +23,7 @@ from .form import ParaInput
 from .reportsLib import ReportCenter
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -135,7 +136,6 @@ def report_prehandle(request):
 
 @login_required(login_url="/login/")
 def report_view(request, rtype):
-
     if request.method == "GET":
         para_received = format_paras(dict(request.GET.items()))
         return parsing_get_report(request=request, rtype=rtype, para_received=para_received)

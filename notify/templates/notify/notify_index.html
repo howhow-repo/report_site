@@ -23,11 +23,11 @@
                                 <th> 啟用 </th>
                             </thead>
                             <tbody>
-                                {% for m in members%}
+                                {% for m in members %}
                                 <tr>
                                     <td>{{ m.name }}</td>
-                                    <td>{{m.token}}</td>
-                                    <td>{{m.activate}}</td>
+                                    <td>{{ m.token }}</td>
+                                    <td>{{ m.activate }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -37,6 +37,17 @@
             </div>
         </div>
     </div>
+    <hr>
+    <h2>新增通知人</h2>
+    <form action="{% url 'add_notify' %}" method="post">
+        {% csrf_token %}
+        {% for f in AddNotify %}
+            <h4> {{f.label}}: {{f}} <br></h4>
+        {% endfor %}
+        <br>
+        <input type="submit" class="btn btn-primary btn-round" value="add">
+    </form>
+
 
 {% endblock content %}
 
