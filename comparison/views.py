@@ -63,27 +63,14 @@ def comparison_result(request, rtype):
         return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
 
     paras_form = ParaInput(request.POST)
-    print("====")
-    print(paras_form.is_valid())
-    # print(paras_form.cleaned_data)
-    print(type(paras_form.cleaned_data['date_begin']))
-    #
-    # print(paras_form.cleaned_data['date_begin'])
-    # print('----')
-    for f in paras_form.data:
-        try:
-            if (paras_form.data.get(f) is not None
-                    and type(paras_form.fields[f].widget) == forms.widgets.CheckboxSelectMultiple):
-                item = paras_form.cleaned_data[f]
-            else:
-                item = paras_form.cleaned_data[f]
-            print(f"{f} -> {item}")
-        except:
-            print(f"{f} -> error")
-    print("====")
+    if paras_form.is_valid():
+        for f in paras_form.cleaned_data:
+            value = paras_form.cleaned_data[f]
+            if f in report.paras_A or f in report.paras_comm:
+                report.chart_A['paras'].update({f: value})
+            if f in report.paras_B or f in report.paras_comm:
+                report.chart_B['paras'].update({f: value})
 
-    request_paras = (dict(request.POST))
-    report.split_request_paras(request_paras=request_paras)
     report.format_paras(report.chart_A)
     report.format_paras(report.chart_B)
     report.calculate_results()

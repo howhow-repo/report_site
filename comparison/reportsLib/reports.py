@@ -33,63 +33,38 @@ class ComparisonReportBase:
                 self.chart_B['paras'].update({r: request_paras[r]})
 
     def format_paras(self, chart):
-        ls = [p for p in chart['paras']]
-        for p in ls:
-            if p == 'rid_stat':
-                chart['paras'].update({
-                    "rid": (ast.literal_eval(chart['paras']['rid_stat'][0]))[0],
-                    "rid_name": (ast.literal_eval(chart['paras']['rid_stat'][0]))[1],
-                })
-                del chart['paras']['rid_stat']
+        if 'rid_stat' in chart['paras']:
+            chart['paras'].update({
+                "rid": (ast.literal_eval(chart['paras']['rid_stat']))[0],
+                "rid_name": (ast.literal_eval(chart['paras']['rid_stat']))[1],
+            })
+            del chart['paras']['rid_stat']
 
-            elif p == "rsid":
-                chart['paras'].update({
-                    'rsid': int(chart['paras']['rsid'][0])
-                })
+        if 'weekday_A' in chart['paras']:
+            chart['paras'].update({
+                "weekday": chart['paras']['weekday_A']
+            })
+            del chart['paras']['weekday_A']
 
-            elif p == "weekday_A":
-                chart['paras'].update({
-                    "weekday": [int(w) for w in chart['paras']['weekday_A']]
-                })
-                del chart['paras']['weekday_A']
+        if "weekday_B" in chart['paras']:
+            chart['paras'].update({
+                "weekday": chart['paras']['weekday_B']
+            })
+            del chart['paras']['weekday_B']
 
-            elif p == "weekday_B":
-                chart['paras'].update({
-                    "weekday": [int(w) for w in chart['paras']['weekday_B']]
-                })
-                del chart['paras']['weekday_B']
+        if "weekdayType_A" in chart['paras']:
+            chart['paras'].update({
+                "weekdayType": chart['paras']['weekdayType_A']
+            })
+            del chart['paras']['weekdayType_A']
 
-            elif p == "weekdayType_A":
-                chart['paras'].update({
-                    "weekdayType": [int(w) for w in chart['paras']['weekdayType_A']]
-                })
-                del chart['paras']['weekdayType_A']
+        if "weekdayType_B" in chart['paras']:
+            chart['paras'].update({
+                "weekdayType": chart['paras']['weekdayType_B']
+            })
+            del chart['paras']['weekdayType_B']
 
-            elif p == "weekdayType_B":
-                chart['paras'].update({
-                    "weekdayType": [int(w) for w in chart['paras']['weekdayType_B']]
-                })
-                del chart['paras']['weekdayType_B']
-
-            elif p == "date_begin":
-                chart['paras'].update({
-                    'date_begin': datetime.strptime(chart['paras']['date_begin'][0], '%Y-%m-%d')
-                })
-
-            elif p == "date_end":
-                chart['paras'].update({
-                    'date_end': datetime.strptime(chart['paras']['date_end'][0], '%Y-%m-%d')
-                })
-
-            elif p == "hour_begin":
-                chart['paras'].update({
-                    'hour_begin': int(chart['paras']['hour_begin'][0])
-                })
-
-            elif p == "hour_end":
-                chart['paras'].update({
-                    'hour_end': int(chart['paras']['hour_end'][0])
-                })
+        print(chart)
 
     def calculate_results(self):
         if self.func is None:

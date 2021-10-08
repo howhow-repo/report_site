@@ -50,8 +50,9 @@ def stoptostop_prehandle(request):
 @login_required(login_url="/login/")
 def stoptostop_traveltime_view(request):
     context = CONTEXT.copy()
-    if request.method == "POST":
-        para_received = format_stoptostop_paras(dict(request.POST))
+    p = ParaInput(request.POST)
+    if p.is_valid():
+        para_received = format_stoptostop_paras(p)
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
         rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
@@ -80,8 +81,9 @@ def stoptostop_traveltime_view(request):
 @login_required(login_url="/login/")
 def stoptostop_staytime_view(request):
     context = CONTEXT.copy()
-    if request.method == "POST":
-        para_received = format_stoptostop_paras(dict(request.POST))
+    p = ParaInput(request.POST)
+    if p.is_valid():
+        para_received = format_stoptostop_paras(p)
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
         rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
@@ -116,11 +118,11 @@ def stoptostop_traveltime_hourly(request, rsid):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
         rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid, **para_received))
+        sr.disconnect()
+
         rp.fillna(0, inplace=True)
         context['chartMaxHight'] = max(rp['avg_arrival_time_spent'].tolist())
         context['result'] = rp.to_dict('records')
-        sr.disconnect()
-
         context['rsid'] = rsid
         context['rsid_name'] = para_received['rsid_name']
         context['pre_rsid_name'] = para_received['pre_rsid_name']
@@ -147,11 +149,11 @@ def stoptostop_staytime_hourly(request, rsid):
         sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
         sr.connect()
         rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid, **para_received))
+        sr.disconnect()
+
         rp.fillna(0, inplace=True)
         context['chartMaxHight'] = max(rp['avg_stay_time'].tolist())
         context['result'] = rp.to_dict('records')
-        sr.disconnect()
-
         context['rsid'] = rsid
         context['rsid_name'] = para_received['rsid_name']
         context['rid'] = para_received['rid']
@@ -171,29 +173,27 @@ def stoptostop_staytime_hourly(request, rsid):
 
 
 weekdayType_cn = {
-    "0": "平日",
-    "1": "週末",
-    "2": "國定假日",
-    "3": "彈性放假",
-    "4": "補假",
-    "5": "補班",
-    "6": "特殊假日",
+    0: "平日",
+    1: "週末",
+    2: "國定假日",
+    3: "彈性放假",
+    4: "補假",
+    5: "補班",
+    6: "特殊假日",
 }
 
 
-def format_stoptostop_paras(para_received: dict):
-    stat = ast.literal_eval(para_received["rid_stat"][0])
+def format_stoptostop_paras(p: ParaInput):
+    para_received = {}
+    stat = ast.literal_eval(p.cleaned_data["rid_stat"])
     para_received["rid"] = int(stat[0])
     para_received["rid_name"] = stat[1]
-    para_received["weekdayType_cn"] = [weekdayType_cn[w] for w in para_received["weekdayType"]]
-    para_received["weekdayType"] = [int(w) for w in para_received["weekdayType"]]
-    para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
-    para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')
-    para_received["hour_begin"] = int(para_received["hour_begin"][0])
-    para_received["hour_end"] = int(para_received["hour_end"][0])
-    del para_received['rid_stat']
-    if "csrfmiddlewaretoken" in para_received:
-        del para_received['csrfmiddlewaretoken']
+    para_received["weekdayType_cn"] = [weekdayType_cn[w] for w in p.cleaned_data["weekdayType"]]
+    para_received["weekdayType"] = p.cleaned_data["weekdayType"]
+    para_received["date_begin"] = p.cleaned_data["date_begin"]
+    para_received["date_end"] = p.cleaned_data["date_end"]
+    para_received["hour_begin"] = p.cleaned_data["hour_begin"]
+    para_received["hour_end"] = p.cleaned_data["hour_end"]
     return para_received
 
 
@@ -203,7 +203,7 @@ def format_hourly_paras(para_received: dict):
     para_received['rid'] = para_received['rid'][0]
     para_received['rid_name'] = para_received['rid_name'][0]
     para_received['rsid_name'] = para_received['rsid_name'][0]
-    para_received["weekdayType_cn"] = [weekdayType_cn[str(w)] for w in eval(para_received["weekdayType"][0])]
+    para_received["weekdayType_cn"] = [weekdayType_cn[int(w)] for w in eval(para_received["weekdayType"][0])]
     para_received["weekdayType"] = [int(w) for w in eval(para_received["weekdayType"][0])]
     para_received["date_begin"] = datetime.strptime(para_received["date_begin"][0], '%Y-%m-%d')
     para_received["date_end"] = datetime.strptime(para_received["date_end"][0], '%Y-%m-%d')
