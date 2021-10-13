@@ -1,13 +1,12 @@
-import logging
-import os
-
+# coding=utf-8
 import numpy as np
 import pandas as pd
-import pdfkit
 from datetime import datetime, timedelta
 from .route_schedule_departure_count_report import RouteScheduleDepartureCountReport
 from .report_base import ReportBase
-from jinja2 import Environment, FileSystemLoader
+import logging
+
+logger = logging.getLogger()
 
 
 def parsing_df_for_user(report: pd.DataFrame):

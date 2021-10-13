@@ -1,13 +1,13 @@
-import os
-
+# coding=utf-8
 import numpy as np
 
 from .report_base import ReportBase
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
-import pdfkit
 import pandas as pd
-from jinja2 import Environment, FileSystemLoader
+import logging
+
+logger = logging.getLogger()
 
 
 def parsing_df_for_user(report: pd.DataFrame):

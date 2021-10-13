@@ -1,12 +1,9 @@
-import os
-
+# coding=utf-8
 import numpy as np
 import pandas as pd
-import pdfkit
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
 from .report_base import ReportBase
-from jinja2 import Environment, FileSystemLoader
 import logging
 
 logger = logging.getLogger()

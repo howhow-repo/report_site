@@ -1,18 +1,15 @@
-import os
-
+# coding=utf-8
 import numpy as np
 import pandas as pd
-import pdfkit
 from datetime import datetime, timedelta
 from .getRawDataLib import StationCenter
 from .report_base import ReportBase
-from jinja2 import Environment, FileSystemLoader
 import logging
 
 logger = logging.getLogger()
 
 
-def to_sqllist(l:list) -> str:
+def to_sqllist(l: list) -> str:
     l = str(l)
     l = l.replace('[', '(')
     l = l.replace(']', ')')
@@ -27,7 +24,7 @@ def parsing_df_for_user(report: pd.DataFrame) -> pd.DataFrame:
     main_report.index += 1  # index from 1
     # main_report['start_time'] = pd.to_datetime(main_report['start_time'], format="%Y-%m-%d")
     main_report['on_time_rate'] = pd.Series(["{0:.1f}%".format(val * 100) for val in main_report['on_time_rate']],
-                                    index=main_report.index)
+                                            index=main_report.index)
     sum_column = main_report["early_departure"] + main_report["delay_departure"]
     main_report["early_delay"] = sum_column
 
@@ -94,8 +91,8 @@ class VendorRouteOnTimeRateReport(ReportBase):
         if len(self.total_rids) != 0:
             total_rids_sqllist = to_sqllist(self.total_rids)
             self.report = station_center.get_on_time_rate(start_time=start_time, off_duty_tol=off_duty_tol,
-                                                end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
-                                                other_filter=f" where rid in {total_rids_sqllist}")
+                                                          end_time=end_time, early_tol=early_tol, delay_tol=delay_tol,
+                                                          other_filter=f" where rid in {total_rids_sqllist}")
 
         station_center.disconnect()
         return self.report
