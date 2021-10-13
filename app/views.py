@@ -2,27 +2,26 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-import os, json
+import inspect
+import json
+import logging
+import os
 from datetime import datetime
 
 from decouple import config
-from dotenv import load_dotenv
-import inspect
-
+from django import template
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
 from django.template import loader
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
-from django import template
+from dotenv import load_dotenv
 
 from authentication.views import authcheck
 from data_traffic.models import get_data_traffic_parsing_result
-from .models import get_report_index_str, parsing_get_report
-from .models import get_parsing_result
 from .form import ParaInput
+from .models import get_parsing_result
+from .models import get_report_index_str, parsing_get_report
 from .reportsLib import ReportCenter
-
-import logging
 
 logger = logging.getLogger(__name__)
 

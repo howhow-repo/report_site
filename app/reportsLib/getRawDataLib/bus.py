@@ -1,3 +1,4 @@
+# coding=utf-8
 from .drivelog_db import *
 from .station_center import StationCenter
 from .run import Run

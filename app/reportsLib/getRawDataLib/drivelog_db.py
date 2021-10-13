@@ -1,7 +1,6 @@
+# coding=utf-8
 import os
 
-import pymongo
-from pymongo import MongoClient
 from datetime import datetime, timedelta
 import pandas as pd
 import logging

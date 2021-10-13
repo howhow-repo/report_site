@@ -1,3 +1,4 @@
+# coding=utf-8
 import pandas as pd
 from datetime import datetime, timedelta
 from .gpslog_db import GpsLogDB
@@ -15,7 +16,6 @@ class DataTrafficCounter(GpsLogDB):
         self.date = None
         self.bus_online = []
         self.bus_on_rail = []
-
 
     def connect(self):
         super(DataTrafficCounter, self).connect()

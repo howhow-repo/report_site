@@ -1,3 +1,4 @@
+# coding=utf-8
 import pymongo
 from pymongo import MongoClient
 from datetime import datetime

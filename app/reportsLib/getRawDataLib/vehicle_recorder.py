@@ -1,5 +1,4 @@
-import pandas as pd
-
+# coding=utf-8
 from .drivelog_db import *
 from datetime import datetime,timedelta
 
