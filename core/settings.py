@@ -32,7 +32,9 @@ INSTALLED_APPS = [
     'django_apscheduler',
     'drf_yasg',
     'rest_framework',
+    'leaflet',
     'notify',
+    'map',
     'api',
     'app',
     'stoptostop_analysis',
@@ -42,6 +44,19 @@ INSTALLED_APPS = [
     'comparison',
 ]
 
+TEMPLATE_DEBUG = False
+LEAFLET_CONFIG = {
+    # 'SPATIAL_EXTENT': (120.0, 25.5, 122.5, 21.4,),
+    'DEFAULT_CENTER': (23.65, 120.86),
+    'DEFAULT_ZOOM': 8,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'DEFAULT_PRECISION': 6,
+    'MINIMAP': True,
+    'RESET_VIEW': False,
+
+}
+
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
 
 MIDDLEWARE = [
@@ -49,7 +64,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

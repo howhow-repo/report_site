@@ -34,6 +34,13 @@
             </a>
           </li>
 
+          <li class="nav-item {% if 'map' in segment %} active {% endif %}">
+            <a class="nav-link" href="{% url 'map_index' %}">
+              <i class="material-icons">map</i>
+              <p><b>地圖(測試)</b></p>
+            </a>
+          </li>
+
           <li class="nav-item {% if 'notify' in segment %} active {% endif %}">
             <a class="nav-link" href="{% url 'notify_index' %}">
               <i class="material-icons">person</i>

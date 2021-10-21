@@ -40,6 +40,7 @@ urlpatterns = [
     path("bus_rawdata/", include("bus_rawdata.urls")),
     path("data_traffic/", include("data_traffic.urls")),
     path("comparison/", include("comparison.urls")),
+    path("map/", include("map.urls")),
     path("api/", include("api.urls")),  # for restful & swagger
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 

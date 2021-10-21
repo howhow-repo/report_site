@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} map {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+    {% load leaflet_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <h1>{{title}}</h1>
+    {% leaflet_map "map" callback="window.map_init"%}
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+    <script type="text/javascript">
+        var collection = {{ geojson_sample|safe }};
+        function map_init(map, options) {
+            L.geoJson(collection).addTo(map);
+            // FeatureGroup is to store editable layers
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            var drawControl = new L.Control.Draw({
+             edit: {
+                 featureGroup: drawnItems
+             }
+            });
+            map.addControl(drawControl);
+        }
+
+    </script>
+    <style>
+
+        .leaflet-container {  /* all maps */
+            height: 800px;
+        }
+
+        #specialbigmap {
+            height: 800px;
+        }
+
+    </style>
+<!--    <script>-->
+<!--        function onMapClick(e) {-->
+<!--            alert("經緯度座標：" + e.latlng);-->
+<!--        }-->
+
+<!--        map.on('click', onMapClick);-->
+<!--    </script>-->
+    <script>
+        $(document).ready(function() {
+            // Javascript method's body can be found in assets/js/demos.js
+            md.initDashboardPageCharts();
+
+        });
+    </script>
+
+{% endblock javascripts %}
