@@ -36,10 +36,10 @@ def map_rid(request):
     station.connect()
     stop_locations = [[s['clon'], s['clat']] for s in station.get_route_stop_location(rid=rid).to_dict('records')]
     station.disconnect()
-    geojson_points = {
-                         "type": "MultiPoint",
-                         "coordinates": stop_locations,
-                     },
+    # geojson_points = {
+    #                      "type": "MultiPoint",
+    #                      "coordinates": stop_locations,
+    #                  },
 
     geojson_line = {
                        "type": "LineString",
@@ -48,7 +48,7 @@ def map_rid(request):
 
     geojson_circle = stop_locations
 
-    context['geojson_points'] = str(json.dumps(geojson_points))
+    # context['geojson_points'] = str(json.dumps(geojson_points))
     context['geojson_line'] = str(json.dumps(geojson_line))
     context['geojson_circle'] = geojson_circle
 
