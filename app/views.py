@@ -128,8 +128,7 @@ def report_prehandle(request):
         "rtype_paras": rtype_paras,
         "para_form": ParaInput()
     })
-    load_template = 'app/report_prehandle.html'
-    html_template = loader.get_template(load_template)
+    html_template = loader.get_template('app/report_prehandle.html')
     return HttpResponse(html_template.render(context, request))
 
 

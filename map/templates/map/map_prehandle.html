@@ -1,0 +1,21 @@
+{% extends "layouts/base.html" %}
+{% block title %} map {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <h3>請選擇路線：</h3>
+    <h4><form action="{% url 'map_rid' %}" method="get">
+        {% for f in para_form %}
+            <h4> {{f.label}}: {{f}} </h4>
+        {% endfor %}
+        <br><br>
+        <input type="submit" class="btn btn-primary btn-round" value="Create">
+    </form></h4>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% endblock javascripts %}

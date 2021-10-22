@@ -98,6 +98,13 @@ class StationCenter(CenterDB):
         sql_cmd = sql_cmd.replace(']', '')
         return self._get_table_data("routestop", sql_cmd)
 
+    def get_route_stop_location(self, rid: int):
+        sql_cmd = f"""SELECT rs.id as rsid, s.name, rs.clon, rs.clat FROM bus.routestop as rs 
+                    left join bus.stop as s on s.id = rs.sid 
+                    where rs.rid = {rid} 
+                    order by seqno"""
+        return self._get_table_data("routestop", sql_cmd)
+
     def get_first_stop_name(self, rid: int):
         sql_cmd = f"""select name from (SELECT sid FROM bus.routestop where rid = {rid} and valid = 1 and seqno = 1 
                   order by seqno) as t 
@@ -112,6 +119,8 @@ class StationCenter(CenterDB):
             return first_sid
         else:
             raise ValueError("can not find first stop")
+
+    # for report
 
     def get_schedule_logs_by_rid(self, rid: int, start_time: datetime, end_time: datetime = None):
         if end_time is None:
