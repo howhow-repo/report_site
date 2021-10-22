@@ -11,6 +11,7 @@
     <p>
         <br>
         <h4><form action="{% url 'comparison_result' rtype=rtype %}" method="post" >
+            {% csrf_token %}
             <div class="row">
                 <div class="col-md-12">
                     <h2>Chart common</h2><br>

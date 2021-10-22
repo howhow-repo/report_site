@@ -105,6 +105,11 @@ class StationCenter(CenterDB):
                     order by seqno"""
         return self._get_table_data("routestop", sql_cmd)
 
+    def get_route_geostr(self, rid):
+        sql_cmd = f""" SELECT gopoints FROM bus.route where id= {rid}; """
+        geostr = self._get_single_data(sql_cmd)
+        return geostr
+
     def get_first_stop_name(self, rid: int):
         sql_cmd = f"""select name from (SELECT sid FROM bus.routestop where rid = {rid} and valid = 1 and seqno = 1 
                   order by seqno) as t 

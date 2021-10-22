@@ -54,6 +54,7 @@
                                 <tr>
                                     <td>
                                         <form action="{% url 'stoptostop_staytime_hourly' rsid=r.rsid %}" method="post">
+                                            {% csrf_token %}
                                             <input type="hidden" value={{r.name}} name="rsid_name">
                                             <input type="hidden" value={{rid}} name="rid">
                                             <input type="hidden" value='{{rid_name}}' name="rid_name">

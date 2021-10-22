@@ -11,6 +11,7 @@
     <p>
         <br>
         <h4><form action="{% url 'bus_rawdata_view' %}" method="post">
+            {% csrf_token %}
 
             {% for f in para_form%}
                 {{f.label}}: {{f}}<br><br>

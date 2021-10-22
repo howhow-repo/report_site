@@ -11,6 +11,7 @@
     <p>
         <br>
         <form action="{% url 'data_traffic_view' %}" method="post">
+            {% csrf_token %}
             {% for f in para_form %}
                 <h4>{{f.label}}: {{f}}</h4>
             {% endfor %}

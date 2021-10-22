@@ -8,6 +8,7 @@
     <h1>{{title}}</h1>
     <h3>請選擇路線：</h3>
     <h4><form action="{% url 'map_rid' %}" method="get">
+        {% csrf_token %}
         {% for f in para_form %}
             <h4> {{f.label}}: {{f}} </h4>
         {% endfor %}
