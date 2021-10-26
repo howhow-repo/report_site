@@ -53,20 +53,16 @@ def map_rid(request):
     line_geostr = decode_googlegeostr(station.get_route_geostr(rid))
     station.disconnect()
 
-    geojson_line = {
-                       "type": "LineString",
-                       "coordinates": line_geostr,
-                   },
+    geojson_line = {"type": "LineString", "coordinates": line_geostr}
 
     para_received = format_stoptostop_paras(p)
     sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
     sr.connect()
     rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
-    rp.fillna("", inplace=True)
     sr.disconnect()
 
-    merged_df = (pd.merge(stop_locations_df, rp))
-    merged_df.fillna("", inplace=True)
+    merged_df = (pd.merge(stop_locations_df, rp, how="outer"))
+    merged_df.fillna(0, inplace=True)
     geojson_circle = merged_df.to_dict('records')
 
     context['geojson_line'] = str(json.dumps(geojson_line))

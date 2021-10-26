@@ -12,7 +12,7 @@
 
 {% block content %}
     <h1>{{title}}</h1>
-    <h3>{{ route_ch_name }}</h3>
+    <h3>{{ route_ch_name }}</h3><br>
     {% leaflet_map "map" callback="window.map_init"%}
 {% endblock content %}
 
@@ -25,28 +25,23 @@
         function map_init(map, options) {
             L.geoJson(line).addTo(map);
 
-            {% for c in geojson_circle %}
-            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_arrival_time_spent }}).addTo(map);
-            {% endfor %}
+            setTimeout(function(){
+                 map.setView([{{avg_lat}}, {{avg_lon}}],12);
+            }, 1000);
 
             {% for c in geojson_circle %}
             var p_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], 3).addTo(map);
             p_{{ forloop.counter }}.setStyle({ color: 'black',fillColor: 'black', fillOpacity: 1})
             {% endfor %}
 
-            setTimeout(function(){
-                 map.setView([{{avg_lat}}, {{avg_lon}}],12);
-            }, 1000);
+            {% for c in geojson_circle %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_arrival_time_spent }}).addTo(map);
+            {% endfor %}
 
         }
 
     </script>
-<!--    <script>-->
-<!--        function onMapClick(e) {-->
-<!--            alert("經緯度座標：" + e.latlng);-->
-<!--        }-->
-<!--        map.on('click', onMapClick);-->
-<!--    </script>-->
+
     <script>
         $(document).ready(function() {
             // Javascript method's body can be found in assets/js/demos.js
