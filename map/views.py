@@ -70,6 +70,12 @@ def map_rid(request):
     context['route_ch_name'] = route_ch_name
     context['avg_lon'] = sum([c['lon'] for c in geojson_circle]) / len(geojson_circle)
     context['avg_lat'] = sum([c['lat'] for c in geojson_circle]) / len(geojson_circle)
+    context['rid'] = p.cleaned_data['rid']
+    context['date_begin'] = p.cleaned_data['date_begin']
+    context['date_end'] = p.cleaned_data['date_end']
+    context['hour_begin'] = p.cleaned_data['hour_begin']
+    context['hour_end'] = p.cleaned_data['hour_end']
+    context['weekdayType_cn'] = [weekdayType_cn[w] for w in p.cleaned_data['weekdayType']]
 
     html_template = loader.get_template('map/map_rid.html')
     return HttpResponse(html_template.render(context, request))

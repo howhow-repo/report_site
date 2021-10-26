@@ -13,7 +13,70 @@
 {% block content %}
     <h1>{{title}}</h1>
     <h3>{{ route_ch_name }}</h3><br>
+    <h4>
+        <b style="color:red">紅色</b>為站內停留時間>60秒 <br>
+        <b style="color:orange">橘色</b>為站內停留時間30~60秒 <br>
+        <b style="color:green">綠色</b>為站內停留時間<30秒 <br>
+        (圓圈大小與站內停留時間成正比)
+        (起站與末站<b>不會有</b>數據)
+    </h4>
     {% leaflet_map "map" callback="window.map_init"%}
+    <br><br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-warning">
+                    <h4 class="card-title" style= "font-weight:bold">路線-站到站 紀錄統計</h4>
+                    <p class="card-category" style= "font-weight:bold">
+                        路線：{{route_ch_name}}, id:{{rid}}</br>
+                        統計時間：{{date_begin|date:'Y/m/d'}} ~ {{date_end|date:'Y/m/d'}}</br>
+                        統計時段：{{hour_begin|stringformat:"02d"}}:00 ~ {{hour_end|stringformat:"02d"}}:00</br>
+                        日種類:{{weekdayType_cn}}
+                    </p>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-warning">
+                            <th></th>
+                            <th>站名</th>
+                            <th>最大停留時間(s)</th>
+                            <th>最小停留時間(s)</th>
+                            <th>平均停留時間(s)</th>
+                            <th>停留時間標準差(s)</th>
+                            <th>變異係數</th>
+                            <th>樣本數量</th>
+                        </thead>
+                        <tbody>
+                            {% for r in geojson_circle%}
+                                <tr>
+                                    <td>
+                                        <form action="{% url 'stoptostop_staytime_hourly' rsid=r.rsid %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" value={{r.name}} name="rsid_name">
+                                            <input type="hidden" value={{rid}} name="rid">
+                                            <input type="hidden" value='{{rid_name}}' name="rid_name">
+                                            <input type="hidden" value='{{weekdayType}}' name="weekdayType">
+                                            <input type="hidden" value={{date_begin|date:'Y-m-d'}} name="date_begin">
+                                            <input type="hidden" value={{date_end|date:'Y-m-d'}} name="date_end">
+                                            <input type="submit" class="btn btn-primary btn-link" value="●">
+                                        </form>
+                                    </td>
+                                    <td>{{r.name }}</td>
+                                    <td>{{r.max_stay_time|floatformat:-2}}</td>
+                                    <td>{{r.min_stay_time|floatformat:-2}}</td>
+                                    <td>{{r.avg_stay_time|floatformat:-2}}</td>
+                                    <td>{{r.std_stay_time|floatformat:-2}}</td>
+                                    <td>{{r.var_stay_time|floatformat:-2}}</td>
+                                    <td>{{r.sample_count|floatformat:0}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
@@ -30,12 +93,21 @@
             }, 1000);
 
             {% for c in geojson_circle %}
-            var p_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], 3).addTo(map);
-            p_{{ forloop.counter }}.setStyle({ color: 'black',fillColor: 'black', fillOpacity: 1})
+                var p_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], 3).addTo(map);
+                p_{{ forloop.counter }}.setStyle({ color: 'black',fillColor: 'black', fillOpacity: 1})
             {% endfor %}
 
             {% for c in geojson_circle %}
-            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_arrival_time_spent }}).addTo(map);
+                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(map);
+
+                {% if c.avg_stay_time > 60 %}
+                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
+                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+                {% else %}
+                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
+                {% endif %}
+
             {% endfor %}
 
         }
