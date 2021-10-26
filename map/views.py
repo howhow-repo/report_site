@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import json
 import os
+import pandas as pd
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -10,13 +11,23 @@ from django.template import loader
 # Create your views here.
 from django.urls import reverse
 
-from app.reportsLib import StationCenter
+from app.reportsLib import StationCenter, StopToStopResult
 from map.form import ParaInput
 
 CONTEXT = {
     "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
     'segment': 'map',
     'title': '地圖(測試)',
+}
+
+weekdayType_cn = {
+    0: "平日",
+    1: "週末",
+    2: "國定假日",
+    3: "彈性放假",
+    4: "補假",
+    5: "補班",
+    6: "特殊假日",
 }
 
 
@@ -29,12 +40,16 @@ def map_prehandle(request):
 
 def map_rid(request):
     context = CONTEXT.copy()
-    if 'rid' not in dict(request.GET.items()):
+    p = ParaInput(request.POST)
+    if not p.is_valid():
         return redirect(reverse('map_prehandle'))
-    rid = int(dict(request.GET.items())['rid'])
+
+    rid = p.cleaned_data["rid"]
+
     station = StationCenter(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
     station.connect()
-    stop_locations = [[s['clon'], s['clat']] for s in station.get_route_stop_location(rid=rid).to_dict('records')]
+    stop_locations_df = station.get_route_stop_location(rid=rid)
+    route_ch_name = station.get_route_ch_name(rid=rid)
     line_geostr = decode_googlegeostr(station.get_route_geostr(rid))
     station.disconnect()
 
@@ -43,14 +58,38 @@ def map_rid(request):
                        "coordinates": line_geostr,
                    },
 
-    geojson_circle = stop_locations
+    para_received = format_stoptostop_paras(p)
+    sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+    sr.connect()
+    rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
+    rp.fillna("", inplace=True)
+    sr.disconnect()
 
-    # context['geojson_points'] = str(json.dumps(geojson_points))
+    merged_df = (pd.merge(stop_locations_df, rp))
+    merged_df.fillna("", inplace=True)
+    geojson_circle = merged_df.to_dict('records')
+
     context['geojson_line'] = str(json.dumps(geojson_line))
     context['geojson_circle'] = geojson_circle
+    context['route_ch_name'] = route_ch_name
+    context['avg_lon'] = sum([c['lon'] for c in geojson_circle]) / len(geojson_circle)
+    context['avg_lat'] = sum([c['lat'] for c in geojson_circle]) / len(geojson_circle)
 
     html_template = loader.get_template('map/map_rid.html')
     return HttpResponse(html_template.render(context, request))
+
+
+def format_stoptostop_paras(p: ParaInput):
+    para_received = {
+        "rid": p.cleaned_data["rid"],
+        "weekdayType_cn": [weekdayType_cn[w] for w in p.cleaned_data["weekdayType"]],
+        "weekdayType": p.cleaned_data["weekdayType"],
+        "date_begin": p.cleaned_data["date_begin"],
+        "date_end": p.cleaned_data["date_end"],
+        "hour_begin": p.cleaned_data["hour_begin"],
+        "hour_end": p.cleaned_data["hour_end"]
+    }
+    return para_received
 
 
 def decode_googlegeostr(point_str):

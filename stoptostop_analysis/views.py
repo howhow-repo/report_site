@@ -171,7 +171,6 @@ def stoptostop_staytime_hourly(request, rsid):
         return HttpResponseNotFound(html_template.render(context, request))
 
 
-
 weekdayType_cn = {
     0: "平日",
     1: "週末",

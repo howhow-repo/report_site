@@ -9,7 +9,7 @@ from .models import DailyDriveLogParsingStatus, ExceptionParsingBus
 
 # Register your models here.
 class DailyDriveLogParsingAdmin(admin.ModelAdmin):
-    list_display = ('date', 'buses_count', 'time_spent', 'exception_bus_count', 'error_code')
+    list_display = ('date', 'buses_count', 'runs_count', 'time_spent', 'exception_bus_count', 'error_code')
 
 
 class ExceptionParsingBusAdmin(admin.ModelAdmin):

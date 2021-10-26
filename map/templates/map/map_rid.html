@@ -7,12 +7,12 @@
     {% load leaflet_tags %}
     {% leaflet_css %}
     {% leaflet_js %}
-
+    {% include "map/map.css" %}
 {% endblock stylesheets %}
 
 {% block content %}
-
     <h1>{{title}}</h1>
+    <h3>{{ route_ch_name }}</h3>
     {% leaflet_map "map" callback="window.map_init"%}
 {% endblock content %}
 
@@ -26,30 +26,25 @@
             L.geoJson(line).addTo(map);
 
             {% for c in geojson_circle %}
-            L.circle([{{c.1}}, {{c.0}}], 200).addTo(map);
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_arrival_time_spent }}).addTo(map);
             {% endfor %}
 
-<!--            var cc = L.circle([22.77468109, 120.49427032], 80000).addTo(map);-->
-<!--            cc.setStyle({ color: 'red'})-->
+            {% for c in geojson_circle %}
+            var p_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], 3).addTo(map);
+            p_{{ forloop.counter }}.setStyle({ color: 'black',fillColor: 'black', fillOpacity: 1})
+            {% endfor %}
+
+            setTimeout(function(){
+                 map.setView([{{avg_lat}}, {{avg_lon}}],12);
+            }, 1000);
+
         }
 
     </script>
-    <style>
-
-        .leaflet-container {  /* all maps */
-            height: 800px;
-        }
-
-        #specialbigmap {
-            height: 800px;
-        }
-
-    </style>
 <!--    <script>-->
 <!--        function onMapClick(e) {-->
 <!--            alert("經緯度座標：" + e.latlng);-->
 <!--        }-->
-
 <!--        map.on('click', onMapClick);-->
 <!--    </script>-->
     <script>

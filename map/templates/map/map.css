@@ -1,0 +1,8 @@
+<style>
+        .leaflet-container {  /* all maps */
+            height: 800px;
+        }
+        #specialbigmap {
+            height: 800px;
+        }
+</style>

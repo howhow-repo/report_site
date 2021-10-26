@@ -7,13 +7,13 @@
 {% block content %}
     <h1>{{title}}</h1>
     <h3>請選擇路線：</h3>
-    <h4><form action="{% url 'map_rid' %}" method="get">
+    <h4><form action="{% url 'map_rid' %}" method="post">
         {% csrf_token %}
         {% for f in para_form %}
             <h4> {{f.label}}: {{f}} </h4>
         {% endfor %}
         <br><br>
-        <input type="submit" class="btn btn-primary btn-round" value="Create">
+        <input type="submit" class="btn btn-primary btn-round" value="站內停留時間">
     </form></h4>
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
