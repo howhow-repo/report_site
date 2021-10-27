@@ -56,19 +56,6 @@ class ParaInput(forms.Form):
     date_end = forms.DateField(required=False, widget=DateInput, initial=lambda: (datetime.today() - timedelta(days=1)))
     date_end.label = "統計截止日"
 
-    hour_begin = forms.IntegerField(
-        required=False,
-        widget=forms.Select(choices=hour_field)
-    )
-    hour_begin.label = "統計起始時段(小時)"
-
-    hour_end = forms.IntegerField(
-        required=False,
-        widget=forms.Select(choices=hour_field),
-        initial=24
-    )
-    hour_end.label = "統計結束時段(小時)"
-
     weekdayType = forms.TypedMultipleChoiceField(
         required=False,
         coerce=int,

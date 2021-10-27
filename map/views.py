@@ -30,6 +30,34 @@ weekdayType_cn = {
     6: "特殊假日",
 }
 
+TIMERANGE = {
+    'morning': {
+        'b': 5,
+        'e': 9,
+    },
+    'noon': {
+        'b': 9,
+        'e': 12,
+    },
+    'afternoon': {
+        'b': 12,
+        'e': 16,
+    },
+    'evening': {
+        'b': 16,
+        'e': 18,
+    },
+    'night': {
+        'b': 18,
+        'e': 20,
+    },
+    'latenight': {
+        'b': 20,
+        'e': 23,
+    },
+
+}
+
 
 def map_prehandle(request):
     context = CONTEXT.copy()
@@ -58,24 +86,50 @@ def map_rid(request):
     para_received = format_stoptostop_paras(p)
     sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
     sr.connect()
-    rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
+    rp_morning = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                        'hour_begin': TIMERANGE['morning']['b'],
+                                                        'hour_end': TIMERANGE['morning']['e']}))
+    rp_noon = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                     'hour_begin': TIMERANGE['noon']['b'],
+                                                     'hour_end': TIMERANGE['noon']['e']}))
+    rp_afternoon = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                          'hour_begin': TIMERANGE['afternoon']['b'],
+                                                          'hour_end': TIMERANGE['afternoon']['e']}))
+    rp_evening = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                        'hour_begin': TIMERANGE['evening']['b'],
+                                                        'hour_end': TIMERANGE['evening']['e']}))
+    rp_night = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                      'hour_begin': TIMERANGE['night']['b'],
+                                                      'hour_end': TIMERANGE['night']['e']}))
+    rp_latenight = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                          'hour_begin': TIMERANGE['latenight']['b'],
+                                                          'hour_end': TIMERANGE['latenight']['e']}))
     sr.disconnect()
 
-    merged_df = (pd.merge(stop_locations_df, rp, how="outer"))
-    merged_df.fillna(0, inplace=True)
-    geojson_circle = merged_df.to_dict('records')
+    geojson_morning = merge_df_to_dict(stop_locations_df, rp_morning)
+    geojson_noon = merge_df_to_dict(stop_locations_df, rp_noon)
+    geojson_afternoon = merge_df_to_dict(stop_locations_df, rp_afternoon)
+    geojson_evening = merge_df_to_dict(stop_locations_df, rp_evening)
+    geojson_night = merge_df_to_dict(stop_locations_df, rp_night)
+    geojson_latenight = merge_df_to_dict(stop_locations_df, rp_latenight)
 
     context['geojson_line'] = str(json.dumps(geojson_line))
-    context['geojson_circle'] = geojson_circle
+    context['stop_location'] = stop_locations_df.to_dict('records')
+    context['geojson_morning'] = geojson_morning
+    context['geojson_noon'] = geojson_noon
+    context['geojson_afternoon'] = geojson_afternoon
+    context['geojson_evening'] = geojson_evening
+    context['geojson_night'] = geojson_night
+    context['geojson_latenight'] = geojson_latenight
     context['route_ch_name'] = route_ch_name
-    context['avg_lon'] = sum([c['lon'] for c in geojson_circle]) / len(geojson_circle)
-    context['avg_lat'] = sum([c['lat'] for c in geojson_circle]) / len(geojson_circle)
+    context['avg_lon'] = sum(stop_locations_df['lon'].tolist()) / len(stop_locations_df['lon'].tolist())
+    context['avg_lat'] = sum(stop_locations_df['lat'].tolist()) / len(stop_locations_df['lat'].tolist())
     context['rid'] = p.cleaned_data['rid']
     context['date_begin'] = p.cleaned_data['date_begin']
     context['date_end'] = p.cleaned_data['date_end']
-    context['hour_begin'] = p.cleaned_data['hour_begin']
-    context['hour_end'] = p.cleaned_data['hour_end']
+    context['weekdayType'] = p.cleaned_data['weekdayType']
     context['weekdayType_cn'] = [weekdayType_cn[w] for w in p.cleaned_data['weekdayType']]
+    context['TIMERANGE'] = TIMERANGE
 
     html_template = loader.get_template('map/map_rid.html')
     return HttpResponse(html_template.render(context, request))
@@ -88,10 +142,14 @@ def format_stoptostop_paras(p: ParaInput):
         "weekdayType": p.cleaned_data["weekdayType"],
         "date_begin": p.cleaned_data["date_begin"],
         "date_end": p.cleaned_data["date_end"],
-        "hour_begin": p.cleaned_data["hour_begin"],
-        "hour_end": p.cleaned_data["hour_end"]
     }
     return para_received
+
+
+def merge_df_to_dict(df_a, df_b):
+    merged_df = (pd.merge(df_a, df_b, how="outer"))
+    merged_df.fillna(0, inplace=True)
+    return merged_df.to_dict('records')
 
 
 def decode_googlegeostr(point_str):
