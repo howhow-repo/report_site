@@ -101,7 +101,7 @@ class StationCenter(CenterDB):
     def get_route_stop_location(self, rid: int):
         sql_cmd = f"""SELECT rs.id as rsid, s.name, rs.clon as lon, rs.clat as lat FROM bus.routestop as rs 
                     left join bus.stop as s on s.id = rs.sid 
-                    where rs.rid = {rid} 
+                    where rs.rid = {rid} and valid = 1 
                     order by seqno"""
         return self._get_table_data("routestop", sql_cmd)
 
