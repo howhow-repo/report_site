@@ -1,14 +1,15 @@
 # -*- encoding: utf-8 -*-
+from queue import Queue
 import json
 import os
+import threading
+
 import pandas as pd
 
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from decouple import config
 from django.template import loader
-
-# Create your views here.
 from django.urls import reverse
 
 from app.reportsLib import StationCenter, StopToStopResult
@@ -55,7 +56,6 @@ TIMERANGE = {
         'b': 20,
         'e': 23,
     },
-
 }
 
 
@@ -84,34 +84,49 @@ def map_rid(request):
     geojson_line = {"type": "LineString", "coordinates": line_geostr}
 
     para_received = format_stoptostop_paras(p)
-    sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
-    sr.connect()
-    rp_morning = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
-                                                        'hour_begin': TIMERANGE['morning']['b'],
-                                                        'hour_end': TIMERANGE['morning']['e']}))
-    rp_noon = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
-                                                     'hour_begin': TIMERANGE['noon']['b'],
-                                                     'hour_end': TIMERANGE['noon']['e']}))
-    rp_afternoon = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
-                                                          'hour_begin': TIMERANGE['afternoon']['b'],
-                                                          'hour_end': TIMERANGE['afternoon']['e']}))
-    rp_evening = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
-                                                        'hour_begin': TIMERANGE['evening']['b'],
-                                                        'hour_end': TIMERANGE['evening']['e']}))
-    rp_night = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
-                                                      'hour_begin': TIMERANGE['night']['b'],
-                                                      'hour_end': TIMERANGE['night']['e']}))
-    rp_latenight = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
-                                                          'hour_begin': TIMERANGE['latenight']['b'],
-                                                          'hour_end': TIMERANGE['latenight']['e']}))
-    sr.disconnect()
 
-    geojson_morning = merge_df_to_dict(stop_locations_df, rp_morning)
-    geojson_noon = merge_df_to_dict(stop_locations_df, rp_noon)
-    geojson_afternoon = merge_df_to_dict(stop_locations_df, rp_afternoon)
-    geojson_evening = merge_df_to_dict(stop_locations_df, rp_evening)
-    geojson_night = merge_df_to_dict(stop_locations_df, rp_night)
-    geojson_latenight = merge_df_to_dict(stop_locations_df, rp_latenight)
+    threads = []
+    que = Queue()
+
+    def stop_staytime_job(report_name, hour_begin, hour_end):
+        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr.connect()
+        rp = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
+                                                    'hour_begin': hour_begin,
+                                                    'hour_end': hour_end}))
+        sr.disconnect()
+        return {report_name: rp}
+
+    threads.append(threading.Thread(target=lambda q, arg1: q.put(
+        stop_staytime_job('rp_morning', TIMERANGE['morning']['b'], TIMERANGE['morning']['e'])), args=(que, ())))
+    threads.append(threading.Thread(target=lambda q, arg1: q.put(
+        stop_staytime_job('rp_noon', TIMERANGE['noon']['b'], TIMERANGE['noon']['e'])), args=(que, ())))
+    threads.append(threading.Thread(target=lambda q, arg1: q.put(
+        stop_staytime_job('rp_afternoon', TIMERANGE['afternoon']['b'], TIMERANGE['afternoon']['e'])), args=(que, ())))
+    threads.append(threading.Thread(target=lambda q, arg1: q.put(
+        stop_staytime_job('rp_evening', TIMERANGE['evening']['b'], TIMERANGE['evening']['e'])), args=(que, ())))
+    threads.append(threading.Thread(target=lambda q, arg1: q.put(
+        stop_staytime_job('rp_night', TIMERANGE['night']['b'], TIMERANGE['night']['e'])), args=(que, ())))
+    threads.append(threading.Thread(target=lambda q, arg1: q.put(
+        stop_staytime_job('rp_latenight', TIMERANGE['latenight']['b'], TIMERANGE['latenight']['e'])), args=(que, ())))
+
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    reports = {}
+    while not que.empty():
+        result = que.get()
+        for key, value in result.items():
+            reports[key] = value
+
+    geojson_morning = merge_df_to_dict(stop_locations_df, reports['rp_morning'])
+    geojson_noon = merge_df_to_dict(stop_locations_df, reports['rp_noon'])
+    geojson_afternoon = merge_df_to_dict(stop_locations_df, reports['rp_afternoon'])
+    geojson_evening = merge_df_to_dict(stop_locations_df, reports['rp_evening'])
+    geojson_night = merge_df_to_dict(stop_locations_df, reports['rp_night'])
+    geojson_latenight = merge_df_to_dict(stop_locations_df, reports['rp_latenight'])
 
     context['geojson_line'] = str(json.dumps(geojson_line))
     context['stop_location'] = stop_locations_df.to_dict('records')
