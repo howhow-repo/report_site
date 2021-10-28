@@ -121,25 +121,18 @@ def map_rid(request):
         for key, value in result.items():
             reports[key] = value
 
-    geojson_morning = merge_df_to_dict(stop_locations_df, reports['rp_morning'])
-    geojson_noon = merge_df_to_dict(stop_locations_df, reports['rp_noon'])
-    geojson_afternoon = merge_df_to_dict(stop_locations_df, reports['rp_afternoon'])
-    geojson_evening = merge_df_to_dict(stop_locations_df, reports['rp_evening'])
-    geojson_night = merge_df_to_dict(stop_locations_df, reports['rp_night'])
-    geojson_latenight = merge_df_to_dict(stop_locations_df, reports['rp_latenight'])
-
     context['geojson_line'] = str(json.dumps(geojson_line))
     context['stop_location'] = stop_locations_df.to_dict('records')
-    context['geojson_morning'] = geojson_morning
-    context['geojson_noon'] = geojson_noon
-    context['geojson_afternoon'] = geojson_afternoon
-    context['geojson_evening'] = geojson_evening
-    context['geojson_night'] = geojson_night
-    context['geojson_latenight'] = geojson_latenight
+    context['geojson_morning'] = merge_df_to_dict(stop_locations_df, reports['rp_morning'])
+    context['geojson_noon'] = merge_df_to_dict(stop_locations_df, reports['rp_noon'])
+    context['geojson_afternoon'] = merge_df_to_dict(stop_locations_df, reports['rp_afternoon'])
+    context['geojson_evening'] = merge_df_to_dict(stop_locations_df, reports['rp_evening'])
+    context['geojson_night'] = merge_df_to_dict(stop_locations_df, reports['rp_night'])
+    context['geojson_latenight'] = merge_df_to_dict(stop_locations_df, reports['rp_latenight'])
     context['route_ch_name'] = route_ch_name
     context['avg_lon'] = sum(stop_locations_df['lon'].tolist()) / len(stop_locations_df['lon'].tolist())
     context['avg_lat'] = sum(stop_locations_df['lat'].tolist()) / len(stop_locations_df['lat'].tolist())
-    context['rid'] = p.cleaned_data['rid']
+    context['rid'] = rid
     context['date_begin'] = p.cleaned_data['date_begin']
     context['date_end'] = p.cleaned_data['date_end']
     context['weekdayType'] = p.cleaned_data['weekdayType']

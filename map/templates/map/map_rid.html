@@ -20,6 +20,14 @@
         (圓圈大小與站內停留時間成正比)
         (起站與末站<b>不會有</b>數據)
     </h4><br>
+    <div class="tab">
+        <button class="tablinks" onclick="show_morning()">Morning</button>
+        <button class="tablinks" onclick="show_noon()">Noon</button>
+        <button class="tablinks" onclick="show_afternoon()">Afternoon</button>
+        <button class="tablinks" onclick="show_evening()">Evening</button>
+        <button class="tablinks" onclick="show_night()">Night</button>
+        <button class="tablinks" onclick="show_latenight()">Late night</button>
+    </div>
     <h2 id="maptime"> </h2>
     {% leaflet_map "map" callback="window.map_init"%}
     <br><br>
@@ -337,9 +345,93 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
     </script>
+    <script>
+        var circle_morning = L.featureGroup();
+        var circle_noon = L.featureGroup();
+        var circle_afternoon = L.featureGroup();
+        var circle_evening = L.featureGroup();
+        var circle_night = L.featureGroup();
+        var circle_latenight = L.featureGroup();
+
+        {% for c in geojson_morning %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_morning);
+            {% if c.avg_stay_time > 60 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'red'})
+            {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+            {% else %}
+                c_{{ forloop.counter }}.setStyle({ color: 'green'})
+            {% endif %}
+        {% endfor %}
+
+        {% for c in geojson_noon %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_noon);
+            {% if c.avg_stay_time > 60 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'red'})
+            {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+            {% else %}
+                c_{{ forloop.counter }}.setStyle({ color: 'green'})
+            {% endif %}
+        {% endfor %}
+
+        {% for c in geojson_afternoon %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_afternoon);
+            {% if c.avg_stay_time > 60 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'red'})
+            {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+            {% else %}
+                c_{{ forloop.counter }}.setStyle({ color: 'green'})
+            {% endif %}
+        {% endfor %}
+
+        {% for c in geojson_evening %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_evening);
+            {% if c.avg_stay_time > 60 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'red'})
+            {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+            {% else %}
+                c_{{ forloop.counter }}.setStyle({ color: 'green'})
+            {% endif %}
+        {% endfor %}
+
+        {% for c in geojson_night %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_night);
+            {% if c.avg_stay_time > 60 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'red'})
+            {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+            {% else %}
+                c_{{ forloop.counter }}.setStyle({ color: 'green'})
+            {% endif %}
+        {% endfor %}
+
+        {% for c in geojson_latenight %}
+            var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_latenight);
+            {% if c.avg_stay_time > 60 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'red'})
+            {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
+                c_{{ forloop.counter }}.setStyle({ color: 'orange'})
+            {% else %}
+                c_{{ forloop.counter }}.setStyle({ color: 'green'})
+            {% endif %}
+        {% endfor %}
+
+    </script>
     <script type="text/javascript">
         var line = {{geojson_line|safe }};
+
         function map_init(map, options) {
+            function clean_all_circle(){
+                map.removeLayer(circle_morning)
+                map.removeLayer(circle_noon)
+                map.removeLayer(circle_afternoon)
+                map.removeLayer(circle_evening)
+                map.removeLayer(circle_night)
+                map.removeLayer(circle_latenight)
+            }
             L.geoJson(line).addTo(map);
 
             setTimeout(function(){
@@ -353,128 +445,82 @@
                 p_{{ forloop.counter }}.setStyle({ color: 'black',fillColor: 'black', fillOpacity: 1})
             {% endfor %}
             map.addLayer(stopspot);
-
-            var circle_morning = L.featureGroup();
-            var circle_noon = L.featureGroup();
-            var circle_afternoon = L.featureGroup();
-            var circle_evening = L.featureGroup();
-            var circle_night = L.featureGroup();
-            var circle_latenight = L.featureGroup();
-
-            {% for c in geojson_morning %}
-                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_morning);
-                {% if c.avg_stay_time > 60 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
-                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
-                {% else %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
-                {% endif %}
-            {% endfor %}
-
-            {% for c in geojson_noon %}
-                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_noon);
-                {% if c.avg_stay_time > 60 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
-                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
-                {% else %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
-                {% endif %}
-            {% endfor %}
-
-            {% for c in geojson_afternoon %}
-                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_afternoon);
-                {% if c.avg_stay_time > 60 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
-                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
-                {% else %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
-                {% endif %}
-            {% endfor %}
-
-            {% for c in geojson_evening %}
-                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_evening);
-                {% if c.avg_stay_time > 60 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
-                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
-                {% else %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
-                {% endif %}
-            {% endfor %}
-
-            {% for c in geojson_night %}
-                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_night);
-                {% if c.avg_stay_time > 60 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
-                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
-                {% else %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
-                {% endif %}
-            {% endfor %}
-
-            {% for c in geojson_latenight %}
-                var c_{{ forloop.counter }} = L.circle([{{c.lat}}, {{c.lon}}], {{ c.avg_stay_time }} *10).addTo(circle_latenight);
-                {% if c.avg_stay_time > 60 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'red'})
-                {% elif 60 > c.avg_stay_time and c.avg_stay_time > 30 %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'orange'})
-                {% else %}
-                    c_{{ forloop.counter }}.setStyle({ color: 'green'})
-                {% endif %}
-            {% endfor %}
-
-            <!----------------------->
-
             map.addLayer(circle_morning);
             document.getElementById("maptime").innerHTML = "morning {{TIMERANGE.morning.b}}:00 ~ {{TIMERANGE.morning.e}}:00";
 
             async function map_animation(time_step){
-                map.removeLayer(circle_morning)
-                map.addLayer(circle_noon);
-                document.getElementById("maptime").innerHTML = "noon {{TIMERANGE.noon.b}}:00 ~ {{TIMERANGE.noon.e}}:00";
+                show_morning()
                 await sleep(time_step)
 
-                map.removeLayer(circle_noon)
-                map.addLayer(circle_afternoon);
-                document.getElementById("maptime").innerHTML = "afternoon {{TIMERANGE.afternoon.b}}:00 ~ {{TIMERANGE.afternoon.e}}:00";
+                show_noon()
                 await sleep(time_step)
 
-                map.removeLayer(circle_afternoon)
-                map.addLayer(circle_evening);
-                document.getElementById("maptime").innerHTML = "evening {{TIMERANGE.evening.b}}:00 ~ {{TIMERANGE.evening.e}}:00";
+                show_afternoon()
                 await sleep(time_step)
 
-                map.removeLayer(circle_evening)
-                map.addLayer(circle_night);
-                document.getElementById("maptime").innerHTML = "night {{TIMERANGE.night.b}}:00 ~ {{TIMERANGE.night.e}}:00";
+                show_evening()
                 await sleep(time_step)
 
-                map.removeLayer(circle_night)
-                map.addLayer(circle_latenight);
-                document.getElementById("maptime").innerHTML = "late night {{TIMERANGE.latenight.b}}:00 ~ {{TIMERANGE.latenight.e}}:00";
+
+                show_night()
                 await sleep(time_step)
 
-                map.removeLayer(circle_latenight)
-                map.addLayer(circle_morning);
-                document.getElementById("maptime").innerHTML = "morning {{TIMERANGE.morning.b}}:00 ~ {{TIMERANGE.morning.e}}:00";
+                show_latenight()
                 await sleep(time_step)
-            }
+            };
+
             var time_step = 800
-            async function loop() {
-                while(true){
-                    map_animation(time_step)
-                    await sleep(time_step*6)
-                }
-            }
-            loop()
+            map_animation(time_step)
         }
     </script>
     <script>
+        var map;
+        $(window).on('map:init', function(e) {
+          map = e.originalEvent.detail.map;
+        });
+        function clean_all_circle(){
+            map.removeLayer(circle_morning)
+            map.removeLayer(circle_noon)
+            map.removeLayer(circle_afternoon)
+            map.removeLayer(circle_evening)
+            map.removeLayer(circle_night)
+            map.removeLayer(circle_latenight)
+        }
 
+        function show_morning(){
+
+            clean_all_circle()
+            map.addLayer(circle_morning);
+            document.getElementById("maptime").innerHTML = "morning {{TIMERANGE.morning.b}}:00 ~ {{TIMERANGE.morning.e}}:00";
+        }
+        function show_noon(){
+            clean_all_circle()
+            map.addLayer(circle_noon);
+            document.getElementById("maptime").innerHTML = "noon {{TIMERANGE.noon.b}}:00 ~ {{TIMERANGE.noon.e}}:00";
+        }
+        function show_afternoon(){
+            clean_all_circle()
+            map.addLayer(circle_afternoon);
+            document.getElementById("maptime").innerHTML = "afternoon {{TIMERANGE.afternoon.b}}:00 ~ {{TIMERANGE.afternoon.e}}:00"
+        }
+
+        function show_evening(){
+            clean_all_circle()
+            map.addLayer(circle_evening);
+            document.getElementById("maptime").innerHTML = "evening {{TIMERANGE.evening.b}}:00 ~ {{TIMERANGE.evening.e}}:00";
+        }
+
+        function show_night(){
+            clean_all_circle()
+            map.addLayer(circle_night);
+            document.getElementById("maptime").innerHTML = "night {{TIMERANGE.night.b}}:00 ~ {{TIMERANGE.night.e}}:00";
+        }
+
+        function show_latenight(){
+            clean_all_circle()
+            map.addLayer(circle_latenight);
+            document.getElementById("maptime").innerHTML = "afternoon {{TIMERANGE.afternoon.b}}:00 ~ {{TIMERANGE.afternoon.e}}:00"
+        }
     </script>
 
     <script>
