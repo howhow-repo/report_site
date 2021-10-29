@@ -106,6 +106,7 @@ def authcheck(request, redirect_to="/oauth_login/"):
         if oauth_is_required(request=request):
             return HttpResponseRedirect(redirect_to)
         else:
-            user = authenticate(username="oAuth", password="AskeyoAuth")
+            user = authenticate(username=config('TEMP_USER', default='oAuth'),
+                                password=config('TEMP_PW', default='AskeyoAuth'))
             login(request, user)
             return redirect("/")

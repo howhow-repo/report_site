@@ -18,7 +18,7 @@ from map.form import ParaInput
 CONTEXT = {
     "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
     'segment': 'map',
-    'title': '地圖(測試)',
+    'title': '數據地理資訊',
 }
 
 weekdayType_cn = {
