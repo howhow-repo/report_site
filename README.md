@@ -242,6 +242,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     PRIMARY KEY (`id`),
     UNIQUE KEY `imsi` (`imsi`)
     ) ENGINE=InnoDB AUTO_INCREMENT=23020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ```
+    ```
     
   * **data_traffic**: 資料流量紀錄。
     * date/hour: 資料量時間，理論上應每小時都有一筆。<br>
