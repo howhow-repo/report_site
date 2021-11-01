@@ -37,19 +37,23 @@ work with **mySQL** & **MongoDB**
 * 統計的方式能夠選擇平日、假日等日種類的選項，也能夠單獨以表格呈現一個站在24小時的統計變化。
 * 為了直覺地顯示，這邊也提供了視覺畫的圖表供使用者參考。
 ![Demo](demo/stoptostop_demo.png)
+
 ### 4. 資料表比較：
 * 此功能用來比較在不同條件下產生的報表數據差異性。
 * 在此可以玄則比較的報表種類，填入相關參數後，系統將報表以左右對應的方式產生在畫面上。
 ![Demo](demo/compare_demo.png)
+
 ### ５. 數據地理資訊(地圖)：
 * 導入真實地圖，將公車的行駛統計數據，以圖像的方時直覺呈現在地圖上。
 * 導入時間段，可以動畫的方式觀看不同時間段在地圖上的數據變化。
 ![Demo](demo/map_demo.png)
+
 ### 6. 通知推播名單：
 * 可以用來管理接收推播者的名單
 * 整合LINE Notify，系統將自動推送每日計算結果到名單上的人。
 * 使用者需要自行申請LINE Notify token，並依照LINE官方說明使用。
 ![Demo](demo/notify_demo.png)
+
 ### 6. 原始資料調用：
 * 在做統計時，有時議會需要調閱原始資料。此頁面能夠調用公車車機回傳的原始資料，以及系統在做資料前處理後的結果。
 ![Demo](demo/rawdata_demo.png)
@@ -57,30 +61,33 @@ work with **mySQL** & **MongoDB**
 ### 7.資料流量統計：
 * 用圖表的方式呈現一天內，每個小時的資訊流量、事件回報量、公車在線處量、公車在路上的數量。
 ![Demo](demo/data_traffic_demo.png)
+
 ### 8. Swagger (API)：
 * 作為網站的應用，本站亦提供許多彈性的api，作為整合的應用。
 * 本站以Swagger UI來提供標準的說明與測試頁面，方便開發人員以清楚直覺的方式了解多項複雜的API應用格式。
 ![Demo](demo/swagger_demo.png)
+
 ### 9. Administration：
 * 系統管理者頁面，此頁面提供了系統背景工作的詳細現狀與紀錄，以及其他各項資料庫操作選項，使資訊管理者能夠直接對原始資料做修改。
 * 包括使用者的新增刪除、通知推播的新增刪除等；每日自動工作亦可在此調整。
 ![Demo](demo/admin_demo.png)
+
 ### Extra: 
 * 本系統在使用者認證上有以OAuth串接Askey計有認證系統。
 * 與一般Oauth部分相異，請參考下圖：
 * **記得在user中新增使用者"oAuth"**
 ![Demo](demo/oauth_diagram.jpg)
 
-
 ----
+
 ## Installation：
 ### what you will need:
-1. 欲建立此系統，需注意幾件事情：
-   1. 此系統需配合
-      1. Askey 既有公車系統的mysql & mongoDB 
-      2. 使Django framework自由調用的mysql 
-      3. 建立專門給此專案的.env file 內所需參數
-   2. .env file 內所需參數
+欲建立此系統，需注意幾件事情：
+1. 此系統需配合
+   1. Askey 既有公車系統的mysql & mongoDB 
+   2. 使Django framework自由調用的mysql 
+   3. 建立專門給此專案的.env file 內所需參數
+2. .env file 內所需參數: 
 ``` python
 PROJECT_TITLE = <專案名稱>  # 可自由取名，名稱講呈現在網頁的sidebar上
 
@@ -99,7 +106,7 @@ TEMP_PW = AskeyoAuth
 EBUS_MONGODB = {"host":"xxx.xxx.xxx.xxx","port":x,"user":"<username>","password":"<password>"} 
 # 填入雅敘用以記錄車輛drivelog的mongoDB相關資訊
 
-EBUS_SQLDB = {"host":"xxx.xxx.xxx.xxx,"port":x,"user":"<username>","password":"<password>"} 
+EBUS_SQLDB = {"host":"xxx.xxx.xxx.xxx","port":x,"user":"<username>","password":"<password>"} 
 # 填入雅敘用以記錄中心資訊的mysql相關資訊
 
 SITESQL_SCHEMA = <DB name>
@@ -160,3 +167,104 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
 * 此user請按照.env中的 TEMP_USER & TEMP_PW 去建立。
 
 ----
+
+## Database Schema：
+###### 簡介引用database種類＆欄位：
+
+### 1. MongoDB:
+###### 用以儲存車輛回傳行駛紀錄。<br>以下僅表述所使用到的欄位。
+* Database name: 目前固定為 **ebus** ，hardcode在libary內。
+* #### collectinos: 以日期命名之，如：drivelog_2021-10-31。
+* document key value:
+  * date: (Date)資料發送時間
+  * date_gpe: (Date) 資料內gps資訊時間
+  * lat: (Double)gps緯度
+  * lon: (Double)gps經度
+  * direct: (int32)gps方向
+  * speed: (Double)gps速度
+  * event: (String) 事件種類
+    * StopEnterLeave: 進出站事件
+    * LongStay: 原地停留超過5分鐘
+  * type: (int32)事件參數
+  * carno: (String)車牌號碼
+  * rid: (int32)路線ID
+  * vid: (int32)營運商ID
+  * cid: (int32)車量ID
+  * did: (int32)駕駛員ID
+  * station: (int32)路線站ID(rsid)
+  * sne: (String)中文站名
+  * dutystatus: (int32) 值勤狀態
+  * busstatus: (int32) 車輛狀態
+
+### 2. mySQL:
+###### 用以儲存中心的固定資料，如路線班次資訊等。<br>以下僅表述所使用到的欄位。
+* Database (Schema) name:  目前固定為 **bus** ，hardcode在libary內。
+* Tables:
+  * **calendar**: 紀錄台灣內政部公布的上班放假等行事曆，無特別紀錄則視為平日。
+    * date/name/isHoliday: 不贅述
+    * holidayCategory、holidayCategoryType: 互相對應：
+      * weekday: 0 -- 平日
+      * weekend: 1 -- 週末
+      * nationalHoliday: 2 -- 國定假日
+      * bridgeHoliday: 3 -- 彈性放假
+      * makeUpHoliday: 4 -- 補假
+      * makeUpDay: 5 -- 補班
+      * specificHoliday: 6 -- 特殊假日(勞動節)
+      
+  * **car**: 車輛資訊。
+    * id: cid，即為車輛id。
+    * no: 車牌號碼。
+    * vid: 所屬營運商id。
+    
+  * **data_traffic**: 資料流量紀錄。
+    * date/hour: 資料量時間，理論上應每小時都有一筆。<br>
+      (ex: 2021-10-31 08:00 代表08:00~09:00)
+    * gps_data_count: mongodb collection of gps數量
+    * drielog_data_count: mongodb collection of drivelog數量
+    * bus_on_rail_count: 時間內正在路上跑的公車數量。<br>
+      (存在event:StopenterLeave)
+    * bus_online_count: 時間內有上傳任何資訊的公車數量。
+    
+  * **route**: 路線資訊。
+    * id: rid，即為路線id。
+    * vid: 營運商id。
+    * name: 路線中文名稱。
+    * gopoints: 可使用function解碼成一系列的經緯度list，用以在地圖上會出此路線行經路線。
+    
+  * **routestop**: 路線經過站點資訊。
+    * id: rsid，即為路線站id。(與sid不同意義。)
+    * rid: 此站所述路線id
+    * sid: 此站對應站id
+    * clat/clon: 此站經緯度
+    * valid: 此站是否使用中
+    * seqno: 用來排序路線站續，以1為第一站。
+    
+  * **runlogs**: 每日班次結果資訊。
+    * bus_departure_time: 此趟次出發時間。
+    * bus_departure_stop: 此趟次出發站(rsid)
+    * bus_arrival_time: 此趟次到達最後一站的時間。
+    * bus_arrival_stop: 此趟次到達的最後一站(rsid)
+    * traveled_stops_count: 趟次行經站數量。
+    * rout_stops_count: 此路線應行經站數量
+    * run_stop_rate: 到站率
+    * schedule_id: 此趟次動應到的班次id。(搜尋與發車時間最近的班次，若超過20分鐘則不屬於任何班次。)
+    * schedule_departure_time: 班次應發車時間。
+    * departure_timedelta: 與班次發車相差秒數。正為晚發車；負為早發車。
+    * weekdayType: 見table *calendar*
+    * error_code: 此筆資料是否有運算上的例外。各bit表示意義如下:
+      * 1,  # 當日schedule中無此路線
+      * 2,  # 不在班次時間範圍內
+      * 4,  # 當日紀錄無進站紀錄
+      * 8,  # 實際行駛站數<應行駛站數
+      * 16,  # 實際行駛站數>應行駛站數
+      * 32,  # 未從首站出發
+      * 64,  # 未到達終點站
+      * 128,  # 路途上有無法辨識sid
+      * 256,  # UNKNOWNERROR
+      * 512,  # sql中查不到此路線順序
+      * 1024  # 車輛紀錄有進起始站，卻未出起始站
+  * **schedule**: 班次資訊。
+  * **stop**: 站點資訊。
+  * **stoptostop**: 站到站行駛紀錄。
+  * **vendor**: 營運商一覽。
+

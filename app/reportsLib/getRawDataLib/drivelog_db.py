@@ -25,11 +25,11 @@ class DriveLogDB(MongoDB):
         datetime = datetime.replace(hour=0, minute=0, second=0)
         bus_list = self.get_distinct(datetime, 'drivelog', {}, 'carno')
         bus_list = bus_list + (self.get_distinct(datetime + timedelta(days=1), 'drivelog',
-                                       {
-                                            "date_gps": {
-                                                "$lt": datetime+timedelta(days=1, hours=time_shift)
-                                            }
-                                       }, 'carno'))
+                                                 {
+                                                     "date_gps": {
+                                                         "$lt": datetime + timedelta(days=1, hours=time_shift)
+                                                     }
+                                                 }, 'carno'))
         drove_buses = list(set(bus_list))
         return drove_buses
 
