@@ -121,7 +121,10 @@ TIME_SHIFT = 02
 # 此例為02:00前發車的公車紀錄，屬於前一日的班次。
 
 LINE_TOKEN = sy9uCRiHNBDVzCCvrDDKkUQtsroL4FD6YLym9XQAOaK 
+# optional: 若新增此項，系統會補寄line notify每日計算結果給此token
+
 TIME_ZONE = Asia/Taipei
+# 時區，預設為"Asia/Taipei"
 ```
 ### Installation Steps:
 #### Step 1:
