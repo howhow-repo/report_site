@@ -92,7 +92,7 @@ def check_oauth(id, token) -> bool:
 def oauth_is_required(request):
     id = request.GET.get('id', None)
     token = request.GET.get('token', None)
-    level = request.GET.get('level', None)
+    # level = request.GET.get('level', None)
     if check_oauth(id, token):
         return False
     else:
@@ -109,4 +109,4 @@ def authcheck(request, redirect_to="/oauth_login/"):
             user = authenticate(username=config('TEMP_USER', default='oAuth'),
                                 password=config('TEMP_PW', default='AskeyoAuth'))
             login(request, user)
-            return redirect("/")
+            return HttpResponseRedirect(redirect_to="/")

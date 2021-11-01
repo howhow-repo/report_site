@@ -30,6 +30,8 @@
         <button class="tablinks" onclick="show_night()">Night</button>
         <button class="tablinks" onclick="show_latenight()">Late night</button>
     </div>
+    <button class="btn btn-primary btn-round" onclick="play_animation()">PLAY</button>
+    <button class="btn btn-primary btn-round" onclick="pause_animation()">PAUSE</button>
     {% leaflet_map "map" callback="window.map_init"%}
     <br><br>
 
@@ -425,14 +427,6 @@
         var line = {{geojson_line|safe }};
 
         function map_init(map, options) {
-            function clean_all_circle(){
-                map.removeLayer(circle_morning)
-                map.removeLayer(circle_noon)
-                map.removeLayer(circle_afternoon)
-                map.removeLayer(circle_evening)
-                map.removeLayer(circle_night)
-                map.removeLayer(circle_latenight)
-            }
             L.geoJson(line).addTo(map);
 
             setTimeout(function(){
@@ -449,37 +443,10 @@
             map.addLayer(circle_morning);
             document.getElementById("maptime").innerHTML = "morning {{TIMERANGE.morning.b}}:00 ~ {{TIMERANGE.morning.e}}:00";
 
-            async function map_animation(time_step){
-                show_morning()
-                await sleep(time_step)
-
-                show_noon()
-                await sleep(time_step)
-
-                show_afternoon()
-                await sleep(time_step)
-
-                show_evening()
-                await sleep(time_step)
-
-                show_night()
-                await sleep(time_step)
-
-                show_latenight()
-                await sleep(time_step)
-
-                show_morning()
-            };
-
             var time_step = 800
-            map_animation(time_step)
+            loop(time_step)
         }
-    </script>
-    <script>
-        var map;
-        $(window).on('map:init', function(e) {
-          map = e.originalEvent.detail.map;
-        });
+
         function clean_all_circle(){
             map.removeLayer(circle_morning)
             map.removeLayer(circle_noon)
@@ -488,6 +455,13 @@
             map.removeLayer(circle_night)
             map.removeLayer(circle_latenight)
         }
+    </script>
+
+    <script>
+        var map;
+        $(window).on('map:init', function(e) {
+            map = e.originalEvent.detail.map;
+        });
 
         function show_morning(){
 
@@ -524,7 +498,57 @@
             document.getElementById("maptime").innerHTML = "late night {{TIMERANGE.latenight.b}}:00 ~ {{TIMERANGE.latenight.e}}:00"
         }
     </script>
+    <script>
+        var run_animation = 1
 
+        function play_animation(){
+            run_animation = 1
+        }
+
+        function pause_animation(){
+            run_animation = 0
+        }
+
+        async function map_animation(time_step){
+                if (run_animation == 1){
+                    show_morning()
+                }
+                await sleep(time_step)
+
+                if (run_animation == 1){
+                    show_noon()
+                }
+                await sleep(time_step)
+
+                if (run_animation == 1){
+                    show_afternoon()
+                }
+                await sleep(time_step)
+
+                if (run_animation == 1){
+                    show_evening()
+                }
+                await sleep(time_step)
+
+                if (run_animation == 1){
+                    show_night()
+                }
+                await sleep(time_step)
+
+                if (run_animation == 1){
+                    show_latenight()
+                }
+                await sleep(time_step)
+
+            };
+
+            function loop(time_step) {
+                map_animation(time_step)
+                setTimeout(function(){
+                        loop(time_step);
+                }, time_step*6);
+            }
+    </script>
     <script>
         $(document).ready(function() {
             // Javascript method's body can be found in assets/js/demos.js
