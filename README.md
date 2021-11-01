@@ -225,6 +225,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
 			PRIMARY KEY (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=709 DEFAULT CHARSET=latin1
 			```
+   
 	* **car**: 車輛資訊。
 		* id: cid，即為車輛id。
 		* no: 車牌號碼。
