@@ -210,11 +210,35 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * makeUpHoliday: 4 -- 補假
       * makeUpDay: 5 -- 補班
       * specificHoliday: 6 -- 特殊假日(勞動節)
-      
+      ```
+      CREATE TABLE `calendar` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `date` datetime DEFAULT NULL,
+      `name` varchar(45) CHARACTER SET utf8mb4 DEFAULT NULL,
+      `isHoliday` tinyint(4) DEFAULT NULL,
+      `holidayCategory` varchar(45) DEFAULT NULL,
+      `holidayCategoryType` int(11) DEFAULT NULL,
+      PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=709 DEFAULT CHARSET=latin1
+      ```
   * **car**: 車輛資訊。
     * id: cid，即為車輛id。
     * no: 車牌號碼。
     * vid: 所屬營運商id。
+    ```
+    CREATE TABLE `car` (
+    `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+    `gid` int(11) NOT NULL DEFAULT '1',
+    `no` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `alias` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `imsi` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `style` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `updatetime` datetime DEFAULT NULL,
+    `enable` tinyint(1) DEFAULT NULL,
+    `seat` int(11) DEFAULT '0',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `imsi` (`imsi`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=23020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ```
     
   * **data_traffic**: 資料流量紀錄。
     * date/hour: 資料量時間，理論上應每小時都有一筆。<br>
@@ -224,13 +248,44 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * bus_on_rail_count: 時間內正在路上跑的公車數量。<br>
       (存在event:StopenterLeave)
     * bus_online_count: 時間內有上傳任何資訊的公車數量。
-    
+    ```
+    CREATE TABLE `data_traffic` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `date` datetime DEFAULT NULL,
+    `hour` int(11) DEFAULT NULL,
+    `gps_data_count` int(11) DEFAULT NULL,
+    `drivelog_data_count` int(11) DEFAULT NULL,
+    `bus_on_rail_count` int(11) DEFAULT NULL,
+    `bus_online_count` int(11) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=4033 DEFAULT CHARSET=latin1
+    ```
+
   * **route**: 路線資訊。
     * id: rid，即為路線id。
     * vid: 營運商id。
     * name: 路線中文名稱。
     * gopoints: 可使用function解碼成一系列的經緯度list，用以在地圖上會出此路線行經路線。
-    
+    ```
+    CREATE TABLE `route` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `vid` int(11) NOT NULL,
+    `name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `ename` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `departure` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `edeparture` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `destination` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `edestination` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `gopoints` text COLLATE utf8mb4_unicode_ci,
+    `backpoints` text COLLATE utf8mb4_unicode_ci,
+    `goback` int(11) NOT NULL DEFAULT '0',
+    `updatetime` datetime DEFAULT CURRENT_TIMESTAMP,
+    `gxrid` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `description` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    `edescription` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
+    UNIQUE KEY `theid` (`id`,`vid`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=367 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ```
   * **routestop**: 路線經過站點資訊。
     * id: rsid，即為路線站id。(與sid不同意義。)
     * rid: 此站所述路線id
@@ -238,6 +293,31 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * clat/clon: 此站經緯度
     * valid: 此站是否使用中
     * seqno: 用來排序路線站續，以1為第一站。
+    ```
+    CREATE TABLE `routestop` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `rid` int(11) NOT NULL,
+    `sid` int(11) NOT NULL,
+    `eradius` int(11) DEFAULT '0',
+    `lradius` int(11) DEFAULT '0',
+    `distance` int(11) DEFAULT '0',
+    `traveltime` int(11) DEFAULT '0',
+    `holidaytraveltime` int(11) DEFAULT '0',
+    `elat` float(13,8) DEFAULT '0.00000000',
+    `elon` float(13,8) DEFAULT '0.00000000',
+    `llat` float(13,8) DEFAULT '0.00000000',
+    `llon` float(13,8) DEFAULT '0.00000000',
+    `clat` float(13,8) DEFAULT '0.00000000',
+    `clon` float(13,8) DEFAULT '0.00000000',
+    `valid` tinyint(4) NOT NULL DEFAULT '1',
+    `direction` int(11) DEFAULT NULL,
+    `seqno` int(11) NOT NULL,
+    `virtual` tinyint(1) DEFAULT NULL,
+    `updatetime` datetime DEFAULT NULL,
+    `gxsid` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=42503 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ```
     
   * **runlogs**: 每日班次結果資訊。
     * bus_departure_time: 此趟次出發時間。
@@ -263,16 +343,67 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * 256,  # UNKNOWNERROR
       * 512,  # sql中查不到此路線順序
       * 1024  # 車輛紀錄有進起始站，卻未出起始站
+    ```
+    CREATE TABLE `runlogs` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `carno` text,
+    `cid` int(11) DEFAULT NULL,
+    `vid` int(11) DEFAULT NULL,
+    `did` int(11) DEFAULT NULL,
+    `rid` int(11) DEFAULT NULL,
+    `dutystatus` int(11) DEFAULT NULL,
+    `bus_departure_time` datetime DEFAULT NULL,
+    `bus_departure_stop` bigint(20) DEFAULT NULL,
+    `bus_arrival_time` datetime DEFAULT NULL,
+    `bus_arrival_stop` bigint(20) DEFAULT NULL,
+    `traveled_stops_count` int(11) DEFAULT NULL,
+    `route_stops_count` int(11) DEFAULT NULL,
+    `run_stop_rate` decimal(5,3) DEFAULT NULL,
+    `schedule_id` int(11) DEFAULT NULL,
+    `schedule_departure_time` datetime DEFAULT NULL,
+    `departure_timedelta` bigint(20) DEFAULT NULL,
+    `weekdayType` int(11) DEFAULT NULL,
+    `error_code` int(11) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=112674 DEFAULT CHARSET=latin1
+    ```
       
   * **schedule**: 班次資訊。
     * id: 班次id
     * rid: 所屬路線
     * starttime: 出發時間
+    ```
+    CREATE TABLE `schedule` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `rid` int(11) NOT NULL,
+    `direct` int(11) NOT NULL,
+    `cid` int(11) NOT NULL,
+    `did` int(11) NOT NULL,
+    `starttime` datetime DEFAULT NULL,
+    `endtime` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=145945 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ```
     
   * **stop**: 站點資訊。
     * id: 站id，即為sid
     * name/ename: 中英文站名
     * lon/lat: 經緯度
+    ```
+    CREATE TABLE `stop` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `ename` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `sname` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    `sename` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    `ssid` int(11) NOT NULL,
+    `lat` float(13,8) DEFAULT '0.00000000',
+    `lon` float(13,8) DEFAULT '0.00000000',
+    `updatetime` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `ssid` (`ssid`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=3322 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ```
     
   * **stoptostop**: 站到站行駛紀錄。
     * carno: 車牌號碼
@@ -295,8 +426,37 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * 16,  # 前一站資料不足
       * 32,  # 在站內有longstay紀錄
       * 64,  # 從上一站過來的路上有longstay紀錄
-    
+    ```
+    CREATE TABLE `stoptostop` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `carno` varchar(45) DEFAULT NULL,
+    `rid` int(11) DEFAULT NULL,
+    `previous_rsid` int(11) DEFAULT NULL,
+    `rsid` int(11) DEFAULT NULL,
+    `next_rsid` int(11) DEFAULT NULL,
+    `isFirst` tinyint(4) DEFAULT NULL,
+    `isLast` tinyint(4) DEFAULT NULL,
+    `arrival_time` datetime DEFAULT NULL,
+    `departure_time` datetime DEFAULT NULL,
+    `arrival_time_spent` int(11) DEFAULT NULL,
+    `stay_time` int(11) DEFAULT NULL,
+    `weekdayType` int(11) DEFAULT NULL,
+    `error_code` int(11) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=3889131 DEFAULT CHARSET=latin1
+    ```
   * **vendor**: 營運商一覽。
     * id: 營運商id，即為vid
     * name/ename: 中英文名稱
-
+    ```
+    CREATE TABLE `vendor` (
+    `id` smallint(6) NOT NULL AUTO_INCREMENT,
+    `name` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `ename` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `url` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `tel` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `email` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `updatetime` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ```
