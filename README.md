@@ -213,6 +213,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * makeUpHoliday: 4 -- 補假
       * makeUpDay: 5 -- 補班
       * specificHoliday: 6 -- 特殊假日(勞動節)
+      
       ```
       CREATE TABLE `calendar` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -228,6 +229,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * id: cid，即為車輛id。
     * no: 車牌號碼。
     * vid: 所屬營運商id。
+    
     ```
     CREATE TABLE `car` (
     `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
@@ -252,6 +254,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * bus_on_rail_count: 時間內正在路上跑的公車數量。<br>
       (存在event:StopenterLeave)
     * bus_online_count: 時間內有上傳任何資訊的公車數量。
+    
     ```
     CREATE TABLE `data_traffic` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -270,6 +273,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * vid: 營運商id。
     * name: 路線中文名稱。
     * gopoints: 可使用function解碼成一系列的經緯度list，用以在地圖上會出此路線行經路線。
+    
     ```
     CREATE TABLE `route` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -290,6 +294,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     UNIQUE KEY `theid` (`id`,`vid`)
     ) ENGINE=InnoDB AUTO_INCREMENT=367 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ```
+    
   * **routestop**: 路線經過站點資訊。
     * id: rsid，即為路線站id。(與sid不同意義。)
     * rid: 此站所述路線id
@@ -297,6 +302,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * clat/clon: 此站經緯度
     * valid: 此站是否使用中
     * seqno: 用來排序路線站續，以1為第一站。
+    
     ```
     CREATE TABLE `routestop` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -347,6 +353,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * 256,  # UNKNOWNERROR
       * 512,  # sql中查不到此路線順序
       * 1024  # 車輛紀錄有進起始站，卻未出起始站
+      
     ```
     CREATE TABLE `runlogs` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -376,6 +383,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * id: 班次id
     * rid: 所屬路線
     * starttime: 出發時間
+    
     ```
     CREATE TABLE `schedule` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -393,6 +401,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * id: 站id，即為sid
     * name/ename: 中英文站名
     * lon/lat: 經緯度
+    
     ```
     CREATE TABLE `stop` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -430,6 +439,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * 16,  # 前一站資料不足
       * 32,  # 在站內有longstay紀錄
       * 64,  # 從上一站過來的路上有longstay紀錄
+
     ```
     CREATE TABLE `stoptostop` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -449,9 +459,11 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB AUTO_INCREMENT=3889131 DEFAULT CHARSET=latin1
     ```
+
   * **vendor**: 營運商一覽。
     * id: 營運商id，即為vid
     * name/ename: 中英文名稱
+    
     ```
     CREATE TABLE `vendor` (
     `id` smallint(6) NOT NULL AUTO_INCREMENT,
