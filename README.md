@@ -263,8 +263,40 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
       * 256,  # UNKNOWNERROR
       * 512,  # sql中查不到此路線順序
       * 1024  # 車輛紀錄有進起始站，卻未出起始站
+      
   * **schedule**: 班次資訊。
+    * id: 班次id
+    * rid: 所屬路線
+    * starttime: 出發時間
+    
   * **stop**: 站點資訊。
+    * id: 站id，即為sid
+    * name/ename: 中英文站名
+    * lon/lat: 經緯度
+    
   * **stoptostop**: 站到站行駛紀錄。
+    * carno: 車牌號碼
+    * rid: 所屬路線
+    * previous_rsid: 上一站rsid
+    * rsid: 本站rsid
+    * next_rsid: 預計下一站前往的站的rsid
+    * isFirst: 是否為出發站(出發站不會有停留時間、到站時間)
+    * isLast: 是否為終點站(終點站不會有停留時間、離站時間)
+    * arrival_time: 到站時間
+    * departure_time: 離站時間
+    * arrival_time_spent: 上一站到此站花費時間
+    * stay_time: 在此站停留時間
+    * weekdayType: 見table *calendar*
+    * error_code: 此筆資料是否有運算上的例外。各bit表示意義如下:
+      * 1,  # 此站紀錄無進站
+      * 2,  # 此戰紀錄無出站
+      * 4,  # 進出站紀錄連續不只一筆
+      * 8,  # 前一站不如預期
+      * 16,  # 前一站資料不足
+      * 32,  # 在站內有longstay紀錄
+      * 64,  # 從上一站過來的路上有longstay紀錄
+    
   * **vendor**: 營運商一覽。
+    * id: 營運商id，即為vid
+    * name/ename: 中英文名稱
 
