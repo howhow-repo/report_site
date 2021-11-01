@@ -84,9 +84,9 @@ work with **mySQL** & **MongoDB**
 ### what you will need:
 欲建立此系統，需注意幾件事情：
 1. 此系統需配合
-   1. Askey 既有公車系統的mysql & mongoDB 
-   2. 使Django framework自由調用的mysql 
-   3. 建立專門給此專案的.env file 內所需參數
+	 1. Askey 既有公車系統的mysql & mongoDB 
+	 2. 使Django framework自由調用的mysql 
+	 3. 建立專門給此專案的.env file 內所需參數
 2. .env file 內所需參數: 
 ``` python
 PROJECT_TITLE = <專案名稱>  # 可自由取名，名稱講呈現在網頁的sidebar上
@@ -128,15 +128,15 @@ TIME_ZONE = Asia/Taipei
 ```
 ### Installation Steps:
 #### Step 1:
-   * 將原始碼clone至專案資料夾
+	 * 將原始碼clone至專案資料夾
 
 #### Step 2 :
-   * 於專案資料集中新增.env
+	 * 於專案資料集中新增.env
 ```$ touch .env```
 
 #### Step 3 :
-   * 將Django與資料庫 migrate
-   * 以下兩行指令，將會自動與上步驟設定的資料庫migrate。Django 將自動在database中建立運作所需的table。
+	 * 將Django與資料庫 migrate
+	 * 以下兩行指令，將會自動與上步驟設定的資料庫migrate。Django 將自動在database中建立運作所需的table。
 ```
 $ python manage.py makemigrations
 $ python manage.py migrate
@@ -179,300 +179,300 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
 * Database name: 目前固定為 **ebus** ，hardcode在libary內。
 * #### collectinos: 以日期命名之，如：drivelog_2021-10-31。
 * document key value:
-  * date: (Date)資料發送時間
-  * date_gpe: (Date) 資料內gps資訊時間
-  * lat: (Double)gps緯度
-  * lon: (Double)gps經度
-  * direct: (int32)gps方向
-  * speed: (Double)gps速度
-  * event: (String) 事件種類
-    * StopEnterLeave: 進出站事件
-    * LongStay: 原地停留超過5分鐘
-  * type: (int32)事件參數
-  * carno: (String)車牌號碼
-  * rid: (int32)路線ID
-  * vid: (int32)營運商ID
-  * cid: (int32)車量ID
-  * did: (int32)駕駛員ID
-  * station: (int32)路線站ID(rsid)
-  * sne: (String)中文站名
-  * dutystatus: (int32) 值勤狀態
-  * busstatus: (int32) 車輛狀態
+	* date: (Date)資料發送時間
+	* date_gpe: (Date) 資料內gps資訊時間
+	* lat: (Double)gps緯度
+	* lon: (Double)gps經度
+	* direct: (int32)gps方向
+	* speed: (Double)gps速度
+	* event: (String) 事件種類
+		* StopEnterLeave: 進出站事件
+		* LongStay: 原地停留超過5分鐘
+	* type: (int32)事件參數
+	* carno: (String)車牌號碼
+	* rid: (int32)路線ID
+	* vid: (int32)營運商ID
+	* cid: (int32)車量ID
+	* did: (int32)駕駛員ID
+	* station: (int32)路線站ID(rsid)
+	* sne: (String)中文站名
+	* dutystatus: (int32) 值勤狀態
+	* busstatus: (int32) 車輛狀態
 
 ### 2. mySQL:
 ###### 用以儲存中心的固定資料，如路線班次資訊等。<br>以下僅表述所使用到的欄位。
 * Database (Schema) name:  目前固定為 **bus** ，hardcode在libary內。
 * Tables:
-  * **calendar**: 紀錄台灣內政部公布的上班放假等行事曆，無特別紀錄則視為平日。
-    * date/name/isHoliday: 不贅述
-    * holidayCategory、holidayCategoryType: 互相對應：
-      * weekday: 0 -- 平日
-      * weekend: 1 -- 週末
-      * nationalHoliday: 2 -- 國定假日
-      * bridgeHoliday: 3 -- 彈性放假
-      * makeUpHoliday: 4 -- 補假
-      * makeUpDay: 5 -- 補班
-      * specificHoliday: 6 -- 特殊假日(勞動節)
-      
-      ```
-      CREATE TABLE `calendar` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `date` datetime DEFAULT NULL,
-      `name` varchar(45) CHARACTER SET utf8mb4 DEFAULT NULL,
-      `isHoliday` tinyint(4) DEFAULT NULL,
-      `holidayCategory` varchar(45) DEFAULT NULL,
-      `holidayCategoryType` int(11) DEFAULT NULL,
-      PRIMARY KEY (`id`)
-      ) ENGINE=InnoDB AUTO_INCREMENT=709 DEFAULT CHARSET=latin1
-      ```
-  * **car**: 車輛資訊。
-    * id: cid，即為車輛id。
-    * no: 車牌號碼。
-    * vid: 所屬營運商id。
-    
-    ```
-    CREATE TABLE `car` (
-    `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-    `gid` int(11) NOT NULL DEFAULT '1',
-    `no` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `alias` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `imsi` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `style` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `updatetime` datetime DEFAULT NULL,
-    `enable` tinyint(1) DEFAULT NULL,
-    `seat` int(11) DEFAULT '0',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `imsi` (`imsi`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=23020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ```
-    ```
-    
-  * **data_traffic**: 資料流量紀錄。
-    * date/hour: 資料量時間，理論上應每小時都有一筆。<br>
-      (ex: 2021-10-31 08:00 代表08:00~09:00)
-    * gps_data_count: mongodb collection of gps數量
-    * drielog_data_count: mongodb collection of drivelog數量
-    * bus_on_rail_count: 時間內正在路上跑的公車數量。<br>
-      (存在event:StopenterLeave)
-    * bus_online_count: 時間內有上傳任何資訊的公車數量。
-    
-    ```
-    CREATE TABLE `data_traffic` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `date` datetime DEFAULT NULL,
-    `hour` int(11) DEFAULT NULL,
-    `gps_data_count` int(11) DEFAULT NULL,
-    `drivelog_data_count` int(11) DEFAULT NULL,
-    `bus_on_rail_count` int(11) DEFAULT NULL,
-    `bus_online_count` int(11) DEFAULT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=4033 DEFAULT CHARSET=latin1
-    ```
+	* **calendar**: 紀錄台灣內政部公布的上班放假等行事曆，無特別紀錄則視為平日。
+		* date/name/isHoliday: 不贅述
+		* holidayCategory、holidayCategoryType: 互相對應：
+			* weekday: 0 -- 平日
+			* weekend: 1 -- 週末
+			* nationalHoliday: 2 -- 國定假日
+			* bridgeHoliday: 3 -- 彈性放假
+			* makeUpHoliday: 4 -- 補假
+			* makeUpDay: 5 -- 補班
+			* specificHoliday: 6 -- 特殊假日(勞動節)
+			
+			```
+			CREATE TABLE `calendar` (
+			`id` int(11) NOT NULL AUTO_INCREMENT,
+			`date` datetime DEFAULT NULL,
+			`name` varchar(45) CHARACTER SET utf8mb4 DEFAULT NULL,
+			`isHoliday` tinyint(4) DEFAULT NULL,
+			`holidayCategory` varchar(45) DEFAULT NULL,
+			`holidayCategoryType` int(11) DEFAULT NULL,
+			PRIMARY KEY (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=709 DEFAULT CHARSET=latin1
+			```
+	* **car**: 車輛資訊。
+		* id: cid，即為車輛id。
+		* no: 車牌號碼。
+		* vid: 所屬營運商id。
+		
+		```
+		CREATE TABLE `car` (
+		`id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+		`gid` int(11) NOT NULL DEFAULT '1',
+		`no` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`alias` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`imsi` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`style` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`updatetime` datetime DEFAULT NULL,
+		`enable` tinyint(1) DEFAULT NULL,
+		`seat` int(11) DEFAULT '0',
+		PRIMARY KEY (`id`),
+		UNIQUE KEY `imsi` (`imsi`)
+		) ENGINE=InnoDB AUTO_INCREMENT=23020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ```
+		```
+		
+	* **data_traffic**: 資料流量紀錄。
+		* date/hour: 資料量時間，理論上應每小時都有一筆。<br>
+			(ex: 2021-10-31 08:00 代表08:00~09:00)
+		* gps_data_count: mongodb collection of gps數量
+		* drielog_data_count: mongodb collection of drivelog數量
+		* bus_on_rail_count: 時間內正在路上跑的公車數量。<br>
+			(存在event:StopenterLeave)
+		* bus_online_count: 時間內有上傳任何資訊的公車數量。
+		
+		```
+		CREATE TABLE `data_traffic` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`date` datetime DEFAULT NULL,
+		`hour` int(11) DEFAULT NULL,
+		`gps_data_count` int(11) DEFAULT NULL,
+		`drivelog_data_count` int(11) DEFAULT NULL,
+		`bus_on_rail_count` int(11) DEFAULT NULL,
+		`bus_online_count` int(11) DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=4033 DEFAULT CHARSET=latin1
+		```
 
-  * **route**: 路線資訊。
-    * id: rid，即為路線id。
-    * vid: 營運商id。
-    * name: 路線中文名稱。
-    * gopoints: 可使用function解碼成一系列的經緯度list，用以在地圖上會出此路線行經路線。
-    
-    ```
-    CREATE TABLE `route` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `vid` int(11) NOT NULL,
-    `name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `ename` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `departure` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `edeparture` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `destination` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `edestination` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `gopoints` text COLLATE utf8mb4_unicode_ci,
-    `backpoints` text COLLATE utf8mb4_unicode_ci,
-    `goback` int(11) NOT NULL DEFAULT '0',
-    `updatetime` datetime DEFAULT CURRENT_TIMESTAMP,
-    `gxrid` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `description` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    `edescription` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
-    UNIQUE KEY `theid` (`id`,`vid`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=367 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ```
-    
-  * **routestop**: 路線經過站點資訊。
-    * id: rsid，即為路線站id。(與sid不同意義。)
-    * rid: 此站所述路線id
-    * sid: 此站對應站id
-    * clat/clon: 此站經緯度
-    * valid: 此站是否使用中
-    * seqno: 用來排序路線站續，以1為第一站。
-    
-    ```
-    CREATE TABLE `routestop` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `rid` int(11) NOT NULL,
-    `sid` int(11) NOT NULL,
-    `eradius` int(11) DEFAULT '0',
-    `lradius` int(11) DEFAULT '0',
-    `distance` int(11) DEFAULT '0',
-    `traveltime` int(11) DEFAULT '0',
-    `holidaytraveltime` int(11) DEFAULT '0',
-    `elat` float(13,8) DEFAULT '0.00000000',
-    `elon` float(13,8) DEFAULT '0.00000000',
-    `llat` float(13,8) DEFAULT '0.00000000',
-    `llon` float(13,8) DEFAULT '0.00000000',
-    `clat` float(13,8) DEFAULT '0.00000000',
-    `clon` float(13,8) DEFAULT '0.00000000',
-    `valid` tinyint(4) NOT NULL DEFAULT '1',
-    `direction` int(11) DEFAULT NULL,
-    `seqno` int(11) NOT NULL,
-    `virtual` tinyint(1) DEFAULT NULL,
-    `updatetime` datetime DEFAULT NULL,
-    `gxsid` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=42503 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ```
-    
-  * **runlogs**: 每日班次結果資訊。
-    * bus_departure_time: 此趟次出發時間。
-    * bus_departure_stop: 此趟次出發站(rsid)
-    * bus_arrival_time: 此趟次到達最後一站的時間。
-    * bus_arrival_stop: 此趟次到達的最後一站(rsid)
-    * traveled_stops_count: 趟次行經站數量。
-    * rout_stops_count: 此路線應行經站數量
-    * run_stop_rate: 到站率
-    * schedule_id: 此趟次動應到的班次id。(搜尋與發車時間最近的班次，若超過20分鐘則不屬於任何班次。)
-    * schedule_departure_time: 班次應發車時間。
-    * departure_timedelta: 與班次發車相差秒數。正為晚發車；負為早發車。
-    * weekdayType: 見table *calendar*
-    * error_code: 此筆資料是否有運算上的例外。各bit表示意義如下:
-      * 1,  # 當日schedule中無此路線
-      * 2,  # 不在班次時間範圍內
-      * 4,  # 當日紀錄無進站紀錄
-      * 8,  # 實際行駛站數<應行駛站數
-      * 16,  # 實際行駛站數>應行駛站數
-      * 32,  # 未從首站出發
-      * 64,  # 未到達終點站
-      * 128,  # 路途上有無法辨識sid
-      * 256,  # UNKNOWNERROR
-      * 512,  # sql中查不到此路線順序
-      * 1024  # 車輛紀錄有進起始站，卻未出起始站
-      
-    ```
-    CREATE TABLE `runlogs` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `carno` text,
-    `cid` int(11) DEFAULT NULL,
-    `vid` int(11) DEFAULT NULL,
-    `did` int(11) DEFAULT NULL,
-    `rid` int(11) DEFAULT NULL,
-    `dutystatus` int(11) DEFAULT NULL,
-    `bus_departure_time` datetime DEFAULT NULL,
-    `bus_departure_stop` bigint(20) DEFAULT NULL,
-    `bus_arrival_time` datetime DEFAULT NULL,
-    `bus_arrival_stop` bigint(20) DEFAULT NULL,
-    `traveled_stops_count` int(11) DEFAULT NULL,
-    `route_stops_count` int(11) DEFAULT NULL,
-    `run_stop_rate` decimal(5,3) DEFAULT NULL,
-    `schedule_id` int(11) DEFAULT NULL,
-    `schedule_departure_time` datetime DEFAULT NULL,
-    `departure_timedelta` bigint(20) DEFAULT NULL,
-    `weekdayType` int(11) DEFAULT NULL,
-    `error_code` int(11) DEFAULT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=112674 DEFAULT CHARSET=latin1
-    ```
-      
-  * **schedule**: 班次資訊。
-    * id: 班次id
-    * rid: 所屬路線
-    * starttime: 出發時間
-    
-    ```
-    CREATE TABLE `schedule` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `rid` int(11) NOT NULL,
-    `direct` int(11) NOT NULL,
-    `cid` int(11) NOT NULL,
-    `did` int(11) NOT NULL,
-    `starttime` datetime DEFAULT NULL,
-    `endtime` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=145945 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ```
-    
-  * **stop**: 站點資訊。
-    * id: 站id，即為sid
-    * name/ename: 中英文站名
-    * lon/lat: 經緯度
-    
-    ```
-    CREATE TABLE `stop` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `ename` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `sname` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-    `sename` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-    `ssid` int(11) NOT NULL,
-    `lat` float(13,8) DEFAULT '0.00000000',
-    `lon` float(13,8) DEFAULT '0.00000000',
-    `updatetime` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `ssid` (`ssid`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=3322 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ```
-    
-  * **stoptostop**: 站到站行駛紀錄。
-    * carno: 車牌號碼
-    * rid: 所屬路線
-    * previous_rsid: 上一站rsid
-    * rsid: 本站rsid
-    * next_rsid: 預計下一站前往的站的rsid
-    * isFirst: 是否為出發站(出發站不會有停留時間、到站時間)
-    * isLast: 是否為終點站(終點站不會有停留時間、離站時間)
-    * arrival_time: 到站時間
-    * departure_time: 離站時間
-    * arrival_time_spent: 上一站到此站花費時間
-    * stay_time: 在此站停留時間
-    * weekdayType: 見table *calendar*
-    * error_code: 此筆資料是否有運算上的例外。各bit表示意義如下:
-      * 1,  # 此站紀錄無進站
-      * 2,  # 此戰紀錄無出站
-      * 4,  # 進出站紀錄連續不只一筆
-      * 8,  # 前一站不如預期
-      * 16,  # 前一站資料不足
-      * 32,  # 在站內有longstay紀錄
-      * 64,  # 從上一站過來的路上有longstay紀錄
+	* **route**: 路線資訊。
+		* id: rid，即為路線id。
+		* vid: 營運商id。
+		* name: 路線中文名稱。
+		* gopoints: 可使用function解碼成一系列的經緯度list，用以在地圖上會出此路線行經路線。
+		
+		```
+		CREATE TABLE `route` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`vid` int(11) NOT NULL,
+		`name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`ename` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`departure` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`edeparture` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`destination` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`edestination` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`gopoints` text COLLATE utf8mb4_unicode_ci,
+		`backpoints` text COLLATE utf8mb4_unicode_ci,
+		`goback` int(11) NOT NULL DEFAULT '0',
+		`updatetime` datetime DEFAULT CURRENT_TIMESTAMP,
+		`gxrid` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`description` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		`edescription` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
+		UNIQUE KEY `theid` (`id`,`vid`)
+		) ENGINE=InnoDB AUTO_INCREMENT=367 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		```
+		
+	* **routestop**: 路線經過站點資訊。
+		* id: rsid，即為路線站id。(與sid不同意義。)
+		* rid: 此站所述路線id
+		* sid: 此站對應站id
+		* clat/clon: 此站經緯度
+		* valid: 此站是否使用中
+		* seqno: 用來排序路線站續，以1為第一站。
+		
+		```
+		CREATE TABLE `routestop` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`rid` int(11) NOT NULL,
+		`sid` int(11) NOT NULL,
+		`eradius` int(11) DEFAULT '0',
+		`lradius` int(11) DEFAULT '0',
+		`distance` int(11) DEFAULT '0',
+		`traveltime` int(11) DEFAULT '0',
+		`holidaytraveltime` int(11) DEFAULT '0',
+		`elat` float(13,8) DEFAULT '0.00000000',
+		`elon` float(13,8) DEFAULT '0.00000000',
+		`llat` float(13,8) DEFAULT '0.00000000',
+		`llon` float(13,8) DEFAULT '0.00000000',
+		`clat` float(13,8) DEFAULT '0.00000000',
+		`clon` float(13,8) DEFAULT '0.00000000',
+		`valid` tinyint(4) NOT NULL DEFAULT '1',
+		`direction` int(11) DEFAULT NULL,
+		`seqno` int(11) NOT NULL,
+		`virtual` tinyint(1) DEFAULT NULL,
+		`updatetime` datetime DEFAULT NULL,
+		`gxsid` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=42503 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		```
+		
+	* **runlogs**: 每日班次結果資訊。
+		* bus_departure_time: 此趟次出發時間。
+		* bus_departure_stop: 此趟次出發站(rsid)
+		* bus_arrival_time: 此趟次到達最後一站的時間。
+		* bus_arrival_stop: 此趟次到達的最後一站(rsid)
+		* traveled_stops_count: 趟次行經站數量。
+		* rout_stops_count: 此路線應行經站數量
+		* run_stop_rate: 到站率
+		* schedule_id: 此趟次動應到的班次id。(搜尋與發車時間最近的班次，若超過20分鐘則不屬於任何班次。)
+		* schedule_departure_time: 班次應發車時間。
+		* departure_timedelta: 與班次發車相差秒數。正為晚發車；負為早發車。
+		* weekdayType: 見table *calendar*
+		* error_code: 此筆資料是否有運算上的例外。各bit表示意義如下:
+			* 1,  # 當日schedule中無此路線
+			* 2,  # 不在班次時間範圍內
+			* 4,  # 當日紀錄無進站紀錄
+			* 8,  # 實際行駛站數<應行駛站數
+			* 16,  # 實際行駛站數>應行駛站數
+			* 32,  # 未從首站出發
+			* 64,  # 未到達終點站
+			* 128,  # 路途上有無法辨識sid
+			* 256,  # UNKNOWNERROR
+			* 512,  # sql中查不到此路線順序
+			* 1024  # 車輛紀錄有進起始站，卻未出起始站
+			
+		```
+		CREATE TABLE `runlogs` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`carno` text,
+		`cid` int(11) DEFAULT NULL,
+		`vid` int(11) DEFAULT NULL,
+		`did` int(11) DEFAULT NULL,
+		`rid` int(11) DEFAULT NULL,
+		`dutystatus` int(11) DEFAULT NULL,
+		`bus_departure_time` datetime DEFAULT NULL,
+		`bus_departure_stop` bigint(20) DEFAULT NULL,
+		`bus_arrival_time` datetime DEFAULT NULL,
+		`bus_arrival_stop` bigint(20) DEFAULT NULL,
+		`traveled_stops_count` int(11) DEFAULT NULL,
+		`route_stops_count` int(11) DEFAULT NULL,
+		`run_stop_rate` decimal(5,3) DEFAULT NULL,
+		`schedule_id` int(11) DEFAULT NULL,
+		`schedule_departure_time` datetime DEFAULT NULL,
+		`departure_timedelta` bigint(20) DEFAULT NULL,
+		`weekdayType` int(11) DEFAULT NULL,
+		`error_code` int(11) DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=112674 DEFAULT CHARSET=latin1
+		```
+			
+	* **schedule**: 班次資訊。
+		* id: 班次id
+		* rid: 所屬路線
+		* starttime: 出發時間
+		
+		```
+		CREATE TABLE `schedule` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`rid` int(11) NOT NULL,
+		`direct` int(11) NOT NULL,
+		`cid` int(11) NOT NULL,
+		`did` int(11) NOT NULL,
+		`starttime` datetime DEFAULT NULL,
+		`endtime` datetime DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=145945 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		```
+		
+	* **stop**: 站點資訊。
+		* id: 站id，即為sid
+		* name/ename: 中英文站名
+		* lon/lat: 經緯度
+		
+		```
+		CREATE TABLE `stop` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`ename` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`sname` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		`sename` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		`ssid` int(11) NOT NULL,
+		`lat` float(13,8) DEFAULT '0.00000000',
+		`lon` float(13,8) DEFAULT '0.00000000',
+		`updatetime` datetime DEFAULT NULL,
+		PRIMARY KEY (`id`),
+		UNIQUE KEY `ssid` (`ssid`)
+		) ENGINE=InnoDB AUTO_INCREMENT=3322 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		```
+		
+	* **stoptostop**: 站到站行駛紀錄。
+		* carno: 車牌號碼
+		* rid: 所屬路線
+		* previous_rsid: 上一站rsid
+		* rsid: 本站rsid
+		* next_rsid: 預計下一站前往的站的rsid
+		* isFirst: 是否為出發站(出發站不會有停留時間、到站時間)
+		* isLast: 是否為終點站(終點站不會有停留時間、離站時間)
+		* arrival_time: 到站時間
+		* departure_time: 離站時間
+		* arrival_time_spent: 上一站到此站花費時間
+		* stay_time: 在此站停留時間
+		* weekdayType: 見table *calendar*
+		* error_code: 此筆資料是否有運算上的例外。各bit表示意義如下:
+			* 1,  # 此站紀錄無進站
+			* 2,  # 此戰紀錄無出站
+			* 4,  # 進出站紀錄連續不只一筆
+			* 8,  # 前一站不如預期
+			* 16,  # 前一站資料不足
+			* 32,  # 在站內有longstay紀錄
+			* 64,  # 從上一站過來的路上有longstay紀錄
 
-    ```
-    CREATE TABLE `stoptostop` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `carno` varchar(45) DEFAULT NULL,
-    `rid` int(11) DEFAULT NULL,
-    `previous_rsid` int(11) DEFAULT NULL,
-    `rsid` int(11) DEFAULT NULL,
-    `next_rsid` int(11) DEFAULT NULL,
-    `isFirst` tinyint(4) DEFAULT NULL,
-    `isLast` tinyint(4) DEFAULT NULL,
-    `arrival_time` datetime DEFAULT NULL,
-    `departure_time` datetime DEFAULT NULL,
-    `arrival_time_spent` int(11) DEFAULT NULL,
-    `stay_time` int(11) DEFAULT NULL,
-    `weekdayType` int(11) DEFAULT NULL,
-    `error_code` int(11) DEFAULT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=3889131 DEFAULT CHARSET=latin1
-    ```
+		```
+		CREATE TABLE `stoptostop` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`carno` varchar(45) DEFAULT NULL,
+		`rid` int(11) DEFAULT NULL,
+		`previous_rsid` int(11) DEFAULT NULL,
+		`rsid` int(11) DEFAULT NULL,
+		`next_rsid` int(11) DEFAULT NULL,
+		`isFirst` tinyint(4) DEFAULT NULL,
+		`isLast` tinyint(4) DEFAULT NULL,
+		`arrival_time` datetime DEFAULT NULL,
+		`departure_time` datetime DEFAULT NULL,
+		`arrival_time_spent` int(11) DEFAULT NULL,
+		`stay_time` int(11) DEFAULT NULL,
+		`weekdayType` int(11) DEFAULT NULL,
+		`error_code` int(11) DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=3889131 DEFAULT CHARSET=latin1
+		```
 
-  * **vendor**: 營運商一覽。
-    * id: 營運商id，即為vid
-    * name/ename: 中英文名稱
-    
-    ```
-    CREATE TABLE `vendor` (
-    `id` smallint(6) NOT NULL AUTO_INCREMENT,
-    `name` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `ename` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `url` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `tel` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `email` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `updatetime` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ```
+	* **vendor**: 營運商一覽。
+		* id: 營運商id，即為vid
+		* name/ename: 中英文名稱
+		
+		```
+		CREATE TABLE `vendor` (
+		`id` smallint(6) NOT NULL AUTO_INCREMENT,
+		`name` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`ename` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`url` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`tel` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`email` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		`updatetime` datetime DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		```
