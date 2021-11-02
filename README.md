@@ -16,9 +16,9 @@ work with **mySQL** & **MongoDB**
 在此基礎之上，本系統亦陸續增加不同的數據分析的比較頁面、自動化運算結果的通知、資訊地理視覺畫的功能等，作為技術展示。
 
 ## Index:
-1. [Features](##Features)
-2. [Installation](##Installation)
-3. [Database Schema](##Database Schema)
+1. [Features](#Features)
+2. [Installation](#Installation)
+3. [Database Schema](#Database Schema)
 
 ## Features
 ### 1. 每日自動運算：
