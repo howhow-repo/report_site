@@ -1,25 +1,25 @@
 # 公車資訊系統
-## Introduction:
+## Introduction
 本系統為網頁網站，主要功能訴求在於：
 1. 分析統整公車行駛數據，建立分析後資料。
 2. 生產各項報表，利於使用者管理公車行駛行為等。
 3. 以多種方式呈現視覺話數據，利於使用者觀察、比較各項統計結果。
 
-## Environment:
+## Environment
 **python3.8** with **Django2.2.24** <br>
 work with **mySQL** & **MongoDB**
 
-## Description:
+## Description
 基於作為縣市公車管理的輔助系統，本系統設計最初的主旨在於產生各項不同的報表，方便業者能夠基於公車的行駛紀錄自動產生相對應的電子化報表。
 能夠有效地減少人工的時間與複雜度。
 <br>
 在此基礎之上，本系統亦陸續增加不同的數據分析的比較頁面、自動化運算結果的通知、資訊地理視覺畫的功能等，作為技術展示。
 
 ## Index:
-1. [簡介](#Introduction:)
-2. [環境](#Environment:)
-3. [介紹](#Description:)
-4. [功能](#Features:)
+1. [簡介](#Introduction)
+2. [環境](#Environment)
+3. [介紹](#Description)
+4. [功能](#Features)
    1. [每日自動運算](#每日自動運算)
    2. [報表](#報表)
    3. [站到站統計](#站到站統計)
@@ -31,22 +31,22 @@ work with **mySQL** & **MongoDB**
    9. [Swagger(API)](#Swagger(API))
    10. [Administration](#Administration)
    11. [Extra](#Extra)
-5. [Installation](#Installation:)
-   1. [事前準備](#Preparing:)
-   2. [安裝步驟](#Installation_Steps:)
-      1. [複製原始碼](Step-1)
-      2. [新增.env](Step-2)
-      3. [migrate database](Step-3)
-      4. [建立superuser](Step-4)
-      5. [確認docker環境](Step-5)
-      6. [建立docker image](Step-6)
-      7. [run docker container](Step-7)
-      8. [add temporary user](Step-8)
+5. [Installation](#Installation)
+   1. [事前準備](#Preparing)
+   2. [安裝步驟](#Installation_Steps)
+      1. [複製原始碼](#Step_1)
+      2. [新增.env](#Step_2)
+      3. [migrate database](#Step_3)
+      4. [建立superuser](#Step_4)
+      5. [確認docker環境](#Step_5)
+      6. [建立docker image](#Step_6)
+      7. [run docker container](#Step_7)
+      8. [add temporary user](#Step_8)
 6. [資料庫使用與欄位說明](#DatabaseSchema)
-   1. [MongoDB](#MongoDB:)
-   2. [mySQL](#mySQL:)
+   1. [MongoDB](#MongoDB)
+   2. [mySQL](#MYSQL)
 
-## Features:
+## Features
 ### 每日自動運算
 * 本站首頁呈現每日自動計算的結果。
 * 在每天固定的時間(03:30)，程式將自動演算，遍歷前一天所有的公車紀錄，作為資料的前處理。
@@ -99,14 +99,14 @@ work with **mySQL** & **MongoDB**
 * 包括使用者的新增刪除、通知推播的新增刪除等；每日自動工作亦可在此調整。
 ![Demo](demo/admin_demo.png)
 
-### Extra: 
+### Extra
 * 本系統在使用者認證上有以OAuth串接Askey計有認證系統。
 * 與一般Oauth部分相異，請參考下圖：
 * **記得在user中新增使用者"oAuth"**
 ![Demo](demo/oauth_diagram.jpg)
 
-## Installation:
-### Preparing:
+## Installation
+### Preparing
 欲建立此系統，需注意幾件事情：
 1. 此系統需配合
      1. Askey 既有公車系統的mysql & mongoDB 
@@ -152,48 +152,48 @@ TIME_ZONE = Asia/Taipei
 # 時區，預設為"Asia/Taipei"
 ```
 
-### Installation_Steps:
-#### Step-1
+### Installation_Steps
+#### Step_1
 * 將原始碼clone至專案資料夾
 
-#### Step-2
+#### Step_2
 * 於專案資料集中新增.env
 ```
 * $ touch .env
 ```
 
-#### Step-3
+#### Step_3
 * 將Django與資料庫 migrate
 * 以下兩行指令，將會自動與上步驟設定的資料庫migrate。Django 將自動在database中建立運作所需的table。
 ```
 $ python manage.py makemigrations
 $ python manage.py migrate
 ```
-#### Step-4
+#### Step_4
 * 建立super user
 * 執行以下指令，跟著步驟建立superuser
 ```
 $ python manage.py createsuperuser 
 ```
 
-#### Step-5
+#### Step_5
 * 確認dockerfile中expose port與目前使用中的port沒有衝突
 * Django webserver 預設使用port 8000作為介面，若有疑慮請更改dockerfile中的 CMD
 
-#### Step-6
+#### Step_6
 * 執行docker build 以建立image
 ```
 $ docker build --tag reportsite:mysite .
 ```
 
-#### Step-7
+#### Step_7
 * 執行docker run 啟動container
 * 請確認環境docker所使用的port
 ```
 $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name reportsite reportsite:mysite
 ```
 
-#### Step-8
+#### Step_8
 * Administration Page: http://{serverip}:{serverport}/admin/
 * 以superuser帳號登入網頁Administration頁面，並新增user。
 * 此user請按照.env中的 TEMP_USER & TEMP_PW 去建立。
@@ -203,7 +203,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
 ## DatabaseSchema
 ###### 簡介引用database種類＆欄位：
 
-### MongoDB:
+### MongoDB
 ###### 用以儲存車輛回傳行駛紀錄。<br>以下僅表述所使用到的欄位。
 * Database name: 目前固定為 **ebus** ，hardcode在libary內。
 * #### collectinos: 以日期命名之，如：drivelog_2021-10-31。
@@ -228,7 +228,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
     * dutystatus: (int32) 值勤狀態
     * busstatus: (int32) 車輛狀態
 
-### mySQL:
+### MYSQL
 ###### 用以儲存中心的固定資料，如路線班次資訊等。<br>以下僅表述所使用到的欄位。
 * Database (Schema) name:  目前固定為 **bus** ，hardcode在libary內。
 * Tables:
