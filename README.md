@@ -18,59 +18,68 @@ work with **mySQL** & **MongoDB**
 ## Index:
 1. [Features](#Features)
    1. [每日自動運算](#每日自動運算)
-   2. [報表](#2. 報表：)
+   2. [報表](#報表)
+   3. [站到站統計](#站到站統計)
+   4. [資料表比較](#資料表比較)
+   5. [數據地理資訊(地圖)](#數據地理資訊(地圖))
+   6. [通知推播名單](#通知推播名單)
+   7. [原始資料調用](#原始資料調用)
+   8. [資料流量統計](#資料流量統計)
+   9. [Swagger(API)](#Swagger(API))
+   10. [Administration](#Administration)
+   11. [Extra](#Extra)
 2. [Installation](#Installation)
 3. [Database Schema](#DatabaseSchema)
 
 ## Features
-### 1. 每日自動運算：
+### 每日自動運算
 * 本站首頁呈現每日自動計算的結果。
 * 在每天固定的時間(03:30)，程式將自動演算，遍歷前一天所有的公車紀錄，作為資料的前處理。
 * 首頁呈現的資訊即是每日計算的結果。若有異常將會以紅色顯示
 ![Demo](demo/dashboard_demo.png)
 
-### 2. 報表：
+### 報表
 * 可以條列式呈現各報表的名稱及功能，並且在選擇後羅列出產生報表所需的參數，供使勇者做選擇。
 * 本站報表以python開發，設計特色在於能夠快速繼承基本樣板。除了既有的報表種類，亦能根據需求快速生成不同的報表。
 * 除了以網頁瀏覽，報表也支援轉存pdf。
 ![Demo](demo/report_demo.png)
 
-### 3. 站到站統計：
+### 站到站統計
 * 用以統計一個路線中，個站之間的行駛時間與等待時間時間的統計結果。
 * 統計的方式能夠選擇平日、假日等日種類的選項，也能夠單獨以表格呈現一個站在24小時的統計變化。
 * 為了直覺地顯示，這邊也提供了視覺畫的圖表供使用者參考。
 ![Demo](demo/stoptostop_demo.png)
 
-### 4. 資料表比較：
+### 資料表比較
 * 此功能用來比較在不同條件下產生的報表數據差異性。
 * 在此可以玄則比較的報表種類，填入相關參數後，系統將報表以左右對應的方式產生在畫面上。
 ![Demo](demo/compare_demo.png)
 
-### ５. 數據地理資訊(地圖)：
+### 數據地理資訊(地圖)
 * 導入真實地圖，將公車的行駛統計數據，以圖像的方時直覺呈現在地圖上。
 * 導入時間段，可以動畫的方式觀看不同時間段在地圖上的數據變化。
 ![Demo](demo/map_demo.png)
 
-### 6. 通知推播名單：
+### 通知推播名單
 * 可以用來管理接收推播者的名單
 * 整合LINE Notify，系統將自動推送每日計算結果到名單上的人。
 * 使用者需要自行申請LINE Notify token，並依照LINE官方說明使用。
 ![Demo](demo/notify_demo.png)
 
-### 6. 原始資料調用：
+### 原始資料調用
 * 在做統計時，有時議會需要調閱原始資料。此頁面能夠調用公車車機回傳的原始資料，以及系統在做資料前處理後的結果。
 ![Demo](demo/rawdata_demo.png)
 
-### 7.資料流量統計：
+### 資料流量統計
 * 用圖表的方式呈現一天內，每個小時的資訊流量、事件回報量、公車在線處量、公車在路上的數量。
 ![Demo](demo/data_traffic_demo.png)
 
-### 8. Swagger (API)：
+### Swagger(API)
 * 作為網站的應用，本站亦提供許多彈性的api，作為整合的應用。
 * 本站以Swagger UI來提供標準的說明與測試頁面，方便開發人員以清楚直覺的方式了解多項複雜的API應用格式。
 ![Demo](demo/swagger_demo.png)
 
-### 9. Administration：
+### Administration
 * 系統管理者頁面，此頁面提供了系統背景工作的詳細現狀與紀錄，以及其他各項資料庫操作選項，使資訊管理者能夠直接對原始資料做修改。
 * 包括使用者的新增刪除、通知推播的新增刪除等；每日自動工作亦可在此調整。
 ![Demo](demo/admin_demo.png)
@@ -130,15 +139,17 @@ TIME_ZONE = Asia/Taipei
 
 ### Installation Steps:
 #### Step 1:
-     * 將原始碼clone至專案資料夾
+* 將原始碼clone至專案資料夾
 
 #### Step 2:
-     * 於專案資料集中新增.env
-```$ touch .env```
+* 於專案資料集中新增.env
+```
+* $ touch .env
+```
 
 #### Step 3:
-     * 將Django與資料庫 migrate
-     * 以下兩行指令，將會自動與上步驟設定的資料庫migrate。Django 將自動在database中建立運作所需的table。
+* 將Django與資料庫 migrate
+* 以下兩行指令，將會自動與上步驟設定的資料庫migrate。Django 將自動在database中建立運作所需的table。
 ```
 $ python manage.py makemigrations
 $ python manage.py migrate
@@ -159,6 +170,7 @@ $ python manage.py createsuperuser
 ```
 $ docker build --tag reportsite:mysite .
 ```
+
 #### Step 7: 
 * 執行docker run 啟動container
 * 請確認環境docker所使用的port
