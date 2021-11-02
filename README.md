@@ -19,13 +19,17 @@ work with **mySQL** & **MongoDB**
 
 ----
 
-## Features:
+## Index:
+[TOC]
+
+----
+## Features
 ### 1. 每日自動運算：
 * 本站首頁呈現每日自動計算的結果。
 * 在每天固定的時間(03:30)，程式將自動演算，遍歷前一天所有的公車紀錄，作為資料的前處理。
 * 首頁呈現的資訊即是每日計算的結果。若有異常將會以紅色顯示
 ![Demo](demo/dashboard_demo.png)
-* 
+
 ### 2. 報表：
 * 可以條列式呈現各報表的名稱及功能，並且在選擇後羅列出產生報表所需的參數，供使勇者做選擇。
 * 本站報表以python開發，設計特色在於能夠快速繼承基本樣板。除了既有的報表種類，亦能根據需求快速生成不同的報表。
@@ -80,7 +84,7 @@ work with **mySQL** & **MongoDB**
 
 ----
 
-## Installation：
+## Installation
 ### what you will need:
 欲建立此系統，需注意幾件事情：
 1. 此系統需配合
@@ -126,52 +130,53 @@ LINE_TOKEN = sy9uCRiHNBDVzCCvrDDKkUQtsroL4FD6YLym9XQAOaK
 TIME_ZONE = Asia/Taipei
 # 時區，預設為"Asia/Taipei"
 ```
+
 ### Installation Steps:
 #### Step 1:
      * 將原始碼clone至專案資料夾
 
-#### Step 2 :
+#### Step 2:
      * 於專案資料集中新增.env
 ```$ touch .env```
 
-#### Step 3 :
+#### Step 3:
      * 將Django與資料庫 migrate
      * 以下兩行指令，將會自動與上步驟設定的資料庫migrate。Django 將自動在database中建立運作所需的table。
 ```
 $ python manage.py makemigrations
 $ python manage.py migrate
 ```
-#### Step 4 :
+#### Step 4:
 * 建立super user
 * 執行以下指令，跟著步驟建立superuser
 ```
 $ python manage.py createsuperuser 
 ```
 
-#### Step 5 : 
+#### Step 5: 
 * 確認dockerfile中expose port與目前使用中的port沒有衝突
 * Django webserver 預設使用port 8000作為介面，若有疑慮請更改dockerfile中的 CMD
 
-#### Step 6 : 
+#### Step 6: 
 * 執行docker build 以建立image
 ```
 $ docker build --tag reportsite:mysite .
 ```
-#### Step 7 : 
+#### Step 7: 
 * 執行docker run 啟動container
 * 請確認環境docker所使用的port
 ```
 $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name reportsite reportsite:mysite
 ```
 
-#### Step 8 :
+#### Step 8:
 * Administration Page: http://{serverip}:{serverport}/admin/
 * 以superuser帳號登入網頁Administration頁面，並新增user。
 * 此user請按照.env中的 TEMP_USER & TEMP_PW 去建立。
 
 ----
 
-## Database Schema：
+## Database Schema
 ###### 簡介引用database種類＆欄位：
 
 ### 1. MongoDB:
