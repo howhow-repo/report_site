@@ -1,6 +1,4 @@
 # 公車資訊系統
-
----
 ## Introduction：
 本系統為網頁網站，主要功能訴求在於：
 1. 分析統整公車行駛數據，建立分析後資料。
@@ -17,12 +15,11 @@ work with **mySQL** & **MongoDB**
 <br>
 在此基礎之上，本系統亦陸續增加不同的數據分析的比較頁面、自動化運算結果的通知、資訊地理視覺畫的功能等，作為技術展示。
 
-----
-
 ## Index:
-[TOC]
+1. [Features](#Features:)
+2. [Installation](#nstallation:)
+3. [Database Schema](#Database Schema:)
 
-----
 ## Features
 ### 1. 每日自動運算：
 * 本站首頁呈現每日自動計算的結果。
@@ -81,8 +78,6 @@ work with **mySQL** & **MongoDB**
 * 與一般Oauth部分相異，請參考下圖：
 * **記得在user中新增使用者"oAuth"**
 ![Demo](demo/oauth_diagram.jpg)
-
-----
 
 ## Installation
 ### what you will need:
