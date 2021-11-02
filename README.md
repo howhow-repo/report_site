@@ -17,8 +17,10 @@ work with **mySQL** & **MongoDB**
 
 ## Index:
 1. [Features](#Features)
+   1. [每日自動運算](#每日自動運算)
+   2. [報表](#2. 報表：)
 2. [Installation](#Installation)
-3. [Database Schema](#Database Schema)
+3. [Database Schema](#DatabaseSchema)
 
 ## Features
 ### 1. 每日自動運算：
@@ -171,7 +173,7 @@ $ docker run -p {port}:{port} --log-opt max-size=10m --log-opt max-file=5 --name
 
 ----
 
-## Database Schema
+## DatabaseSchema
 ###### 簡介引用database種類＆欄位：
 
 ### 1. MongoDB:
