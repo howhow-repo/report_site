@@ -50,32 +50,52 @@ class DateInput(forms.DateInput):
 
 
 class ParaInput(forms.Form):
-    start_time = forms.DateField(required=False, widget=DateInput, initial=lambda: (datetime.today() - timedelta(days=1)))
-    start_time.label = "統計起始日"
+    start_time = forms.DateField(
+        required=False,
+        widget=DateInput,
+        initial=lambda: (datetime.today() - timedelta(days=1)),
+        label="統計起始日"
+    )
 
-    end_time = forms.DateField(required=False, widget=DateInput, initial=lambda: (datetime.today() - timedelta(days=1)))
-    end_time.label = "統計截止日"
+    end_time = forms.DateField(
+        required=False,
+        widget=DateInput,
+        initial=lambda: (datetime.today() - timedelta(days=1)),
+        label="統計截止日"
+    )
 
-    carno = forms.CharField(required=False, initial="117-FX")
-    carno.label = "車號"
+    carno = forms.CharField(
+        required=False,
+        initial="117-FX",
+        label="車號"
+    )
 
     vid = forms.IntegerField(
         required=False,
-        widget=forms.Select(choices=get_vid_select_options())
+        widget=forms.Select(choices=get_vid_select_options()),
+        label="營運商"
     )
-    vid.label = "營運商"
 
     rid = forms.IntegerField(
         required=False,
-        widget=forms.Select(choices=get_rid_select_options())
+        widget=forms.Select(choices=get_rid_select_options()),
+        label="路線"
     )
-    rid.label = "路線"
 
-    off_duty_tol = forms.IntegerField(required=False, initial=1200)
-    off_duty_tol.label = "脫班"
+    off_duty_tol = forms.IntegerField(
+        required=False,
+        initial=1200,
+        label="脫班"
+    )
 
-    early_tol = forms.IntegerField(required=False, initial=60)
-    early_tol.label = "早發"
+    early_tol = forms.IntegerField(
+        required=False,
+        initial=60,
+        label="早發"
+    )
 
-    delay_tol = forms.IntegerField(required=False, initial=300)
-    delay_tol.label = "遲發"
+    delay_tol = forms.IntegerField(
+        required=False,
+        initial=300,
+        label="遲發"
+    )

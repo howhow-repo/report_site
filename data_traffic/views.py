@@ -53,13 +53,17 @@ def data_traffic_view(request):
             html_template = loader.get_template('page-404.html')
             return HttpResponseNotFound(html_template.render(context, request))
         else:
-            context['hour'] = list(range(0, 24))
-            context['date'] = date
-            context['gps_data_count_max'] = max(df['gps_data_count'])
-            context['drivelog_data_count_max'] = max(df['drivelog_data_count'])
-            context['bus_on_rail_count_max'] = max(df['bus_on_rail_count'])
-            context['bus_online_count_max'] = max(df['bus_online_count'])
-            context['report'] = df.to_dict('records')
+            context.update(
+                {
+                    'hour': list(range(0, 24)),
+                    'date': date,
+                    'gps_data_count_max': max(df['gps_data_count']),
+                    'drivelog_data_count_max': max(df['drivelog_data_count']),
+                    'bus_on_rail_count_max': max(df['bus_on_rail_count']),
+                    'bus_online_count_max': max(df['bus_online_count']),
+                    'report': df.to_dict('records')
+                }
+            )
             html_template = loader.get_template('data_traffic/data_traffic_view.html')
             return HttpResponse(html_template.render(context, request))
     else:

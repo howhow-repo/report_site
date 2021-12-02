@@ -8,5 +8,9 @@ class DateInput(forms.DateInput):
 
 
 class ParaInput(forms.Form):
-    date = forms.DateField(required=True, widget=DateInput, initial=lambda: (datetime.today()-timedelta(days=1)))
-    date.label = "日期"
+    date = forms.DateField(
+        required=True,
+        widget=DateInput,
+        initial=lambda: (datetime.today()-timedelta(days=1)),
+        label="日期",
+    )

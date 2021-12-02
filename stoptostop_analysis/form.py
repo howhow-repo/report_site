@@ -43,34 +43,42 @@ class DateInput(forms.DateInput):
 class ParaInput(forms.Form):
     rid_stat = forms.CharField(
         required=False,
-        widget=forms.Select(choices=get_rid_select_options())
+        widget=forms.Select(choices=get_rid_select_options()),
+        label="路線"
     )
-    rid_stat.label = "路線"
 
-    date_begin = forms.DateField(required=False, widget=DateInput, initial=lambda: (datetime.now() - timedelta(days=31)))
-    date_begin.label = "統計起始日"
+    date_begin = forms.DateField(
+        required=False,
+        widget=DateInput,
+        initial=lambda: (datetime.now() - timedelta(days=31)),
+        label="統計起始日"
+    )
 
-    date_end = forms.DateField(required=False, widget=DateInput, initial=lambda: (datetime.today() - timedelta(days=1)))
-    date_end.label = "統計截止日"
+    date_end = forms.DateField(
+        required=False,
+        widget=DateInput,
+        initial=lambda: (datetime.today() - timedelta(days=1)),
+        label="統計截止日"
+    )
 
     hour_begin = forms.IntegerField(
         required=False,
-        widget=forms.Select(choices=hour_field)
+        widget=forms.Select(choices=hour_field),
+        label="統計起始時段(小時)"
     )
-    hour_begin.label = "統計起始時段(小時)"
 
     hour_end = forms.IntegerField(
         required=False,
         widget=forms.Select(choices=hour_field),
-        initial=24
+        initial=24,
+        label="統計結束時段(小時)"
     )
-    hour_end.label = "統計結束時段(小時)"
 
     weekdayType = forms.TypedMultipleChoiceField(
         required=False,
         coerce=int,
         widget=forms.CheckboxSelectMultiple,
         choices=weekdayType_cn,
-        initial=[0, 1, 2, 3, 4, 5, 6]
+        initial=[0, 1, 2, 3, 4, 5, 6],
+        label="計算日種類(複選)"
     )
-    weekdayType.label = "計算日種類(複選)"

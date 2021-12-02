@@ -3,11 +3,18 @@ from django import forms
 
 
 class AddNotify(forms.Form):
-    name = forms.CharField(required=True)
-    name.label = "名稱"
+    name = forms.CharField(
+        required=True,
+        label="名稱"
+    )
 
-    token = forms.CharField(required=True)
-    token.label = "權杖(token)"
+    token = forms.CharField(
+        required=True,
+        label="權杖(token)"
+    )
 
-    activate = forms.BooleanField(required=False, initial=True)
-    activate.label = "啟用"
+    activate = forms.BooleanField(
+        required=False,
+        initial=True,
+        label="啟用"
+    )

@@ -45,22 +45,29 @@ def get_rid_select_options():
 class ParaInput(forms.Form):
     rid = forms.IntegerField(
         required=False,
-        widget=forms.Select(choices=get_rid_select_options())
+        widget=forms.Select(choices=get_rid_select_options()),
+        label="路線"
     )
-    rid.label = "路線"
 
-    date_begin = forms.DateField(required=False, widget=DateInput,
-                                 initial=lambda: (datetime.now() - timedelta(days=31)))
-    date_begin.label = "統計起始日"
+    date_begin = forms.DateField(
+        required=False,
+        widget=DateInput,
+        initial=lambda: (datetime.now() - timedelta(days=31)),
+        label="統計起始日",
+    )
 
-    date_end = forms.DateField(required=False, widget=DateInput, initial=lambda: (datetime.today() - timedelta(days=1)))
-    date_end.label = "統計截止日"
+    date_end = forms.DateField(
+        required=False,
+        widget=DateInput,
+        initial=lambda: (datetime.today() - timedelta(days=1)),
+        label="統計截止日"
+    )
 
     weekdayType = forms.TypedMultipleChoiceField(
         required=False,
         coerce=int,
         widget=forms.CheckboxSelectMultiple,
         choices=weekdayType_cn,
-        initial=[0, 1, 2, 3, 4, 5, 6]
+        initial=[0, 1, 2, 3, 4, 5, 6],
+        label="計算日種類(複選)"
     )
-    weekdayType.label = "計算日種類(複選)"

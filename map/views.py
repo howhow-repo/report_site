@@ -121,23 +121,30 @@ def map_rid(request):
         for key, value in result.items():
             reports[key] = value
 
-    context['geojson_line'] = str(json.dumps(geojson_line))
-    context['stop_location'] = stop_locations_df.to_dict('records')
-    context['geojson_morning'] = merge_df_to_dict(stop_locations_df, reports['rp_morning'])
-    context['geojson_noon'] = merge_df_to_dict(stop_locations_df, reports['rp_noon'])
-    context['geojson_afternoon'] = merge_df_to_dict(stop_locations_df, reports['rp_afternoon'])
-    context['geojson_evening'] = merge_df_to_dict(stop_locations_df, reports['rp_evening'])
-    context['geojson_night'] = merge_df_to_dict(stop_locations_df, reports['rp_night'])
-    context['geojson_latenight'] = merge_df_to_dict(stop_locations_df, reports['rp_latenight'])
-    context['route_ch_name'] = route_ch_name
-    context['avg_lon'] = sum(stop_locations_df['lon'].tolist()) / len(stop_locations_df['lon'].tolist())
-    context['avg_lat'] = sum(stop_locations_df['lat'].tolist()) / len(stop_locations_df['lat'].tolist())
-    context['rid'] = rid
-    context['date_begin'] = p.cleaned_data['date_begin']
-    context['date_end'] = p.cleaned_data['date_end']
-    context['weekdayType'] = p.cleaned_data['weekdayType']
-    context['weekdayType_cn'] = [weekdayType_cn[w] for w in p.cleaned_data['weekdayType']]
-    context['TIMERANGE'] = TIMERANGE
+    context.update(
+        {
+            'rid': rid,
+            'route_ch_name': route_ch_name,
+            'avg_lon': sum(stop_locations_df['lon'].tolist()) / len(stop_locations_df['lon'].tolist()),
+            'avg_lat': sum(stop_locations_df['lat'].tolist()) / len(stop_locations_df['lat'].tolist()),
+            'geojson_line': str(json.dumps(geojson_line)),
+            'stop_location': stop_locations_df.to_dict('records'),
+            'geojson_morning': merge_df_to_dict(stop_locations_df, reports['rp_morning']),
+            'geojson_noon': merge_df_to_dict(stop_locations_df, reports['rp_noon']),
+            'geojson_afternoon': merge_df_to_dict(stop_locations_df, reports['rp_afternoon']),
+            'geojson_evening': merge_df_to_dict(stop_locations_df, reports['rp_evening']),
+            'geojson_night': merge_df_to_dict(stop_locations_df, reports['rp_night']),
+            'geojson_latenight': merge_df_to_dict(stop_locations_df, reports['rp_latenight']),
+
+            'date_begin': p.cleaned_data['date_begin'],
+            'date_end': p.cleaned_data['date_end'],
+            'weekdayType': p.cleaned_data['weekdayType'],
+            'weekdayType_cn': [weekdayType_cn[w] for w in p.cleaned_data['weekdayType']],
+            'TIMERANGE': TIMERANGE,
+
+
+        }
+    )
 
     html_template = loader.get_template('map/map_rid.html')
     return HttpResponse(html_template.render(context, request))

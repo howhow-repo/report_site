@@ -39,13 +39,16 @@ def comparison_prehandle(request, rtype):
         html_template = loader.get_template('page-404.html')
         return HttpResponseNotFound(html_template.render(context, request))  # return if rtype not in list
 
-    context['rtype'] = rtype
-    context['title'] = report.title
-    context['paras_comm'] = report.paras_comm
-    context['paras_A'] = report.paras_A
-    context['paras_B'] = report.paras_B
-
-    context['paras_form'] = ParaInput()
+    context.update(
+        {
+            'rtype': rtype,
+            'title': report.title,
+            'paras_comm': report.paras_comm,
+            'paras_A': report.paras_A,
+            'paras_B': report.paras_B,
+            'paras_form': ParaInput()
+        }
+    )
 
     load_template = 'comparison/comparison_prehandle.html'
     html_template = loader.get_template(load_template)
@@ -74,20 +77,21 @@ def comparison_result(request, rtype):
     report.format_paras(report.chart_B)
     report.calculate_results()
 
-    context['chart_A'] = report.chart_A
-    context['chart_B'] = report.chart_B
-
-    context['compare_value'] = report.compare_value
-    context['chart_type'] = report.chart_type
-    context['hour_range'] = list(range(24))
-
-    context['chartMaxHight'] = max([
-        max([r[report.compare_value] for r in report.chart_A['result']]),
-        max([r[report.compare_value] for r in report.chart_B['result']]),
-    ])
-
-    context['diff'] = (abs(report.result_A[report.compare_value] - report.result_B[report.compare_value]).to_list())
-    context['diff_max'] = max(context['diff'])
+    context.update(
+        {
+            'chart_A': report.chart_A,
+            'chart_B': report.chart_B,
+            'compare_value': report.compare_value,
+            'chart_type': report.chart_type,
+            'hour_range': list(range(24)),
+            'chartMaxHight': max([
+                max([r[report.compare_value] for r in report.chart_A['result']]),
+                max([r[report.compare_value] for r in report.chart_B['result']]),
+            ]),
+            'diff': abs(report.result_A[report.compare_value] - report.result_B[report.compare_value]).to_list(),
+            'diff_max': max(context['diff'])
+        }
+    )
 
     load_template = 'comparison/comparison_view.html'
     html_template = loader.get_template(load_template)

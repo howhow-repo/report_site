@@ -69,9 +69,12 @@ def index(request):
 
     results = get_parsing_result()
     data_traffic_results = get_data_traffic_parsing_result()
-
-    context['results'] = [vars(r) for r in results]
-    context['data_traffic_results'] = [vars(r) for r in data_traffic_results]
+    context.update(
+        {
+            'results': [vars(r) for r in results],
+            'data_traffic_results': [vars(r) for r in data_traffic_results]
+        }
+    )
     html_template = loader.get_template('app/task_info.html')
     return HttpResponse(html_template.render(context, request))
 

@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from app.reportsLib import Bus
 from .form import ParaInput
 
+
 logger = logging.getLogger('django')
 
 load_dotenv()
@@ -47,11 +48,16 @@ def bus_rawdata_view(request):
                       end_time=datetime.combine(para_received.cleaned_data['end_time'], datetime.min.time()))
             bus.disconnect()
 
-            context['carno'] = para_received.cleaned_data['carno']
-            context['start_time'] = para_received.cleaned_data['start_time']
-            context['end_time'] = para_received.cleaned_data['end_time']
-            context['drivelog'] = bus.travel_logs.to_dict('records')
-            context['runs'] = [r.df.to_dict('records')[0] for r in bus.runs]
+            context.update(
+                {
+                    'carno': para_received.cleaned_data['carno'],
+                    'start_time': para_received.cleaned_data['start_time'],
+                    'end_time': para_received.cleaned_data['end_time'],
+                    'drivelog': bus.travel_logs.to_dict('records'),
+                    'runs': [r.df.to_dict('records')[0] for r in bus.runs]
+                }
+            )
+
             for i, r in enumerate(context['runs']):
                 r['runs_log'] = bus.runs[i].logs.to_dict('records')
 
