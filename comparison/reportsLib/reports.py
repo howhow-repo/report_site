@@ -64,7 +64,6 @@ class ComparisonReportBase:
             })
             del chart['paras']['weekdayType_B']
 
-        print(chart)
 
     def calculate_results(self):
         if self.func is None:
