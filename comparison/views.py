@@ -2,7 +2,6 @@ import logging
 
 from decouple import config
 from django.contrib.auth.decorators import login_required
-from django import forms
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
 from dotenv import load_dotenv
