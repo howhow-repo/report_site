@@ -21,7 +21,6 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', config('SERVER', default='127.0.0.1'), ]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,6 +42,8 @@ INSTALLED_APPS = [
     'data_traffic',
     'comparison',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 TEMPLATE_DEBUG = False
 LEAFLET_CONFIG = {
@@ -215,6 +216,3 @@ LOGGING = {
         },
     },
 }
-
-import logging.config
-logging.config.dictConfig(LOGGING)

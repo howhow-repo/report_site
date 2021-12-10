@@ -89,9 +89,9 @@ def comparison_result(request, rtype):
                 max([r[report.compare_value] for r in report.chart_B['result']]),
             ]),
             'diff': abs(report.result_A[report.compare_value] - report.result_B[report.compare_value]).to_list(),
-            'diff_max': max(context['diff'])
         }
     )
+    context['diff_max'] = max(context['diff'])
 
     load_template = 'comparison/comparison_view.html'
     html_template = loader.get_template(load_template)

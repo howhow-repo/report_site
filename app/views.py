@@ -5,13 +5,12 @@ Copyright (c) 2019 - present AppSeed.us
 import inspect
 import json
 import logging
-import os
 from datetime import datetime
 
 from decouple import config
 from django import template
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
 from dotenv import load_dotenv
@@ -26,8 +25,8 @@ from .reportsLib import ReportCenter
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-sql_options = json.loads(os.getenv("EBUS_SQLDB"))
-mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
+sql_options = json.loads(config("EBUS_SQLDB"))
+mongo_options = json.loads(config("EBUS_MONGODB"))
 
 CONTEXT = {
     "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed')
@@ -35,8 +34,7 @@ CONTEXT = {
 
 
 def test_button(request):
-    from core.urls import scheduler
-    return HttpResponse(scheduler.get_jobs())
+    return JsonResponse({'Json': 'Response'})
 
 
 def pause_jobs(request):

@@ -11,7 +11,6 @@
     <p>
         <br>
         <h4><form action="{% url 'report_view' rtype=rtype %}" method="get">
-            {% csrf_token %}
             {% for f in para_form %}
                 {% if f.name in rtype_paras %}
                     <h4> {{f.label}}: {{f}} </h4>

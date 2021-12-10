@@ -49,14 +49,26 @@ def data_traffic_view(request):
         df = sc.get_data_traffic(date)
         sc.disconnect()
 
+        context.update(
+            {
+                'hour': list(range(0, 24)),
+                'date': date,
+            }
+        )
         if df.empty:
-            html_template = loader.get_template('page-404.html')
-            return HttpResponseNotFound(html_template.render(context, request))
+            context.update(
+                {
+                    'gps_data_count_max': 20000,
+                    'drivelog_data_count_max': 5000,
+                    'bus_on_rail_count_max': 150,
+                    'bus_online_count_max': 150,
+                    'err_msg': '無法搜尋到本日紀錄。',
+                }
+            )
+
         else:
             context.update(
                 {
-                    'hour': list(range(0, 24)),
-                    'date': date,
                     'gps_data_count_max': max(df['gps_data_count']),
                     'drivelog_data_count_max': max(df['drivelog_data_count']),
                     'bus_on_rail_count_max': max(df['bus_on_rail_count']),
@@ -64,8 +76,9 @@ def data_traffic_view(request):
                     'report': df.to_dict('records')
                 }
             )
-            html_template = loader.get_template('data_traffic/data_traffic_view.html')
-            return HttpResponse(html_template.render(context, request))
+
+        html_template = loader.get_template('data_traffic/data_traffic_view.html')
+        return HttpResponse(html_template.render(context, request))
     else:
         html_template = loader.get_template('page-500.html')
         return HttpResponseServerError(html_template.render(context, request))
