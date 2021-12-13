@@ -43,7 +43,7 @@ class MongoDB:
 
     def list_collections(self):
         try:
-            return self.db.collection_names()
+            return self.db.list_collection_names()
         except Exception as err:
             logger.error("something went wrong")
             raise err
@@ -51,7 +51,7 @@ class MongoDB:
     def get_distinct(self, datetime: datetime, collection_type: str, query_cmd: dict, field_name: str):
         datetime = datetime.strftime("%Y-%m-%d")
         collection_name = collection_type + "_" + datetime
-        if collection_name in self.db.collection_names():
+        if collection_name in self.db.list_collection_names():
             return self.db[collection_name].find(query_cmd).distinct(field_name)
         else:
             logger.warning(f"can not find collection name: {collection_name}")
