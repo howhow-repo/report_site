@@ -61,7 +61,7 @@ class MongoDB:
                   query_cmd: dict, projection_cmd: dict = None) -> pd.DataFrame:
         datetime = datetime.strftime("%Y-%m-%d")
         collection_name = collection_type + "_" + datetime
-        if collection_name in self.db.collection_names():
+        if collection_name in self.db.list_collection_names():
             logs = []
             for log in self.db[collection_name].find(query_cmd,projection_cmd):
                 logs.append(log)
