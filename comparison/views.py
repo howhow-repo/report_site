@@ -4,16 +4,13 @@ from decouple import config
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
-from dotenv import load_dotenv
 
 from .form import ParaInput
-from .reportsLib import *
+from .reportsLib import ComparisonReportCenter
+
 
 logger = logging.getLogger(__name__)
 
-load_dotenv()
-sql_options = json.loads(os.getenv("EBUS_SQLDB"))
-mongo_options = json.loads(os.getenv("EBUS_MONGODB"))
 
 CONTEXT = {
     "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),

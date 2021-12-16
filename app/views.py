@@ -13,7 +13,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from dotenv import load_dotenv
 
 from authentication.views import authcheck
 from data_traffic.models import get_data_traffic_parsing_result
@@ -24,7 +23,6 @@ from .reportsLib import ReportCenter
 
 logger = logging.getLogger(__name__)
 
-load_dotenv()
 sql_options = json.loads(config("EBUS_SQLDB"))
 mongo_options = json.loads(config("EBUS_MONGODB"))
 

@@ -1,9 +1,7 @@
 # -*- encoding: utf-8 -*-
 from queue import Queue
 import json
-import os
 import threading
-
 import pandas as pd
 
 from django.http import HttpResponse
@@ -74,7 +72,7 @@ def map_rid(request):
 
     rid = p.cleaned_data["rid"]
 
-    station = StationCenter(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+    station = StationCenter(sqlOption=json.loads(config("EBUS_SQLDB")))
     station.connect()
     stop_locations_df = station.get_route_stop_location(rid=rid)
     route_ch_name = station.get_route_ch_name(rid=rid)
@@ -89,7 +87,7 @@ def map_rid(request):
     que = Queue()
 
     def stop_staytime_job(report_name, hour_begin, hour_end):
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr = StopToStopResult(sqlOption=json.loads(config("EBUS_SQLDB")))
         sr.connect()
         rp = (sr.get_default_stop_to_stop_by_rid(**{**para_received,
                                                     'hour_begin': hour_begin,
@@ -168,7 +166,7 @@ def merge_df_to_dict(df_a, df_b):
 
 
 def decode_googlegeostr(point_str):
-    '''Decodes a polyline that has been encoded using Google's algorithm
+    """Decodes a polyline that has been encoded using Google's algorithm
     http://code.google.com/apis/maps/documentation/polylinealgorithm.html
     This is a generic method that returns a list of (latitude, longitude)
     tuples.
@@ -176,7 +174,7 @@ def decode_googlegeostr(point_str):
     :type point_str: string
     :returns: List of 2-tuples where each tuple is (latitude, longitude)
     :rtype: list
-    '''
+    """
 
     # sone coordinate offset is represented by 4 to 5 binary chunks
     if point_str is None:

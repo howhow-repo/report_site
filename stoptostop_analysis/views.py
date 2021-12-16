@@ -1,21 +1,18 @@
 import json
 import logging
-import os
 import ast
 from datetime import datetime
 from decouple import config
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.template import loader
-from dotenv import load_dotenv
 
 from app.reportsLib import StationCenter, StopToStopResult
 from .form import ParaInput
 
 logger = logging.getLogger('django')
 
-load_dotenv()
-sql_options = json.loads(os.getenv("EBUS_SQLDB"))
+sql_options = json.loads(config("EBUS_SQLDB"))
 
 CONTEXT = {
     "PROJECT_TITLE": config('PROJECT_TITLE', default='unnamed'),
@@ -52,7 +49,7 @@ def stoptostop_traveltime_view(request):
     p = ParaInput(request.POST)
     if p.is_valid():
         para_received = format_stoptostop_paras(p)
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr = StopToStopResult(sqlOption=sql_options)
         sr.connect()
         rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
         context['chartMaxHight'] = max(rp['avg_arrival_time_spent'].tolist())
@@ -87,7 +84,7 @@ def stoptostop_staytime_view(request):
     p = ParaInput(request.POST)
     if p.is_valid():
         para_received = format_stoptostop_paras(p)
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr = StopToStopResult(sqlOption=sql_options)
         sr.connect()
         rp = (sr.get_default_stop_to_stop_by_rid(**para_received))
         context['chartMaxHight'] = max(rp['avg_stay_time'].tolist())
@@ -121,7 +118,7 @@ def stoptostop_traveltime_hourly(request, rsid):
     context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_hourly_paras(dict(request.POST))
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr = StopToStopResult(sqlOption=sql_options)
         sr.connect()
         rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid, **para_received))
         sr.disconnect()
@@ -156,7 +153,7 @@ def stoptostop_staytime_hourly(request, rsid):
     context = CONTEXT.copy()
     if request.method == "POST":
         para_received = format_hourly_paras(dict(request.POST))
-        sr = StopToStopResult(sqlOption=json.loads(os.getenv("EBUS_SQLDB")))
+        sr = StopToStopResult(sqlOption=sql_options)
         sr.connect()
         rp = (sr.get_stop_to_stop_hourly_by_rsid(rsid=rsid, **para_received))
         sr.disconnect()
