@@ -15,7 +15,7 @@ urlpatterns = [
     # url with reports
     path('demo/', views.demo, name='demo'),
     path('report_index/', views.report_index, name='report_index'),
-    # path('report_index/testbutton/', views.test_button, name='test_button'),
+    path('report_index/testbutton/', views.test_button, name='test_button'),
     # path('report_index/pause/', views.pause_jobs, name='pause_button'),
     # path('report_index/resume/', views.resume_jobs, name='resume_button'),
     path('report_index/prehandle/', views.report_prehandle, name='report_prehandle'),

@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
 
 from authentication.views import authcheck
 from data_traffic.models import get_data_traffic_parsing_result
@@ -31,6 +32,7 @@ CONTEXT = {
 }
 
 
+@csrf_exempt
 def test_button(request):
     return JsonResponse({'Json': 'Response'})
 
