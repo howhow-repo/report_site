@@ -3,7 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 import logging
-
+from decouple import config
 import django.db.utils
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -50,12 +50,14 @@ urlpatterns = [
 
 # Daily or scheduled job are submit here
 try:
+    TIME_ZONE = config('TIME_ZONE', default="Asia/Taipei")
     scheduler = BackgroundScheduler()
     scheduler.add_jobstore(DjangoJobStore(), "default")
     scheduler.add_job(
         sql_conn_keepalive,
         trigger=CronTrigger(
-            minute="30"
+            minute="30",
+            timezone=TIME_ZONE,
         ),
         id="sql_conn_keepalive",
         max_instances=1,
@@ -66,8 +68,10 @@ try:
     scheduler.add_job(
         stacking_runs_and_stoptostop,
         trigger=CronTrigger(
-            hour="03", minute="30"
+            hour="03", minute="30",
+            timezone=TIME_ZONE,
         ),
+
         id="stacking_runs_and_stoptostop",
         max_instances=1,
         misfire_grace_time=3600,
@@ -77,7 +81,8 @@ try:
     scheduler.add_job(
         stacking_data_traffic,
         trigger=CronTrigger(
-            hour="03", minute="50"
+            hour="03", minute="50",
+            timezone=TIME_ZONE,
         ),
         id="stacking_data_traffic",
         max_instances=1,
@@ -88,7 +93,8 @@ try:
     scheduler.add_job(
         task_report_notification,
         trigger=CronTrigger(
-            hour="04", minute="00"
+            hour="04", minute="00",
+            timezone=TIME_ZONE,
         ),
         id="task_report_notification",
         max_instances=1,
@@ -99,7 +105,8 @@ try:
     scheduler.add_job(
         delete_old_job_executions,
         trigger=CronTrigger(
-            day_of_week="mon", hour="00", minute="00"
+            day_of_week="mon", hour="00", minute="00",
+            timezone=TIME_ZONE,
         ),  # Midnight on Monday, before start of the next work week.
         id="delete_old_job_executions",
         max_instances=1,
