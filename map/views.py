@@ -119,6 +119,30 @@ def map_rid(request):
         for key, value in result.items():
             reports[key] = value
 
+    if not reports.get('rp_morning').empty:
+        context.update({
+            'geojson_morning': merge_df_to_dict(stop_locations_df, reports.get('rp_morning')),
+        })
+    if not reports.get('rp_noon').empty:
+        context.update({
+            'geojson_noon': merge_df_to_dict(stop_locations_df, reports.get('rp_noon')),
+        })
+    if not reports.get('rp_afternoon').empty:
+        context.update({
+            'geojson_afternoon': merge_df_to_dict(stop_locations_df, reports.get('rp_afternoon')),
+        })
+    if not reports.get('rp_evening').empty:
+        context.update({
+            'geojson_evening': merge_df_to_dict(stop_locations_df, reports.get('rp_evening')),
+        })
+    if not reports.get('rp_night').empty:
+        context.update({
+            'geojson_night': merge_df_to_dict(stop_locations_df, reports.get('rp_night')),
+        })
+    if not reports.get('rp_latenight').empty:
+        context.update({
+            'geojson_latenight': merge_df_to_dict(stop_locations_df, reports.get('rp_latenight')),
+        })
     context.update(
         {
             'rid': rid,
@@ -127,20 +151,11 @@ def map_rid(request):
             'avg_lat': sum(stop_locations_df['lat'].tolist()) / len(stop_locations_df['lat'].tolist()),
             'geojson_line': str(json.dumps(geojson_line)),
             'stop_location': stop_locations_df.to_dict('records'),
-            'geojson_morning': merge_df_to_dict(stop_locations_df, reports['rp_morning']),
-            'geojson_noon': merge_df_to_dict(stop_locations_df, reports['rp_noon']),
-            'geojson_afternoon': merge_df_to_dict(stop_locations_df, reports['rp_afternoon']),
-            'geojson_evening': merge_df_to_dict(stop_locations_df, reports['rp_evening']),
-            'geojson_night': merge_df_to_dict(stop_locations_df, reports['rp_night']),
-            'geojson_latenight': merge_df_to_dict(stop_locations_df, reports['rp_latenight']),
-
             'date_begin': p.cleaned_data['date_begin'],
             'date_end': p.cleaned_data['date_end'],
             'weekdayType': p.cleaned_data['weekdayType'],
             'weekdayType_cn': [weekdayType_cn[w] for w in p.cleaned_data['weekdayType']],
             'TIMERANGE': TIMERANGE,
-
-
         }
     )
 
