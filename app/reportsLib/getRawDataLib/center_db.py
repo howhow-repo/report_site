@@ -81,7 +81,7 @@ class CenterDB:
             self.disconnect()
             raise err
 
-    def insert_data(self,table_name:str,data:pd.DataFrame):
+    def insert_data(self, table_name: str, data: pd.DataFrame):
         try:
             db_data = f"mysql+pymysql://{self.__sqlOption['user']}:{self.__sqlOption['password']}" \
                       f"@{self.__sqlOption['host']}:{self.__sqlOption['port']}/bus?charset=utf8mb4"

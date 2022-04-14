@@ -1,8 +1,12 @@
 import json
 
+import pandas as pd
 import requests
+from decouple import config
 from datetime import datetime
-from django.conf import settings
+from center_db import CenterDB
+
+sql_options = json.loads(config("EBUS_SQLDB"))
 
 
 def format_to_sql(d: dict) -> dict:
@@ -64,7 +68,7 @@ class GovCalendar:
             file.write(json_string)
 
     @classmethod
-    def pull_latest_year(cls) -> list:
+    def pull_latest_year(cls) -> pd.DataFrame:
         raw_list = cls.gov_api(page=1, size=9999)
         latest_year = datetime.strptime(raw_list[-1]['date'], '%Y/%m/%d').year
         year_list = []
@@ -72,14 +76,48 @@ class GovCalendar:
         for d in raw_list:
             if datetime.strptime(d['date'], '%Y/%m/%d').year == latest_year:
                 year_list.append(format_to_sql(d))
+        df = pd.DataFrame(year_list)
+        return df
 
-        cls.keep_as_file(f'{"./calendar_cache_file/"}{str(latest_year)}.json', json.dumps(year_list))
+    @classmethod
+    def dump_to_sql(cls):
+        new_df = cls.pull_latest_year()
+        old_df = cls.get_celendar_from_sql()
+        exsist_dates = [int(v.timestamp()) for v in old_df.to_dict()['date'].values()]
+        update_data = []
 
-        return year_list
+        for d in new_df.to_dict('records'):
+            if int(d.get('date').timestamp()) not in exsist_dates:
+                update_data.append(d)
+        df = pd.DataFrame(update_data)
+
+        db = CenterDB(sql_options)
+        db.connect()
+        db.insert_data(table_name='calendar', data=df)
+        db.disconnect()
+
+    @classmethod
+    def get_celendar_from_sql(cls) -> pd.DataFrame:
+        db = CenterDB(sql_options)
+        db.connect()
+        df = db._get_table_data('calendar')
+        db.disconnect()
+        return df
 
 
 if __name__ == '__main__':
-    GovCalendar.pull_latest_year()
+    df = GovCalendar.dump_to_sql()
+
+
+
+    # db = CenterDB(sql_options)
+    # db.connect()
+    # df = db._get_table_data('calendar')
+    # db.disconnect()
+    # l = df.to_json()
+    # [print(d) for d in json.loads(l)]
+
+
 
     # GovCalendar.keep_as_file(f'{"."}/calendar_cache_file', 'aaaa')
 
