@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 from decouple import config
 from datetime import datetime
-from center_db import CenterDB
+from .center_db import CenterDB
 
 sql_options = json.loads(config("EBUS_SQLDB"))
 
@@ -91,6 +91,7 @@ class GovCalendar:
                 update_data.append(d)
         df = pd.DataFrame(update_data)
 
+        # insert
         db = CenterDB(sql_options)
         db.connect()
         db.insert_data(table_name='calendar', data=df)
@@ -106,18 +107,4 @@ class GovCalendar:
 
 
 if __name__ == '__main__':
-    df = GovCalendar.dump_to_sql()
-
-
-
-    # db = CenterDB(sql_options)
-    # db.connect()
-    # df = db._get_table_data('calendar')
-    # db.disconnect()
-    # l = df.to_json()
-    # [print(d) for d in json.loads(l)]
-
-
-
-    # GovCalendar.keep_as_file(f'{"."}/calendar_cache_file', 'aaaa')
-
+    GovCalendar.dump_to_sql()

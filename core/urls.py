@@ -18,6 +18,7 @@ from app.tasks import sql_conn_keepalive, stacking_runs_and_stoptostop, task_rep
 from app.views import pages
 from data_traffic.tasks import stacking_data_traffic
 from .tasks import delete_old_job_executions
+from app.reportsLib import GovCalendar
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,17 @@ try:
             timezone=TIME_ZONE,
         ),  # Midnight on Monday, before start of the next work week.
         id="delete_old_job_executions",
+        max_instances=1,
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        GovCalendar.dump_to_sql,
+        trigger=CronTrigger(
+            month=12, day=30,
+            timezone=TIME_ZONE,
+        ),
+        id="update_gov_calendar",
         max_instances=1,
         replace_existing=True,
     )
